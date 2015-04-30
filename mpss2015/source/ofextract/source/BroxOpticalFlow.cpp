@@ -1,6 +1,7 @@
 #include <ofextract/BroxOpticalFlow.h>
 
 #include <iostream>
+#include <sstream>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -35,6 +36,9 @@ namespace ofextract
         cv::Mat FlowX;
         cv::Mat FlowY;
 
+        cv::Mat NormImageOutputFlowX;
+        cv::Mat NormImageOutputFlowY;
+
         // Create optical flow object
         cv::gpu::BroxOpticalFlow OpticalFlowGPU = cv::gpu::BroxOpticalFlow(0.197f, 50.0f, 0.8f, 10, 77, 10);
 
@@ -48,13 +52,7 @@ namespace ofextract
             videoCapture.retrieve(CurrentFrame);
             cv::cvtColor(CurrentFrame, CurrentFrameGray, CV_RGB2GRAY);
 
-            if (PreviousFrameGray.empty()){
-                std::cout << "previous frame empty" << std::endl;
-                continue;
-            }
-
-            if (CurrentFrameGray.empty()){
-                std::cout << "current frame empty" << std::endl;
+            if (PreviousFrameGray.empty() || CurrentFrameGray.empty()){
                 continue;
             }
 
@@ -72,18 +70,22 @@ namespace ofextract
             FlowXGPU.download(FlowX);
             FlowYGPU.download(FlowY);
 
-            // debug output
-            // cv::imwrite("output/flowX.jpg", FlowX);
-            // cv::imwrite("output/flowY.jpg", FlowY);
+            cv::normalize(FlowX, NormImageOutputFlowX, 0, 255, cv::NORM_MINMAX, CV_8UC1); // TODO constant normalization factor needed
+            cv::normalize(FlowY, NormImageOutputFlowY, 0, 255, cv::NORM_MINMAX, CV_8UC1); // TODO constant normalization factor needed
+
+            std::stringstream outputX;
+            std::stringstream outputY;
+            outputX << "/opt/data_sets/UCF-101/broxoptflow/Archery/v_Archery_g01_c01/X" << i << ".jpg";
+            outputY << "/opt/data_sets/UCF-101/broxoptflow/Archery/v_Archery_g01_c01/Y" << i << ".jpg";
+
+            // write output
+            cv::imwrite(outputX.str(), NormImageOutputFlowX);
+            cv::imwrite(outputY.str(), NormImageOutputFlowY);
+
 
             cv::imshow("flowX", FlowX);
             cv::imshow("flowY", FlowY);
             cv::waitKey(0);
-
-            // cv::FileStorage storage("output/result.yml", cv::FileStorage::WRITE);
-            // storage << "FlowX" << FlowX;
-            // storage << "FlowY" << FlowY;
-            // storage.release();
 
             // Use FlowX and FlowY in further processing
             //...
