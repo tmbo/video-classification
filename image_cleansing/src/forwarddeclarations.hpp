@@ -16,3 +16,7 @@ namespace cv {
     class CvSVMParams;
     class CvSVM;
 }
+
+namespace ic {
+    class Image;
+}

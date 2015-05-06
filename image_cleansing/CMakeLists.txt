@@ -109,6 +109,13 @@ find_package(Boost COMPONENTS system filesystem regex REQUIRED)
 set(sources
 	src/main.cpp
         src/main.hpp
+        src/forwarddeclarations.hpp
+        src/image_data/file_reader.cpp
+        src/image_data/file_reader.hpp
+        src/image_data/image.hpp
+        src/image_data/image.cpp
+        src/svm/svm.hpp
+        src/svm/svm.cpp
 )
 
 source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"

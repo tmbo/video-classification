@@ -2,29 +2,37 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <boost/filesystem.hpp>
+#include "image_data/file_reader.hpp"
+#include "image_data/image.hpp"
+#include "svm/svm.hpp"
 #include "main.hpp"
 
 using namespace cv;
 using namespace std;
+using namespace ic;
 
 int main(int argc, char** argv) {
-    std::vector<std::string> imagePaths = getImageFilePaths();
+    std::vector<ic::Image> images = FileReader::loadImages();
+    std::vector<Feature> features = extractFeautes(images);
+    trainSVM(features);
 
     return 0;
 }
 
+std::vector<Feature> extractFeautes(std::vector<ic::Image> images) {
+    std::vector<Feature> features;
+    return features;
+}
 
-std::vector<std::string> getImageFilePaths() {
-//    std::string server_dir = "opt/data_sets/imagedata_2146_classes/";
-    std::string local_dir = "../resources/images/";
-    std::vector<std::string> imagePaths;
+void trainSVM(std::vector<Feature> features) {
+    // Set up training data
+    float labels[4] = { 1.0, -1.0, -1.0, -1.0 };
+    cv::Mat labelsMat(4, 1, CV_32FC1, labels);
 
-    boost::filesystem::recursive_directory_iterator rdi(local_dir);
-    boost::filesystem::recursive_directory_iterator end_rdi;
-    for (; rdi != end_rdi; rdi++) {
-        imagePaths.push_back((*rdi).path().string());
-//        cout << (*rdi).path().string() << endl;
-    }
+    float trainingData[4][2] = { { 501, 10 }, { 255, 10 }, { 501, 255 }, { 10, 501 } };
+    cv::Mat trainingDataMat(4, 2, CV_32FC1, trainingData);
 
-    return imagePaths;
+    SVMLearner svm;
+    svm.train(trainingDataMat, labelsMat);
+//	svm.plotDecisionRegions();
 }
