@@ -14,8 +14,9 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-//    train();
-    predict();
+    train();
+//    predict();
+    predict("/home/joseph/Masterprojekt/imageNet/predict/n00452293");
 }
 
 /**
@@ -57,11 +58,11 @@ void trainSVM(std::vector<Feature> features) {
  * PREDICTING
  */
 
-void predict() {
+void predict(std::string dir) {
     FileWriter fileWriter;
 
     // Load valid images
-    std::vector<ic::Image> images = FileReader::loadImages(fileWriter);
+    std::vector<ic::Image> images = FileReader::loadImages(fileWriter, dir);
 
     // Extract features
     std::vector<Feature> features = extractFeatures(images);
@@ -80,7 +81,6 @@ void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
         std::vector<float> vec = convertMatToVector(features[i].values);
         cv::Mat dataMat(vec.size(), 1, CV_32FC1, &vec[0]);
 
-        std::cout << svm.predict(dataMat) << std::endl;
         if (svm.predict(dataMat) > 0.0) {
             fileWriter.writeLine(features[i].file);
         }

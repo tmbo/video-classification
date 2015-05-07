@@ -11,7 +11,7 @@ namespace ic {
             static bool checkImageSize(std::string file, FileWriter& fileWriter);
         public:
             static std::vector<Image> loadGoldStandardImages(FileWriter& fileWriter);
-            static std::vector<Image> loadImages(FileWriter& fileWriter);
+            static std::vector<Image> loadImages(FileWriter& fileWriter, std::string dir);
     };
 
 }

@@ -41,6 +41,9 @@ void Histogram::plotHistogram(const cv::Mat &hist, int width, int height) {
 }
 
 cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
+    cv::Mat imageHSV;
+    cv::cvtColor(image, imageHSV, CV_BGR2HSV);
+
     int nrImages = 1;
     int channels[] = { 0, 1, 2 };
     cv::Mat mask;
@@ -49,7 +52,7 @@ cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
     int histSizes[] = { this->m_histSize, this->m_histSize, this->m_histSize };
     float range[] = { 0, 256 };
     const float* ranges[] = { range, range, range };
-    calcHist(&image, nrImages, channels, mask,
+    calcHist(&imageHSV, nrImages, channels, mask,
              hist, histDimensionality, histSizes, ranges, true, false);
 
     return hist;

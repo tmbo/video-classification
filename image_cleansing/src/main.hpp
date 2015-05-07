@@ -17,7 +17,7 @@ typedef struct {
 
 
 void train();
-void predict();
+void predict(std::string dir = "resources/images/");
 
 void trainSVM(std::vector<Feature> features);
 void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter);
