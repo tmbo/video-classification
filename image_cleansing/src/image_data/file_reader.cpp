@@ -10,7 +10,7 @@
 using namespace ic;
 using namespace std;
 
-std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
+std::vector<Image> FileReader::loadGoldStandardImages(FileWriter& fileWriter) {
     std::vector<Image> images;
 
     // read truth data
@@ -22,6 +22,13 @@ std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
 
     return images;
 }
+
+std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
+    std::vector<Image> images;
+    load("resources/images/", 0.0, images, fileWriter);
+    return images;
+}
+
 
 void FileReader::load(std::string dir, float clazz, std::vector<Image>& images, FileWriter& fileWriter) {
     boost::filesystem::recursive_directory_iterator rdi(dir);

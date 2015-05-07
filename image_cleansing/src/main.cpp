@@ -14,6 +14,18 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
+    // Train
+    train();
+
+    // Predict
+//    predict();
+}
+
+/**
+ * TRAINING
+ */
+
+void train() {
     FileWriter fileWriter;
 
     // Load valid images
@@ -24,8 +36,52 @@ int main(int argc, char** argv) {
     trainSVM(features);
 
     fileWriter.close();
+}
 
-    return 0;
+void trainSVM(std::vector<Feature> features) {
+    SvmTrainingData data = convertFeatures(features);
+
+    // Set up training data
+    cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, &data.labels[0]);
+    cv::Mat trainingDataMat(data.labelSize, data.trainingDataSize, CV_32FC1, &data.values[0]);
+
+//    showMat(labelsMat, 1);
+//    showMat(trainingDataMat, 2);
+//    cv::waitKey(0);
+
+    SVMLearner svm;
+    svm.train(trainingDataMat, labelsMat);
+    svm.save();
+
+//	svm.plotDecisionRegions();
+}
+
+/**
+ * PREDICTING
+ */
+
+void predict() {
+    FileWriter fileWriter;
+
+    // Load valid images
+    std::vector<ic::Image> images = FileReader::loadImages(fileWriter);
+
+    // Extract features
+    std::vector<Feature> features = extractFeatures(images);
+
+    // Predict classes
+
+    fileWriter.close();
+}
+
+/**
+ * HELPER FUNCTIONS
+ */
+
+std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
+    std::vector<Feature> histogramFeatures = buildHistogram(images);
+
+    return histogramFeatures;
 }
 
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
@@ -43,14 +99,7 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     return features;
 }
 
-
-std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
-    std::vector<Feature> histogramFeatures = buildHistogram(images);
-
-    return histogramFeatures;
-}
-
-void trainSVM(std::vector<Feature> features) {
+SvmTrainingData convertFeatures(std::vector<Feature> features) {
     std::vector<float> labels;
     std::vector<std::vector<float>> trainingData;
 
@@ -66,22 +115,11 @@ void trainSVM(std::vector<Feature> features) {
         labels.push_back(feature.clazz);
     }
 
-    // Set up training data
-    cv::Mat labelsMat(features.size(), 1, CV_32FC1, &labels[0]);
-    cv::Mat trainingDataMat(features.size(), trainingDataSize, CV_32FC1, &trainingData[0]);
-
-    showMat(labelsMat, 1);
-    showMat(trainingDataMat, 2);
-    cv::waitKey(0);
-
-    SVMLearner svm;
-    svm.train(trainingDataMat, labelsMat);
-    svm.save();
-//	svm.plotDecisionRegions();
+    SvmTrainingData data = {labels, trainingData, features.size(), trainingDataSize};
+    return data;
 }
 
-void showMat(cv::Mat &img, int id)
-{
+void showMat(cv::Mat &img, int id) {
     cv::namedWindow(std::to_string(id), cv::WINDOW_NORMAL);
     cv::imshow(std::to_string(id), img);
     cv::waitKey(1);

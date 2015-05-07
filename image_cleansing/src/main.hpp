@@ -7,6 +7,16 @@ typedef struct {
     cv::Mat values;
 } Feature;
 
+typedef struct {
+    std::vector<float> labels;
+    std::vector<std::vector<float>> values;
+    int labelSize;
+    int trainingDataSize;
+} SvmTrainingData;
+
+void train();
+void predict();
+SvmTrainingData convertFeatures(std::vector<Feature> features);
 std::vector<ic::Image> getImageFilePaths();
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images);
 std::vector<Feature> extractFeatures(std::vector<ic::Image> images);
