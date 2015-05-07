@@ -76,6 +76,7 @@ void trainSVM(std::vector<Feature> features) {
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
+    svm.save();
 //	svm.plotDecisionRegions();
 }
 

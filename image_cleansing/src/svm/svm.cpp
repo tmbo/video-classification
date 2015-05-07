@@ -23,6 +23,14 @@ float SVMLearner::predict(cv::Mat& sample) {
     return m_svm.predict(sample);
 }
 
+void SVMLearner::save(std::string filename) {
+    m_svm.save(filename.c_str());
+}
+
+void SVMLearner::load(std::string filename) {
+    m_svm.load(filename.c_str());
+}
+
 void SVMLearner::plotDecisionRegions() {
     // Data for visual representation
     int width = 512, height = 512;
