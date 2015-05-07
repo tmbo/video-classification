@@ -44,16 +44,26 @@ cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
     cv::Mat imageHSV;
     cv::cvtColor(image, imageHSV, CV_BGR2HSV);
 
+//    cv::namedWindow("test", cv::WINDOW_NORMAL);
+//    cv::imshow("test", imageHSV);
+
     int nrImages = 1;
-    int channels[] = { 0, 1, 2 };
+    int channels[] = { 2 };
     cv::Mat mask;
     cv::Mat hist;
-    int histDimensionality = 3;
-    int histSizes[] = { this->m_histSize, this->m_histSize, this->m_histSize };
+    cv::Mat transposedHist;
+    int histDimensionality = 1;
+    int histSizes[] = { this->m_histSize };
     float range[] = { 0, 256 };
-    const float* ranges[] = { range, range, range };
+    const float* ranges[] = { range };
     calcHist(&imageHSV, nrImages, channels, mask,
              hist, histDimensionality, histSizes, ranges, true, false);
+    cv::transpose(hist, transposedHist);
 
-    return hist;
+//    cv::namedWindow("histogram", cv::WINDOW_NORMAL);
+//    cv::imshow("histogram", hist);
+//    cv::waitKey(0);
+
+
+    return transposedHist;
 }

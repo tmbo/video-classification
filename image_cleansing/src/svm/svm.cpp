@@ -17,7 +17,7 @@ SVMLearner::SVMLearner() {
 
 void SVMLearner::train(cv::Mat& trainingData, cv::Mat& labels) {
     // Train the SVM
-    m_svm.train(trainingData, labels, cv::Mat(), cv::Mat(), m_params);
+    m_svm.train_auto(trainingData, labels, cv::Mat(), cv::Mat(), m_params);
 }
 
 float SVMLearner::predict(cv::Mat& sample) {

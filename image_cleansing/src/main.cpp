@@ -15,8 +15,8 @@ using namespace ic;
 
 int main(int argc, char** argv) {
     train();
-//    predict();
-    predict("/home/joseph/Masterprojekt/imageNet/predict/n00452293");
+    predict();
+//    predict("/home/joseph/Masterprojekt/imageNet/predict/n00452293");
 }
 
 /**
@@ -42,12 +42,18 @@ void trainSVM(std::vector<Feature> features) {
     SvmData data;
     convertFeatures(data, features);
 
-    float* labels = &data.labels[0];
-    float* values = &data.values[0][0];
-
     // Set up training data
-    cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, labels);
-    cv::Mat trainingDataMat(data.labelSize, data.valueSize, CV_32FC1, values);
+    cv::Mat labelsMat(data.labels);
+
+    cv::Mat trainingDataMat(data.values[0]);
+
+    for (int i = 1; i < data.values.size(); i++){
+        trainingDataMat.push_back(data.values[i]);
+    }
+
+    showMat(labelsMat, 1);
+    showMat(trainingDataMat, 2);
+    waitKey(0);
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
@@ -81,7 +87,7 @@ void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
         std::vector<float> vec = convertMatToVector(features[i].values);
         cv::Mat dataMat(vec.size(), 1, CV_32FC1, &vec[0]);
 
-        if (svm.predict(dataMat) > 0.0) {
+        if (svm.predict(dataMat) < 0.0) {
             fileWriter.writeLine(features[i].file);
         }
     }
@@ -99,7 +105,7 @@ std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
 
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     std::vector<Feature> features;
-    Histogram histBuilder(8);
+    Histogram histBuilder(64);
 
     for (int i = 0; i < images.size(); i++) {
         Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
@@ -117,9 +123,10 @@ void convertFeatures(SvmData &data, std::vector<Feature> features) {
 
     for (int i = 0; i < data.labelSize; i++) {
         Feature feature = features[i];
-        std::vector<float> v = convertMatToVector(feature.values);
-        data.valueSize = v.size();
-        data.values.push_back(v);
+        data.values.push_back(feature.values);
+        data.valueSize = feature.values.size().width;
+//        std::vector<float> v = convertMatToVector(feature.values);
+//        data.values.push_back(v);
         data.labels.push_back(feature.clazz);
     }
 }

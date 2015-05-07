@@ -10,7 +10,7 @@ typedef struct {
 
 typedef struct {
     std::vector<float> labels;
-    std::vector<std::vector<float>> values;
+    std::vector<cv::Mat> values;
     int labelSize;
     int valueSize;
 } SvmData;
