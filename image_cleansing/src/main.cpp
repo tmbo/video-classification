@@ -51,9 +51,9 @@ void trainSVM(std::vector<Feature> features) {
         trainingDataMat.push_back(data.values[i]);
     }
 
-    showMat(labelsMat, 1);
-    showMat(trainingDataMat, 2);
-    waitKey(0);
+//    showMat(labelsMat, 1);
+//    showMat(trainingDataMat, 2);
+//    waitKey(0);
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
@@ -105,7 +105,7 @@ std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
 
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     std::vector<Feature> features;
-    Histogram histBuilder(64);
+    Histogram histBuilder(8);
 
     for (int i = 0; i < images.size(); i++) {
         Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
@@ -125,8 +125,6 @@ void convertFeatures(SvmData &data, std::vector<Feature> features) {
         Feature feature = features[i];
         data.values.push_back(feature.values);
         data.valueSize = feature.values.size().width;
-//        std::vector<float> v = convertMatToVector(feature.values);
-//        data.values.push_back(v);
         data.labels.push_back(feature.clazz);
     }
 }
