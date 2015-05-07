@@ -12,32 +12,14 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
+    // Load valid images
     std::vector<ic::Image> images = FileReader::loadImages();
-    std::vector<ic::Image> invalidImages;
-
-    // Remove images with size 0 x 0
-    checkImageSize(images, invalidImages);
 
     // Extract features and train SVM
     std::vector<Feature> features = extractFeautes(images);
     trainSVM(features);
 
     return 0;
-}
-
-void checkImageSize(std::vector<ic::Image>& images, std::vector<ic::Image>& invalidImages) {
-    for(std::vector<ic::Image>::size_type i = 0; i != images.size(); i++) {
-        std::string file = images[i].file;
-
-        Mat image = imread(file, CV_LOAD_IMAGE_COLOR);
-        cv::Size s = image.size();
-
-        if (s.height == 0 && s.width == 0) {
-//            cout << "Image size 0: " << images[i].file << endl;
-            invalidImages.push_back(images[i]);
-        }
-    }
-
 }
 
 std::vector<Feature> extractFeautes(std::vector<ic::Image> images) {

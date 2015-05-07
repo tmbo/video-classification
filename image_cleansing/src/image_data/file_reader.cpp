@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <regex>
+#include <opencv2/opencv.hpp>
 #include <boost/filesystem.hpp>
 #include "file_reader.hpp"
 
@@ -24,7 +25,22 @@ void FileReader::load(std::string dir, bool clazz, std::vector<Image>& images) {
     boost::filesystem::recursive_directory_iterator end_rdi;
 
     for (; rdi != end_rdi; rdi++) {
-        Image image(clazz, (*rdi).path().string());
-        images.push_back(image);
+        std::string file = (*rdi).path().string();
+
+        if (checkImageSize(file)) {
+            Image image(clazz, file);
+            images.push_back(image);
+        }
     }
+}
+
+bool FileReader::checkImageSize(std::string file) {
+    cv::Mat image = cv::imread(file, CV_LOAD_IMAGE_COLOR);
+    cv::Size s = image.size();
+
+    if (s.height == 0 && s.width == 0) {
+//            cout << "Image size 0: " << file << endl;
+        return false;
+    }
+    return true;
 }
