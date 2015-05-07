@@ -1,7 +1,7 @@
 ###
 #
 # A simple script to quickly scan a directory and its sub-dirs for images.
-# The found images' path will be saved to 'files.txt' in your current working
+# The found images' path will be saved to 'files.txt' in the root
 # directory. Each file is assigned to a topic ID. Every 'top-level' directory
 # in the root path creates a new dir-
 #
@@ -21,7 +21,7 @@
 from __future__ import print_function
 import os, sys, glob
 
-def run(root_dir, output_dir):
+def run(root_dir):
 
   output = {}
 
@@ -37,7 +37,7 @@ def run(root_dir, output_dir):
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
       for file in files:
 
-        absolute_file = os.path.join(parent_dir, file)
+	absolute_file = os.path.join(parent_dir,file)
         if (file.endswith(("jpeg", "jpg", "png"))):
 
           # save all absolute file paths and their corresponding topic Ids
@@ -45,7 +45,7 @@ def run(root_dir, output_dir):
           output[absolute_file] = topicId
 
   # write ouput to file
-  filename = os.path.join(output_dir, "files.txt")
+  filename = os.path.join(root_dir, "files.txt")
   input_file = open(filename, "w")
   for k, v in output.items():
       line = '{} {}'.format(k, v)
@@ -53,8 +53,9 @@ def run(root_dir, output_dir):
   input_file.close()
 
   # just some logging
-  sys.stdout.write("Done. Exported %s/files.txt \n" % output_dir)
-  sys.stdout.write("Please, call Caffee's 'convert_image' tool now.\n")
+  sys.stdout.write("Done. Exported %s/files.txt \n" % root_dir)
+  sys.stdout.write("Please, call Caffee's 'convert_image' tool now:\n\n")
+  sys.stdout.write("$CAFFE_ROOT/build/tools/convert_image \"\" files.txt UCF101 \n")
 
 
 if __name__ == "__main__":
@@ -62,10 +63,9 @@ if __name__ == "__main__":
   if len(sys.argv) < 2:
     sys.exit("Usage: %s <root_directory>" % sys.argv[0])
 
-  root_dir = sys.argv[1]
-  output_dir = os.getcwd()
+  root_dir = os.path.abspath(sys.argv[1])
 
   if (not os.path.isdir(root_dir)):
     sys.exit("The argument <root directory> is not a valid directory.")
 
-  run(root_dir, output_dir)
+  run(root_dir)
