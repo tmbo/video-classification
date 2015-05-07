@@ -1,3 +1,4 @@
 .localconfig/
 CMakeLists.txt.user
 CMakeLists.txt.user.*
+invalid_images.txt

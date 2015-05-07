@@ -13,10 +13,10 @@ std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
     std::vector<Image> images;
 
     // read truth data
-    load("../resources/images/truth/", 0, images, fileWriter);
+    load("resources/images/truth/", 0, images, fileWriter);
 
     // read noise data
-    load("../resources/images/noise/", 1, images, fileWriter);
+    load("resources/images/noise/", 1, images, fileWriter);
 
     return images;
 }
