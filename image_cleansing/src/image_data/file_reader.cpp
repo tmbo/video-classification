@@ -14,9 +14,7 @@ std::vector<Image> FileReader::loadGoldStandardImages(FileWriter& fileWriter) {
     std::vector<Image> images;
 
     // read truth data
-
     load("resources/images/truth/", -1.0, images, fileWriter);
-
     // read noise data
     load("resources/images/noise/", 1.0, images, fileWriter);
 
@@ -25,7 +23,9 @@ std::vector<Image> FileReader::loadGoldStandardImages(FileWriter& fileWriter) {
 
 std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
     std::vector<Image> images;
+
     load("resources/images/", 0.0, images, fileWriter);
+
     return images;
 }
 

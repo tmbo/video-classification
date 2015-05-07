@@ -14,10 +14,7 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-    // Train
     train();
-
-    // Predict
 //    predict();
 }
 
@@ -29,21 +26,26 @@ void train() {
     FileWriter fileWriter;
 
     // Load valid images
-    std::vector<ic::Image> images = FileReader::loadImages(fileWriter);
+    std::vector<ic::Image> images = FileReader::loadGoldStandardImages(fileWriter);
 
-    // Extract features and train SVM
+    // Extract features
     std::vector<Feature> features = extractFeatures(images);
+
+    // Train SVM
     trainSVM(features);
 
     fileWriter.close();
 }
 
 void trainSVM(std::vector<Feature> features) {
-    SvmTrainingData data = convertFeatures(features);
+    SvmData data = convertFeatures(features);
+
+    float* labels = &data.labels[0];
+    float* values = &data.values[0][0];
 
     // Set up training data
-    cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, &data.labels[0]);
-    cv::Mat trainingDataMat(data.labelSize, data.trainingDataSize, CV_32FC1, &data.values[0]);
+    cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, labels);
+    cv::Mat trainingDataMat(data.labelSize, data.trainingDataSize, CV_32FC1, values);
 
 //    showMat(labelsMat, 1);
 //    showMat(trainingDataMat, 2);
@@ -99,11 +101,13 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     return features;
 }
 
-SvmTrainingData convertFeatures(std::vector<Feature> features) {
+SvmData convertFeatures(std::vector<Feature> features) {
     std::vector<float> labels;
     std::vector<std::vector<float>> trainingData;
 
     int trainingDataSize = 0;
+    int labelSize = features.size();
+
     for (int i = 0; i < features.size(); i++) {
         Feature feature = features[i];
 
@@ -115,7 +119,7 @@ SvmTrainingData convertFeatures(std::vector<Feature> features) {
         labels.push_back(feature.clazz);
     }
 
-    SvmTrainingData data = {labels, trainingData, features.size(), trainingDataSize};
+    SvmData data = {labels, trainingData, labelSize, trainingDataSize};
     return data;
 }
 
