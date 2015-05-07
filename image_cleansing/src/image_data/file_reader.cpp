@@ -8,20 +8,22 @@
 #include "../output/file_writer.hpp"
 
 using namespace ic;
+using namespace std;
 
 std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
     std::vector<Image> images;
 
     // read truth data
-    load("resources/images/truth/", 0, images, fileWriter);
+
+    load("resources/images/truth/", -1.0, images, fileWriter);
 
     // read noise data
-    load("resources/images/noise/", 1, images, fileWriter);
+    load("resources/images/noise/", 1.0, images, fileWriter);
 
     return images;
 }
 
-void FileReader::load(std::string dir, bool clazz, std::vector<Image>& images, FileWriter& fileWriter) {
+void FileReader::load(std::string dir, float clazz, std::vector<Image>& images, FileWriter& fileWriter) {
     boost::filesystem::recursive_directory_iterator rdi(dir);
     boost::filesystem::recursive_directory_iterator end_rdi;
 

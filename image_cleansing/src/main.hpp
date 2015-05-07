@@ -3,7 +3,7 @@
 #include "forwarddeclarations.hpp"
 
 typedef struct {
-    bool clazz;
+    float clazz;
     cv::Mat values;
 } Feature;
 

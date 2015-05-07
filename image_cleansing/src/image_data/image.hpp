@@ -6,10 +6,10 @@ namespace ic {
 
     class Image {
         public:
-            bool clazz;
+            float clazz;
             std::string file;
 
-            Image(bool clazz, std::string file);
+            Image(float clazz, std::string file);
     };
 
 }

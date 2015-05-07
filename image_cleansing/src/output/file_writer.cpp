@@ -6,7 +6,7 @@ using namespace ic;
 using namespace std;
 
 FileWriter::FileWriter() {
-    m_file.open ("invalid_images.txt");
+    m_file.open ("invalid_images.txt", std::ofstream::trunc);
 }
 
 void FileWriter::writeLine(std::string text) {

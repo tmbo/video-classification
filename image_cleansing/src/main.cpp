@@ -51,12 +51,22 @@ std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
 }
 
 void trainSVM(std::vector<Feature> features) {
-    // Set up training data
-    float labels[4] = { 1.0, -1.0, -1.0, -1.0 };
-    cv::Mat labelsMat(4, 1, CV_32FC1, labels);
+    std::vector<float> labels;
+    std::vector<std::vector<float>> trainingData;
 
-    float trainingData[4][2] = { { 501, 10 }, { 255, 10 }, { 501, 255 }, { 10, 501 } };
-    cv::Mat trainingDataMat(4, 2, CV_32FC1, trainingData);
+    for (int i = 0; i < features.size(); i++) {
+        Feature feature = features[i];
+
+        std::vector<float> array;
+        array.assign((float*) feature.values.datastart, (float*) feature.values.dataend);
+
+        trainingData.push_back(array);
+        labels.push_back(feature.clazz);
+    }
+
+    // Set up training data
+    cv::Mat labelsMat(4, 1, CV_32FC1, &labels);
+    cv::Mat trainingDataMat(4, 2, CV_32FC1, &trainingData);
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);

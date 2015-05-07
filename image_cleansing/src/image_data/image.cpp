@@ -2,7 +2,7 @@
 
 using namespace ic;
 
-Image::Image(bool c, std::string f) {
+Image::Image(float c, std::string f) {
     clazz = c;
     file = f;
 }
