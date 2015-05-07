@@ -15,7 +15,7 @@ using namespace ic;
 
 int main(int argc, char** argv) {
     train();
-//    predict();
+    predict();
 }
 
 /**
@@ -77,7 +77,7 @@ void predict() {
     fileWriter.close();
 }
 
-void predictSVM(std::vector<Feature> features, FileWriter fileWriter) {
+void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
     SVMLearner svm;
     svm.load("model.xml");
 

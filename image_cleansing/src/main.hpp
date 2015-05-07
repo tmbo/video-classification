@@ -20,7 +20,7 @@ void train();
 void predict();
 
 void trainSVM(std::vector<Feature> features);
-void predictSVM(std::vector<Feature> features, ic::FileWriter fileWriter);
+void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter);
 
 std::vector<Feature> extractFeatures(std::vector<ic::Image> images);
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images);
