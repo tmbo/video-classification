@@ -45,7 +45,7 @@ void trainSVM(std::vector<Feature> features) {
 
     // Set up training data
     cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, labels);
-    cv::Mat trainingDataMat(data.labelSize, data.trainingDataSize, CV_32FC1, values);
+    cv::Mat trainingDataMat(data.labelSize, data.valueSize, CV_32FC1, values);
 
 //    showMat(labelsMat, 1);
 //    showMat(trainingDataMat, 2);
@@ -53,7 +53,7 @@ void trainSVM(std::vector<Feature> features) {
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
-    svm.save();
+    svm.save("model.xml");
 
 //	svm.plotDecisionRegions();
 }
@@ -72,8 +72,20 @@ void predict() {
     std::vector<Feature> features = extractFeatures(images);
 
     // Predict classes
+    predictSVM(features, fileWriter);
 
     fileWriter.close();
+}
+
+void predictSVM(std::vector<Feature> features, FileWriter fileWriter) {
+    SVMLearner svm;
+    svm.load("model.xml");
+
+    for (int i = 0; i < features.size(); i++) {
+        if (svm.predict(features[i].values) == 1.0) {
+            fileWriter.writeLine(features[i].file);
+        }
+    }
 }
 
 /**
@@ -94,7 +106,7 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
         Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
         Mat hist = histBuilder.buildHistogram(image);
 
-        Feature feature = {images[i].clazz, hist};
+        Feature feature = {images[i].clazz, hist, images[i].file};
         features.push_back(feature);
     }
 
