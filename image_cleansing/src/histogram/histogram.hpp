@@ -2,7 +2,7 @@
 
 #include "../forwarddeclarations.hpp"
 
-namespace sbd {
+namespace ic {
 	class Histogram {
     private:
         int m_histSize;

@@ -5,6 +5,7 @@
 #include "image_data/file_reader.hpp"
 #include "image_data/image.hpp"
 #include "svm/svm.hpp"
+#include "histogram/histogram.hpp"
 #include "main.hpp"
 
 using namespace cv;
@@ -21,6 +22,22 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
+    std::vector<Feature> features;
+    Histogram histBuilder(8);
+
+    for (int i = 0; i < images.size(); i += 2) {
+        Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
+        Mat hist = histBuilder.buildHistogram(image);
+
+        Feature feature = {images[i].clazz, hist};
+        features.push_back(feature);
+    }
+
+    return features;
+}
+
 
 std::vector<Feature> extractFeautes(std::vector<ic::Image> images) {
     std::vector<Feature> features;

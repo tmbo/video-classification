@@ -116,6 +116,8 @@ set(sources
         src/image_data/image.cpp
         src/svm/svm.hpp
         src/svm/svm.cpp
+        src/histogram/histogram.hpp
+        src/histogram/histogram.cpp
 )
 
 source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"
