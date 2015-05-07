@@ -12,11 +12,15 @@ include_directories(
 
 # Libraries
 set(IDE_FOLDER "")
-add_subdirectory(ofextract)
+if (CUDA_VERSION)
+    add_subdirectory(ofextract)
+endif ()
 
 # Applications
 set(IDE_FOLDER "Applications")
-add_subdirectory(ofextractcmd)
+if (CUDA_VERSION)
+    add_subdirectory(ofextractcmd)
+endif ()
 
 # Tests
 set(IDE_FOLDER "Tests")
