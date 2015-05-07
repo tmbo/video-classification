@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     std::vector<ic::Image> images = FileReader::loadImages(fileWriter);
 
     // Extract features and train SVM
-    std::vector<Feature> features = extractFeautes(images);
+    std::vector<Feature> features = extractFeatures(images);
     trainSVM(features);
 
     fileWriter.close();
@@ -32,7 +32,7 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     std::vector<Feature> features;
     Histogram histBuilder(8);
 
-    for (int i = 0; i < images.size(); i += 2) {
+    for (int i = 0; i < images.size(); i++) {
         Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
         Mat hist = histBuilder.buildHistogram(image);
 
@@ -44,9 +44,10 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
 }
 
 
-std::vector<Feature> extractFeautes(std::vector<ic::Image> images) {
-    std::vector<Feature> features;
-    return features;
+std::vector<Feature> extractFeatures(std::vector<ic::Image> images) {
+    std::vector<Feature> histogramFeatures = buildHistogram(images);
+
+    return histogramFeatures;
 }
 
 void trainSVM(std::vector<Feature> features) {
@@ -60,4 +61,11 @@ void trainSVM(std::vector<Feature> features) {
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
 //	svm.plotDecisionRegions();
+}
+
+void showMat(cv::Mat &img, int id)
+{
+    cv::namedWindow(std::to_string(id), cv::WINDOW_NORMAL);
+    cv::imshow(std::to_string(id), img);
+    cv::waitKey(1);
 }
