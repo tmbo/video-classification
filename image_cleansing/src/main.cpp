@@ -14,7 +14,7 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-    train();
+//    train();
     predict();
 }
 
@@ -80,7 +80,8 @@ void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
         std::vector<float> vec = convertMatToVector(features[i].values);
         cv::Mat dataMat(vec.size(), 1, CV_32FC1, &vec[0]);
 
-        if (svm.predict(dataMat) == 1.0) {
+        std::cout << svm.predict(dataMat) << std::endl;
+        if (svm.predict(dataMat) > 0.0) {
             fileWriter.writeLine(features[i].file);
         }
     }

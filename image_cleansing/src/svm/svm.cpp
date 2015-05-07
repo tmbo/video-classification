@@ -11,13 +11,13 @@ SVMLearner::SVMLearner() {
     // Set up SVM's parameters
     m_params.svm_type = CvSVM::C_SVC;
     m_params.C = 100.0;
-    m_params.kernel_type = CvSVM::LINEAR;
-    m_params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
+    m_params.kernel_type = CvSVM::RBF;
+    m_params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
 }
 
 void SVMLearner::train(cv::Mat& trainingData, cv::Mat& labels) {
     // Train the SVM
-    m_svm.train(trainingData, labels, cv::Mat(), cv::Mat(), m_params);
+    m_svm.train_auto(trainingData, labels, cv::Mat(), cv::Mat(), m_params);
 }
 
 float SVMLearner::predict(cv::Mat& sample) {
