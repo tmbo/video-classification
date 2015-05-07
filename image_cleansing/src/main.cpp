@@ -14,7 +14,7 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-    train();
+    //train();
     predict();
 }
 
@@ -47,15 +47,9 @@ void trainSVM(std::vector<Feature> features) {
     cv::Mat labelsMat(data.labelSize, 1, CV_32FC1, labels);
     cv::Mat trainingDataMat(data.labelSize, data.valueSize, CV_32FC1, values);
 
-//    showMat(labelsMat, 1);
-//    showMat(trainingDataMat, 2);
-//    cv::waitKey(0);
-
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
     svm.save("model.xml");
-
-//	svm.plotDecisionRegions();
 }
 
 /**
@@ -82,7 +76,10 @@ void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
     svm.load("model.xml");
 
     for (int i = 0; i < features.size(); i++) {
-        if (svm.predict(features[i].values) == 1.0) {
+        std::vector<float> vec = convertMatToVector(features[i].values);
+        cv::Mat dataMat(vec.size(), 1, CV_32FC1, &vec[0]);
+
+        if (svm.predict(dataMat) == 1.0) {
             fileWriter.writeLine(features[i].file);
         }
     }
@@ -122,17 +119,20 @@ SvmData convertFeatures(std::vector<Feature> features) {
 
     for (int i = 0; i < features.size(); i++) {
         Feature feature = features[i];
-
-        std::vector<float> array;
-        array.assign((float*) feature.values.datastart, (float*) feature.values.dataend);
-        trainingDataSize = array.size();
-
-        trainingData.push_back(array);
+        std::vector<float> v = convertMatToVector(feature.values);
+        trainingDataSize = v.size();
+        trainingData.push_back(v);
         labels.push_back(feature.clazz);
     }
 
     SvmData data = {labels, trainingData, labelSize, trainingDataSize};
     return data;
+}
+
+std::vector<float> convertMatToVector(cv::Mat values) {
+    std::vector<float> vec;
+    vec.assign((float*) values.datastart, (float*) values.dataend);
+    return vec;
 }
 
 void showMat(cv::Mat &img, int id) {
