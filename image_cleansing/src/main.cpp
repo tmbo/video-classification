@@ -14,7 +14,7 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-    //train();
+    train();
     predict();
 }
 
@@ -38,7 +38,8 @@ void train() {
 }
 
 void trainSVM(std::vector<Feature> features) {
-    SvmData data = convertFeatures(features);
+    SvmData data;
+    convertFeatures(data, features);
 
     float* labels = &data.labels[0];
     float* values = &data.values[0][0];
@@ -110,23 +111,16 @@ std::vector<Feature> buildHistogram(std::vector<ic::Image> images) {
     return features;
 }
 
-SvmData convertFeatures(std::vector<Feature> features) {
-    std::vector<float> labels;
-    std::vector<std::vector<float>> trainingData;
+void convertFeatures(SvmData &data, std::vector<Feature> features) {
+    data.labelSize = features.size();
 
-    int trainingDataSize = 0;
-    int labelSize = features.size();
-
-    for (int i = 0; i < features.size(); i++) {
+    for (int i = 0; i < data.labelSize; i++) {
         Feature feature = features[i];
         std::vector<float> v = convertMatToVector(feature.values);
-        trainingDataSize = v.size();
-        trainingData.push_back(v);
-        labels.push_back(feature.clazz);
+        data.valueSize = v.size();
+        data.values.push_back(v);
+        data.labels.push_back(feature.clazz);
     }
-
-    SvmData data = {labels, trainingData, labelSize, trainingDataSize};
-    return data;
 }
 
 std::vector<float> convertMatToVector(cv::Mat values) {

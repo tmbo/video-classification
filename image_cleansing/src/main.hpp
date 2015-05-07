@@ -26,6 +26,6 @@ std::vector<Feature> extractFeatures(std::vector<ic::Image> images);
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images);
 
 std::vector<float> convertMatToVector(cv::Mat values);
-SvmData convertFeatures(std::vector<Feature> features);
+void convertFeatures(SvmData &data, std::vector<Feature> features);
 
 void showMat(cv::Mat &img, int id = 0);

@@ -10,6 +10,7 @@ using namespace ic;
 SVMLearner::SVMLearner() {
     // Set up SVM's parameters
     m_params.svm_type = CvSVM::C_SVC;
+    m_params.C = 100.0;
     m_params.kernel_type = CvSVM::LINEAR;
     m_params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
 }
