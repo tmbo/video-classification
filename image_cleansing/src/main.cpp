@@ -4,6 +4,7 @@
 #include <boost/filesystem.hpp>
 #include "image_data/file_reader.hpp"
 #include "image_data/image.hpp"
+#include "output/file_writer.hpp"
 #include "svm/svm.hpp"
 #include "histogram/histogram.hpp"
 #include "main.hpp"
@@ -13,12 +14,16 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
+    FileWriter fileWriter;
+
     // Load valid images
-    std::vector<ic::Image> images = FileReader::loadImages();
+    std::vector<ic::Image> images = FileReader::loadImages(fileWriter);
 
     // Extract features and train SVM
     std::vector<Feature> features = extractFeautes(images);
     trainSVM(features);
+
+    fileWriter.close();
 
     return 0;
 }

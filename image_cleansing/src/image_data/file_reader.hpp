@@ -7,10 +7,10 @@ namespace ic {
 
     class FileReader {
         private:
-            static void load(std::string dir, bool clazz, std::vector<Image>& images);
-            static bool checkImageSize(std::string file);
+            static void load(std::string dir, bool clazz, std::vector<Image>& images, FileWriter& fileWriter);
+            static bool checkImageSize(std::string file, FileWriter& fileWriter);
         public:
-            static std::vector<Image> loadImages();
+            static std::vector<Image> loadImages(FileWriter& fileWriter);
     };
 
 }
