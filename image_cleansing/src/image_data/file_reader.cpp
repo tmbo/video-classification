@@ -26,8 +26,13 @@ std::vector<Image> FileReader::loadImages(FileWriter& fileWriter) {
 void FileReader::load(std::string dir, float clazz, std::vector<Image>& images, FileWriter& fileWriter) {
     boost::filesystem::recursive_directory_iterator rdi(dir);
     boost::filesystem::recursive_directory_iterator end_rdi;
+    std::string emptyString = "";
 
     for (; rdi != end_rdi; rdi++) {
+        if (boost::filesystem::is_directory((*rdi).path()) || boost::filesystem::basename((*rdi).path()).compare(emptyString) == 0)
+        {
+            continue;
+        }
         std::string file = (*rdi).path().string();
 
         if (checkImageSize(file, fileWriter)) {

@@ -54,19 +54,25 @@ void trainSVM(std::vector<Feature> features) {
     std::vector<float> labels;
     std::vector<std::vector<float>> trainingData;
 
+    int trainingDataSize = 0;
     for (int i = 0; i < features.size(); i++) {
         Feature feature = features[i];
 
         std::vector<float> array;
         array.assign((float*) feature.values.datastart, (float*) feature.values.dataend);
+        trainingDataSize = array.size();
 
         trainingData.push_back(array);
         labels.push_back(feature.clazz);
     }
 
     // Set up training data
-    cv::Mat labelsMat(4, 1, CV_32FC1, &labels);
-    cv::Mat trainingDataMat(4, 2, CV_32FC1, &trainingData);
+    cv::Mat labelsMat(features.size(), 1, CV_32FC1, &labels[0]);
+    cv::Mat trainingDataMat(features.size(), trainingDataSize, CV_32FC1, &trainingData[0]);
+
+    showMat(labelsMat, 1);
+    showMat(trainingDataMat, 2);
+    cv::waitKey(0);
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
