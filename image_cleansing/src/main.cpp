@@ -14,10 +14,10 @@ using namespace std;
 using namespace ic;
 
 int main(int argc, char** argv) {
-    train();
-    predict();
+//    train();
+//    predict();
+    predict("/home/joseph/Masterprojekt/imageNet/predict/", true);
     waitKey(0);
-//    predict("/home/joseph/Masterprojekt/imageNet/predict/n00452293");
 }
 
 /**
@@ -52,8 +52,8 @@ void trainSVM(std::vector<Feature> features) {
         trainingDataMat.push_back(data.values[i]);
     }
 
-    showMat(labelsMat, 1);
-    showMat(trainingDataMat, 2);
+    showMat(labelsMat, "labels");
+    showMat(trainingDataMat, "trainingData");
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);
@@ -64,7 +64,7 @@ void trainSVM(std::vector<Feature> features) {
  * PREDICTING
  */
 
-void predict(std::string dir) {
+void predict(std::string dir, bool showNoiseImgs) {
     FileWriter fileWriter;
 
     // Load valid images
@@ -74,20 +74,28 @@ void predict(std::string dir) {
     std::vector<Feature> features = extractFeatures(images);
 
     // Predict classes
-    predictSVM(features, fileWriter);
+    predictSVM(features, fileWriter, images, showNoiseImgs);
 
     fileWriter.close();
 }
 
-void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter) {
+void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter, std::vector<ic::Image> images, bool showNoiseImgs) {
     SVMLearner svm;
     svm.load("model.xml");
 
-    for (int i = 0; i < features.size(); i++) {
+    for (int i = 0; i < features.size(); i++)
+    {
         std::vector<float> vec = convertMatToVector(features[i].values);
         cv::Mat dataMat(vec.size(), 1, CV_32FC1, &vec[0]);
 
-        if (svm.predict(dataMat) < 0.0) {
+        if (svm.predict(dataMat) < 0.0)
+        {
+            if (showNoiseImgs)
+            {
+                Mat image = imread(images[i].file, CV_LOAD_IMAGE_COLOR);
+                showMat(image, "noise image found");
+                waitKey(0);
+            }
             fileWriter.writeLine(features[i].file);
         }
     }
@@ -138,5 +146,11 @@ std::vector<float> convertMatToVector(cv::Mat values) {
 void showMat(cv::Mat &img, int id) {
     cv::namedWindow(std::to_string(id), cv::WINDOW_NORMAL);
     cv::imshow(std::to_string(id), img);
+    cv::waitKey(1);
+}
+
+void showMat(cv::Mat &img, std::string windowName) {
+    cv::namedWindow(windowName, cv::WINDOW_NORMAL);
+    cv::imshow(windowName, img);
     cv::waitKey(1);
 }

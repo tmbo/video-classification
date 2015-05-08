@@ -17,10 +17,10 @@ typedef struct {
 
 
 void train();
-void predict(std::string dir = "resources/images/");
+void predict(std::string dir = "resources/images/", bool showNoiseImgs=false);
 
 void trainSVM(std::vector<Feature> features);
-void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter);
+void predictSVM(std::vector<Feature> features, ic::FileWriter& fileWriter, std::vector<ic::Image> images, bool showNoiseImgs);
 
 std::vector<Feature> extractFeatures(std::vector<ic::Image> images);
 std::vector<Feature> buildHistogram(std::vector<ic::Image> images);
@@ -29,3 +29,4 @@ std::vector<float> convertMatToVector(cv::Mat values);
 void convertFeatures(SvmData &data, std::vector<Feature> features);
 
 void showMat(cv::Mat &img, int id = 0);
+void showMat(cv::Mat &img, std::string windowName);
