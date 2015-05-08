@@ -16,6 +16,7 @@ using namespace ic;
 int main(int argc, char** argv) {
     train();
     predict();
+    waitKey(0);
 //    predict("/home/joseph/Masterprojekt/imageNet/predict/n00452293");
 }
 
@@ -51,9 +52,8 @@ void trainSVM(std::vector<Feature> features) {
         trainingDataMat.push_back(data.values[i]);
     }
 
-//    showMat(labelsMat, 1);
-//    showMat(trainingDataMat, 2);
-//    waitKey(0);
+    showMat(labelsMat, 1);
+    showMat(trainingDataMat, 2);
 
     SVMLearner svm;
     svm.train(trainingDataMat, labelsMat);

@@ -19,6 +19,9 @@ namespace ic
     private:
             CvSVMParams m_params;
             CvSVM m_svm;
+            CvMat m_cvMat;
+            cv::Mat m_classWeights;
+            std::vector<float> m_classWeightsV;
     };
 
 }

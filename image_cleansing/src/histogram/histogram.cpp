@@ -55,36 +55,47 @@ cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
     bool accumulate = false;
 
     cv::Mat h_hist, s_hist, v_hist;
-    cv::Mat h_hist_norm, s_hist_norm, v_hist_norm;
 
     /// Compute the histograms:
     cv::calcHist(&hsv_planes[0], 1, 0, cv::Mat(), h_hist, 1, &histSize, &histRange, uniform, accumulate );
     cv::calcHist(&hsv_planes[1], 1, 0, cv::Mat(), s_hist, 1, &histSize, &histRange, uniform, accumulate );
     cv::calcHist(&hsv_planes[2], 1, 0, cv::Mat(), v_hist, 1, &histSize, &histRange, uniform, accumulate );
 
-    // Draw the histograms for H, S, V
-    int hist_w = 1024; int hist_h = 255;
-    int bin_w = cvRound((double) hist_w/histSize);
-
-    cv::Mat histImage(hist_h, hist_w, CV_8UC3, cv::Scalar(0,0,0));
-
-    // Normalize the result to [ 0, histImage.rows ]
-    cv::normalize(h_hist, h_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(s_hist, s_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-    cv::normalize(v_hist, v_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
-
     cv::transpose(h_hist, h_hist);
     cv::transpose(s_hist, s_hist);
     cv::transpose(v_hist, v_hist);
 
+    int numberOfPixels = image.size().width + image.size().height;
+
+    h_hist = h_hist / numberOfPixels;
+    s_hist = s_hist / numberOfPixels;
+    v_hist = v_hist / numberOfPixels;
+
     std::vector<cv::Mat> allHist;
+
     allHist.push_back(h_hist);
     allHist.push_back(s_hist);
     allHist.push_back(v_hist);
+
     cv::Mat allHistMat;
     cv::hconcat(allHist, allHistMat);
 
-    // Draw for each channel
+    // Debug Output start
+
+//    cv::Mat h_hist_norm, s_hist_norm, v_hist_norm;
+
+//    // Draw the histograms for H, S, V
+//    int hist_w = 1024; int hist_h = 255;
+//    int bin_w = cvRound((double) hist_w/histSize);
+
+//    cv::Mat histImage(hist_h, hist_w, CV_8UC3, cv::Scalar(0,0,0));
+
+//    // Normalize the result to [ 0, histImage.rows ]
+//    cv::normalize(h_hist, h_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+//    cv::normalize(s_hist, s_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+//    cv::normalize(v_hist, v_hist_norm, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat());
+
+//    // Draw for each channel
 //    for( int i = 1; i < histSize; i++ )
 //    {
 //        cv::line(histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(h_hist_norm.at<float>(i-1)) ) ,
@@ -98,7 +109,7 @@ cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
 //                       cv::Scalar( 0, 0, 255), 2, 8, 0  );
 //    }
 
-    // Display
+//    // Display
 //    cv::namedWindow("original", CV_WINDOW_NORMAL);
 //    cv::imshow("original", image);
 
@@ -106,6 +117,8 @@ cv::Mat Histogram::buildHistogram(const cv::Mat& image) {
 //    cv::imshow("histogram", histImage );
 
 //    cv::waitKey(0);
+
+    // Debug Output end
 
     return allHistMat;
 }

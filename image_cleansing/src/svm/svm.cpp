@@ -13,6 +13,11 @@ SVMLearner::SVMLearner() {
     m_params.C = 100.0;
     m_params.kernel_type = CvSVM::RBF;
     m_params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 1000, 1e-6);
+    m_classWeightsV.push_back(0.9);
+    m_classWeightsV.push_back(0.1);
+    m_classWeights = cv::Mat(m_classWeightsV);
+    m_cvMat = m_classWeights;
+    m_params.class_weights = &m_cvMat;
 }
 
 void SVMLearner::train(cv::Mat& trainingData, cv::Mat& labels) {
