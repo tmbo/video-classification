@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <boost/filesystem.hpp>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/gpu/gpu.hpp"
@@ -21,9 +23,41 @@ namespace ofextract
 
     void BroxOpticalFlow::runAll()
     {
-        std::stringstream folder;
-        folder << m_sourceFolder << "/%d.jpg";
-        cv::VideoCapture videoCapture(folder.str());
+        boost::filesystem::recursive_directory_iterator rdi(m_sourceFolder);
+        boost::filesystem::recursive_directory_iterator end_rdi;
+
+        std::string parentFolder = m_sourceFolder;
+        bool dirProcessed = false;
+        for (; rdi != end_rdi; rdi++) {
+            if (boost::filesystem::is_directory((*rdi).path()))
+            {
+                parentFolder = (*rdi).path().string();
+                dirProcessed = false;
+            }
+            else
+            {
+                if (!dirProcessed && boost::filesystem::extension((*rdi).path()).compare(".jpg") == 0)
+                {
+                    runOnFolder(parentFolder);
+                    dirProcessed = true;
+                }
+            }
+        }
+    }
+
+    void BroxOpticalFlow::runOnFolder(std::string currentFolder)
+    {
+        std::stringstream videoCapturePath;
+        videoCapturePath << currentFolder << "/%d.jpg";
+        cv::VideoCapture videoCapture(videoCapturePath.str());
+
+        std::string currentOutputFolder = replaceString(currentFolder, m_sourceFolder, m_outputFolder);
+        
+        boost::filesystem::path outputPath(currentOutputFolder);
+        if(boost::filesystem::create_directories(outputPath))
+        {
+            std::cout << "Directory Created: " << outputPath << std::endl;
+        }
 
         cv::Mat CurrentFrame;
 
@@ -81,21 +115,36 @@ namespace ofextract
 
             std::stringstream outputX;
             std::stringstream outputY;
-            outputX << m_outputFolder << "/X" << outputId << ".jpg";
-            outputY << m_outputFolder << "/Y" << outputId << ".jpg";
+
+            outputX << currentOutputFolder << "/X" << outputId << ".jpg";
+            outputY << currentOutputFolder << "/Y" << outputId << ".jpg";
 
             outputId++;
 
             // write output
-            cv::imwrite(outputX.str(), NormImageOutputFlowX);
-            cv::imwrite(outputY.str(), NormImageOutputFlowY);
+            bool successX, successY;
+            successX = cv::imwrite(outputX.str(), NormImageOutputFlowX);
+            successY = cv::imwrite(outputY.str(), NormImageOutputFlowY);
+
+            if (!successX || !successY)
+            {
+                std::cerr << "failed saving image " << outputX.str() << " or " << outputY.str() << std::endl;
+                break;
+            }
 
             // // debug output
             // cv::imshow("flowX", FlowX);
             // cv::imshow("flowY", FlowY);
             // cv::waitKey(0);
-
         }
+    }
+
+    std::string BroxOpticalFlow::replaceString(std::string &s, std::string toReplace, std::string replaceWith)
+    {
+        if (s.find(toReplace) == std::string::npos){
+            return s;
+        }
+        return (s.replace(s.find(toReplace), toReplace.length(), replaceWith));
     }
 
 } // namespace ofextract

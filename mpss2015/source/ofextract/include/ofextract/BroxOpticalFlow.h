@@ -6,10 +6,6 @@
 
 namespace ofextract
 {
-    /** \brief ..
-
-    ...
-    */
     class OFEXTRACT_API BroxOpticalFlow
     {
     public:
@@ -20,7 +16,10 @@ namespace ofextract
         virtual ~BroxOpticalFlow();
 
         void runAll();
+        void runOnFolder(std::string currentFolder);
     private:
+        std::string replaceString(std::string &s, std::string toReplace, std::string replaceWith);
+
         double m_alpha = 7.0;
         double m_beta = 127.0;
 
