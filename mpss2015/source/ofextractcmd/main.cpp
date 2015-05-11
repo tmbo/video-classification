@@ -9,7 +9,7 @@ int main(int /*argc*/, char* /*argv*/[])
 {
     std::cout << "Version: " << MPSS2015_VERSION << std::endl;
     ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow();
-    broxOpticalFlow->runTest();
+    broxOpticalFlow->runAll();
 
     // // Read file
     // std::cout << "Reading from 'data/example.txt': " << std::endl;

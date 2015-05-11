@@ -10,6 +10,8 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+find_package(OpenCV REQUIRED)
+
 # Libraries
 set(IDE_FOLDER "")
 if (CUDA_VERSION)

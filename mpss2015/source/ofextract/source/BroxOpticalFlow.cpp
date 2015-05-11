@@ -9,7 +9,9 @@
 
 namespace ofextract
 {
-    BroxOpticalFlow::BroxOpticalFlow()
+    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string outputFolder):
+    m_sourceFolder(sourceFolder)
+    , m_outputFolder(outputFolder)
     {
     }
 
@@ -17,9 +19,11 @@ namespace ofextract
     {
     }
 
-    void BroxOpticalFlow::runTest()
+    void BroxOpticalFlow::runAll()
     {
-        cv::VideoCapture videoCapture("/opt/data_sets/UCF-101/frames/Archery/v_Archery_g01_c01/%d.jpg");
+        std::stringstream folder;
+        folder << m_sourceFolder << "%d.jpg";
+        cv::VideoCapture videoCapture(folder.str());
 
         cv::Mat CurrentFrame;
 
@@ -43,6 +47,14 @@ namespace ofextract
         cv::gpu::BroxOpticalFlow OpticalFlowGPU = cv::gpu::BroxOpticalFlow(0.197f, 50.0f, 0.8f, 10, 77, 10);
 
         int i = 0;
+
+        double alpha = 5.0;
+        double beta = 127.0;
+
+        double min = 0.0;
+        double max = 0.0;
+        double totalMin = 0.0;
+        double totalMax = 0.0;
 
         while (videoCapture.grab()){
             std::cout << "extracting image " << i << std::endl;
@@ -70,8 +82,31 @@ namespace ofextract
             FlowXGPU.download(FlowX);
             FlowYGPU.download(FlowY);
 
-            cv::normalize(FlowX, NormImageOutputFlowX, 0, 255, cv::NORM_MINMAX, CV_8UC1); // TODO constant normalization factor needed
-            cv::normalize(FlowY, NormImageOutputFlowY, 0, 255, cv::NORM_MINMAX, CV_8UC1); // TODO constant normalization factor needed
+            cv::minMaxLoc(FlowX, &min, &max);
+            if (min < totalMin)
+            {
+                totalMin = min;
+                std::cout << "new total min: " << totalMin << std ::endl; 
+            }
+            if (max > totalMax)
+            {
+                totalMax = max;
+                std::cout << "new total max: " << totalMax << std ::endl; 
+            }
+            cv::minMaxLoc(FlowY, &min, &max);
+            if (min < totalMin)
+            {
+                totalMin = min;
+                std::cout << "new total min: " << totalMin << std ::endl; 
+            }
+            if (max > totalMax)
+            {
+                totalMax = max;
+                std::cout << "new total max: " << totalMax << std ::endl; 
+            }
+
+            FlowX.convertTo(NormImageOutputFlowX, CV_8UC1, alpha, beta);
+            FlowY.convertTo(NormImageOutputFlowY, CV_8UC1, alpha, beta);
 
             std::stringstream outputX;
             std::stringstream outputY;
@@ -82,10 +117,9 @@ namespace ofextract
             cv::imwrite(outputX.str(), NormImageOutputFlowX);
             cv::imwrite(outputY.str(), NormImageOutputFlowY);
 
-
-            cv::imshow("flowX", FlowX);
-            cv::imshow("flowY", FlowY);
-            cv::waitKey(0);
+            // cv::imshow("flowX", FlowX);
+            // cv::imshow("flowY", FlowY);
+            // cv::waitKey(0);
 
             // Use FlowX and FlowY in further processing
             //...
