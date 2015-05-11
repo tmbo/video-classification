@@ -22,7 +22,7 @@ namespace ofextract
     void BroxOpticalFlow::runAll()
     {
         std::stringstream folder;
-        folder << m_sourceFolder << "%d.jpg";
+        folder << m_sourceFolder << "/%d.jpg";
         cv::VideoCapture videoCapture(folder.str());
 
         cv::Mat CurrentFrame;
@@ -30,8 +30,8 @@ namespace ofextract
         cv::Mat PreviousFrameGray;
         cv::Mat CurrentFrameGray;
 
-        cv::Mat PreviousFrameGrayFloat; // Has an image in format CV_32FC1
-        cv::Mat CurrentFrameGrayFloat;  // Has an image in format CV_32FC1
+        cv::Mat PreviousFrameGrayFloat;
+        cv::Mat CurrentFrameGrayFloat;
 
         // Prepare receiving variables
         cv::gpu::GpuMat FlowXGPU;
@@ -48,13 +48,7 @@ namespace ofextract
 
         int i = 0;
 
-        double alpha = 5.0;
-        double beta = 127.0;
-
-        double min = 0.0;
-        double max = 0.0;
-        double totalMin = 0.0;
-        double totalMax = 0.0;
+        int outputId = 0;
 
         while (videoCapture.grab()){
             std::cout << "extracting image " << i << std::endl;
@@ -82,47 +76,25 @@ namespace ofextract
             FlowXGPU.download(FlowX);
             FlowYGPU.download(FlowY);
 
-            cv::minMaxLoc(FlowX, &min, &max);
-            if (min < totalMin)
-            {
-                totalMin = min;
-                std::cout << "new total min: " << totalMin << std ::endl; 
-            }
-            if (max > totalMax)
-            {
-                totalMax = max;
-                std::cout << "new total max: " << totalMax << std ::endl; 
-            }
-            cv::minMaxLoc(FlowY, &min, &max);
-            if (min < totalMin)
-            {
-                totalMin = min;
-                std::cout << "new total min: " << totalMin << std ::endl; 
-            }
-            if (max > totalMax)
-            {
-                totalMax = max;
-                std::cout << "new total max: " << totalMax << std ::endl; 
-            }
-
-            FlowX.convertTo(NormImageOutputFlowX, CV_8UC1, alpha, beta);
-            FlowY.convertTo(NormImageOutputFlowY, CV_8UC1, alpha, beta);
+            FlowX.convertTo(NormImageOutputFlowX, CV_8UC1, m_alpha, m_beta);
+            FlowY.convertTo(NormImageOutputFlowY, CV_8UC1, m_alpha, m_beta);
 
             std::stringstream outputX;
             std::stringstream outputY;
-            outputX << "/opt/data_sets/UCF-101/broxoptflow/Archery/v_Archery_g01_c01/X" << i << ".jpg";
-            outputY << "/opt/data_sets/UCF-101/broxoptflow/Archery/v_Archery_g01_c01/Y" << i << ".jpg";
+            outputX << m_outputFolder << "/X" << outputId << ".jpg";
+            outputY << m_outputFolder << "/Y" << outputId << ".jpg";
+
+            outputId++;
 
             // write output
             cv::imwrite(outputX.str(), NormImageOutputFlowX);
             cv::imwrite(outputY.str(), NormImageOutputFlowY);
 
+            // // debug output
             // cv::imshow("flowX", FlowX);
             // cv::imshow("flowY", FlowY);
             // cv::waitKey(0);
 
-            // Use FlowX and FlowY in further processing
-            //...
         }
     }
 

@@ -7,12 +7,16 @@ message(STATUS "Lib ${target}")
 
 find_package(OpenCV REQUIRED)
 
+add_definitions(-DBOOST_ALL_NO_LIB)
+find_package(Boost COMPONENTS system filesystem regex REQUIRED)
+
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/cuda/lib64/)
 
 # Includes
 
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
 )
 
 include_directories(
@@ -25,6 +29,7 @@ include_directories(
 
 set(libs
     ${OpenCV_LIBRARIES}
+    ${Boost_LIBRARIES} 
 )
 
 
