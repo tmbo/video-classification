@@ -101,6 +101,8 @@ find_package( OpenCV REQUIRED )
 add_definitions(-DBOOST_ALL_NO_LIB)
 find_package(Boost COMPONENTS system filesystem regex REQUIRED)
 
+find_package( Caffe )
+
 
 #################################################
 # SOURCES
@@ -127,7 +129,6 @@ source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"
 
 # Set target name
 set(target ${META_PROJECT_NAME})
-set(Caffe_INCLUDE_DIR /usr/include/caffe)
 
 add_executable(${target} ${sources})
 
@@ -135,15 +136,17 @@ add_executable(${target} ${sources})
 include_directories(
 	${CMAKE_SOURCE_DIR}
 	${OpenCV_INCLUDE_DIR}
-        ${Caffe_INCLUDE_DIR}
+        ${Caffe_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIR}
 	${PROJECT_BINARY_DIR} #for the generated files
 )
 
+add_definitions(${Caffe_DEFINITIONS})
 
 link_directories(${Boost_LIBRARY_DIR})
 
 target_link_libraries( ${target}
     ${OpenCV_LIBS}
     ${Boost_LIBRARIES} 
+    ${Caffe_LIBRARIES}
 )

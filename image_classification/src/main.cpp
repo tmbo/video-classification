@@ -13,13 +13,13 @@ using namespace ic;
 
 int main(int argc, char** argv) {
     // Image directory
-    std::string dir = "resources/images/";
+    std::string dir = "../resources/images/";
     // Result file
     std::string outputFile = "results.txt";
     // Caffee parameters
     bool cpuSetting = true;
-    std::string preModel = "resources/model/bvlc_reference_caffenet.caffemodel";
-    std::string protoFile = "resources/model/deploy.prototxt";
+    std::string preModel = "../resources/model/bvlc_reference_caffenet.caffemodel";
+    std::string protoFile = "../resources/model/deploy.prototxt";
     cv::Size size(277, 277);
     int channels = 3;
     bool isDebug = true;
