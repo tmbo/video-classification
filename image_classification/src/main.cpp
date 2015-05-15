@@ -20,11 +20,11 @@ int main(int argc, char** argv) {
     bool cpuSetting = true;
     std::string preModel = "../resources/model/bvlc_reference_caffenet.caffemodel";
     std::string protoFile = "../resources/model/deploy.prototxt";
-    cv::Size size(277, 277);
+    cv::Size size(227, 227);
     int channels = 3;
-    bool isDebug = true;
-    std::string result_layer = "prob";
-    std::string data_layer = "data";
+    bool isDebug = false;
+    std::string resultLayer = "argmax";
+    std::string dataLayer = "data";
 
     // Get all image paths
     std::vector<std::string> imagePaths;
@@ -41,7 +41,7 @@ int main(int argc, char** argv) {
 
         std::vector<float> predictions;
         cv::Mat img = cv::imread(imagePath);
-        classifier.predict(img, result_layer, data_layer, predictions);
+        classifier.predict(img, resultLayer, dataLayer, predictions);
 
         writer.writeLine(imagePath);
         for (int j = 0; j < predictions.size(); j++) {
