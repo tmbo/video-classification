@@ -5,30 +5,26 @@
 #include <mpss2015-version.h>
 #include <ofextract/BroxOpticalFlow.h>
 
-int main(int /*argc*/, char* /*argv*/[])
+int main(int argc, char* argv[])
 {
     std::cout << "Version: " << MPSS2015_VERSION << std::endl;
-    
-    ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow(
-        "/opt/data_sets/UCF-101/frames/",
-        "/opt/data_sets/UCF-101/broxoptflow/"
-        );
 
-    broxOpticalFlow->runAll();
+    if (argc == 3)
+    {
+        ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow(
+            argv[1],
+            argv[2]
+            );
 
-    // // Read file
-    // std::cout << "Reading from 'data/example.txt': " << std::endl;
-    // std::cout << std::endl;
-    // std::ifstream f("data/example.txt");
-    // if (f.is_open()) {
-    //     std::string line;
-    //     while (getline(f, line)) {
-    //         std::cout << line << '\n';
-    //     }
-    //     f.close();
-    // } else {
-    //     std::cout << "Unable to open file." << std::endl;
-    // }
+        broxOpticalFlow->runAll();
+    } else {
+        std::cout << "usage: <source_root_dir> <output_root_dir>" << std::endl;
+        // ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow(
+        //     "/opt/data_sets/UCF-101/frames/",
+        //     "/opt/data_sets/UCF-101/broxoptflow/"
+        //     );
 
+        // broxOpticalFlow->runAll();
+    }
     return 0;
 }
