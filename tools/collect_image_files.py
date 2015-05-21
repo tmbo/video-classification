@@ -3,14 +3,14 @@
 # A simple script to quickly scan a directory and its sub-dirs for images.
 # The found images' path will be saved to 'files.txt' in the root
 # directory. Each file is assigned to a topic ID. Every 'top-level' directory
-# in the root path creates a new dir-
+# in the root path creates a new topic.
 #
 # <root directory>
 # |
 # |__ <topic directory #0>
 # |    |__ <sub directory>
-# |    |__ image1.jpg
-# |    |__ image2.jpg
+# |    |____ image1.jpg
+# |    |____ image2.jpg
 # |
 # |__ <topic directory #1>
 # |__ <topic directory #2>
@@ -19,11 +19,10 @@
 
 
 from __future__ import print_function
-import os, sys, glob
+from natsort import natsorted
+import os, sys, glob, collections
 
-def run(root_dir):
-
-  output = {}
+def run(root_dir, n):
 
   # read the content of the root directory and filter all directories
   directory_names = map(lambda f: os.path.join(root_dir, f), os.listdir(root_dir))
@@ -32,40 +31,54 @@ def run(root_dir):
   # assign each 'top-level' directory to a topic id
   topics = {dir : topicId for (topicId, dir) in enumerate(directories)}
 
+  # open ouput file
+  filename = os.path.join(root_dir, "files_with_labels.txt")
+  output_file = open(filename, "w")
+
   # for every topic read all its image files
   for topic_dir in directories:
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
-      for file in files:
 
-	absolute_file = os.path.join(parent_dir,file)
-        if (file.endswith(("jpeg", "jpg", "png"))):
+      # sort files
+      files = natsorted(files)
+      # select every 'count' frame
+      if (n == -1):
+        count = 1
+        start = 0
+      else:
+        count = (len(files) - 5) / (n - 1)
+        start = 5
 
-          # save all absolute file paths and their corresponding topic Ids
-          topicId = topics[topic_dir]
-          output[absolute_file] = topicId
+      for i in range(start, len(files), count):
+        absolute_file = os.path.join(parent_dir, files[i])
 
-  # write ouput to file
-  filename = os.path.join(root_dir, "files.txt")
-  input_file = open(filename, "w")
-  for k, v in output.items():
-      line = '{} {}'.format(k, v)
-      print(line, file=input_file)
-  input_file.close()
+        if (files[i].endswith(("jpeg", "jpg", "png"))):
+          # write absolute file path and the corresponding topic Id to the output file
+          line = '{} {}'.format(absolute_file, topics[topic_dir])
+          print(line, file = output_file)
+
+  # close output file
+  output_file.close()
 
   # just some logging
   sys.stdout.write("Done. Exported %s/files.txt \n" % root_dir)
-  sys.stdout.write("Please, call Caffee's 'convert_image' tool now:\n\n")
+  sys.stdout.write("Please, call Caffee's 'convert_image' tool now:\n")
   sys.stdout.write("$CAFFE_ROOT/build/tools/convert_image \"\" files.txt UCF101 \n")
 
 
 if __name__ == "__main__":
 
   if len(sys.argv) < 2:
-    sys.exit("Usage: %s <root_directory>" % sys.argv[0])
+    sys.exit("Usage: %s <root_directory> <number_of_frames_per_video>" % sys.argv[0])
+    sys.exit("<number_of_frames_per_video>: '-all' for all frames")
 
   root_dir = os.path.abspath(sys.argv[1])
+  if (sys.argv[2] == '-all'):
+    n = -1
+  else:
+    n = int(sys.argv[2])
 
   if (not os.path.isdir(root_dir)):
     sys.exit("The argument <root directory> is not a valid directory.")
 
-  run(root_dir)
+  run(root_dir, n)
