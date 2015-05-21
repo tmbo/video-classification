@@ -26,6 +26,7 @@ def run(root_dir, n):
 
   # read the content of the root directory and filter all directories
   directory_names = map(lambda f: os.path.join(root_dir, f), os.listdir(root_dir))
+  #directory_names = filter(lambda f: os.path.basename(f).startswith('v_'), directory_names)
   directories = filter(os.path.isdir, directory_names)
 
   # assign each 'top-level' directory to a topic id
@@ -38,15 +39,21 @@ def run(root_dir, n):
   # for every topic read all its image files
   for topic_dir in directories:
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
+      file_count = len(files)
+
+      if file_count == 0:
+        continue
 
       # sort files
       files = natsorted(files)
-      # select every 'count' frame
+
+      # all frames
       if (n == -1):
         count = 1
         start = 0
+      # every 'count' frames
       else:
-        count = (len(files) - 5) / (n - 1)
+        count = (file_count - 5) / (n - 1)
         start = 5
 
       for i in range(start, len(files), count):
