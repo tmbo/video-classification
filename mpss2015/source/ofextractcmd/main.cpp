@@ -10,8 +10,8 @@ int main(int /*argc*/, char* /*argv*/[])
     std::cout << "Version: " << MPSS2015_VERSION << std::endl;
     
     ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow(
-        "/opt/data_sets/UCF-101/frames/Archery/",
-        "/opt/data_sets/UCF-101/broxoptflow/Archery/"
+        "/opt/data_sets/UCF-101/frames/",
+        "/opt/data_sets/UCF-101/broxoptflow/"
         );
 
     broxOpticalFlow->runAll();
