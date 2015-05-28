@@ -32,6 +32,7 @@ INPUT = "/Users/therold/Dropbox/Uni/MasterProjekt/data/frames/Archery/v_Archery_
 
 def get_flow_for_line(line, root_dir, stacked_frames_count):
 
+
   filename, label = line.split(" ")
   complete_dir, sub_dir, frame_number, file_type = re.findall(DIRECTORY_RE, filename)[0]
   frame_number = int(frame_number)
@@ -39,6 +40,8 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
   absolute_directory = os.path.join(root_dir, complete_dir)
 
   file_count = len(os.listdir(absolute_directory))
+
+
 
 
   # for every frame stack <sliding_window> many forwards and backwards
@@ -50,24 +53,22 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
 
   # open ouput file
   filename = os.path.join(root_dir, "files_with_labels.txt")
-  output_file = open(filename, "w")
+  output_file = open(filename, "a")
 
   for stack_number in stacks:
-
-    print stack_number
 
     if stack_number < 0 or stack_number > file_count:
       filename_x = filename_y = FILENAME_EMPTY_FLOW
     else:
       if stack_number < frame_number:
-	filename_x = "-X%s" % stack_number
-	filename_y = "-Y%s" % stack_number
+        filename_x = "-X%s" % stack_number
+        filename_y = "-Y%s" % stack_number
       else:
-	filename_x = "X%s" % stack_number
-	filename_y = "Y%s" % stack_number
+        filename_x = "X%s" % stack_number
+        filename_y = "Y%s" % stack_number
 
-    line_x = '{}{}{} {}\n'.format(root_dir, complete_dir, filename_x, label)
-    line_y = '{}{}{} {}\n'.format(root_dir, complete_dir, filename_y, label)
+    line_x = '{}/{}{}.jpg {}\n'.format(root_dir, complete_dir, filename_x, label)
+    line_y = '{}/{}{}.jpg {}\n'.format(root_dir, complete_dir, filename_y, label)
     output_file.write(line_x)
     output_file.write(line_y)
 
@@ -77,15 +78,21 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
 
 if __name__ == "__main__":
 
-  if len(sys.argv) < 2:
-    sys.exit("Usage: %s <root_directory> <number_of_frames_per_stack>" % sys.argv[0])
+  if len(sys.argv) < 3:
+    sys.exit("Usage: %s <frame_directory> <frames_list_file> <number_of_frames_per_stack>" % sys.argv[0])
 
   root_dir = os.path.abspath(sys.argv[1])
-  stacked_frames_count = int(sys.argv[2])
+  frames_list_file = sys.argv[2]
+  stacked_frames_count = int(sys.argv[3])
 
 
   if (not os.path.isdir(root_dir)):
     sys.exit("The argument <root directory> is not a valid directory.")
 
   # Ready tpo rumble
-  get_flow_for_line(INPUT, root_dir, stacked_frames_count)
+
+  with open(frames_list_file) as f:
+    lines = f.readlines()
+
+  for line in lines:
+    get_flow_for_line(line, root_dir, stacked_frames_count)
