@@ -11,9 +11,10 @@
 
 namespace ofextract
 {
-    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string outputFolder):
+    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string resizedOutputFolder, std::string opticalFlowOutputFolder):
     m_sourceFolder(sourceFolder)
-    , m_outputFolder(outputFolder)
+    , m_resizedOutputFolder(resizedOutputFolder)
+    , m_opticalOutputFolder(opticalFlowOutputFolder)
     {
     }
 
@@ -51,15 +52,24 @@ namespace ofextract
         videoCapturePath << currentFolder << "/%d.jpg";
         cv::VideoCapture videoCapture(videoCapturePath.str());
 
-        std::string currentOutputFolder = replaceString(currentFolder, m_sourceFolder, m_outputFolder);
+        std::string currentOpticalOutputFolder = replaceString(currentFolder, m_sourceFolder, m_opticalOutputFolder);
+        std::string currentResizedOutputFolder = replaceString(currentFolder, m_sourceFolder, m_resizedOutputFolder);
         
-        boost::filesystem::path outputPath(currentOutputFolder);
-        if(boost::filesystem::create_directories(outputPath))
+        // create neccessary directories
+        boost::filesystem::path opticalOutputPath(currentOpticalOutputFolder);
+        if(boost::filesystem::create_directories(opticalOutputPath))
         {
-            std::cout << "Directory Created: " << outputPath << std::endl;
+            std::cout << "Directory Created: " << opticalOutputPath << std::endl;
+        }
+
+        boost::filesystem::path resizedOutputPath(currentResizedOutputFolder);
+        if(boost::filesystem::create_directories(resizedOutputPath))
+        {
+            std::cout << "Directory Created: " << resizedOutputPath << std::endl;
         }
 
         cv::Mat CurrentFrame;
+        cv::Mat ResizedFrame;
 
         cv::Mat PreviousFrameGray;
         cv::Mat CurrentFrameGray;
@@ -84,13 +94,28 @@ namespace ofextract
 
         int outputId = 0;
 
+        bool success, successX, successY;
+
         while (videoCapture.grab()){
             std::cout << "extracting image " << i << std::endl;
             i++;
 
             CurrentFrameGray.copyTo(PreviousFrameGray);
             videoCapture.retrieve(CurrentFrame);
-            cv::cvtColor(CurrentFrame, CurrentFrameGray, CV_RGB2GRAY);
+            cv::resize(CurrentFrame, ResizedFrame, cv::Size(227, 227));
+
+            // write resized output
+            std::stringstream resizedOutput;
+            resizedOutput << currentResizedOutputFolder << "/" << outputId << ".jpg";
+            success = cv::imwrite(resizedOutput.str(), ResizedFrame);
+
+            if (!success)
+            {
+                std::cerr << "failed saving image " << resizedOutput.str() << std::endl;
+                break;
+            }
+
+            cv::cvtColor(ResizedFrame, CurrentFrameGray, CV_RGB2GRAY);
 
             if (PreviousFrameGray.empty() || CurrentFrameGray.empty()){
                 continue;
@@ -116,19 +141,40 @@ namespace ofextract
             std::stringstream outputX;
             std::stringstream outputY;
 
-            outputX << currentOutputFolder << "/X" << outputId << ".jpg";
-            outputY << currentOutputFolder << "/Y" << outputId << ".jpg";
+            outputX << currentOpticalOutputFolder << "/X" << outputId << ".jpg";
+            outputY << currentOpticalOutputFolder << "/Y" << outputId << ".jpg";
 
-            outputId++;
-
-            // write output
-            bool successX, successY;
+            // write positive output
             successX = cv::imwrite(outputX.str(), NormImageOutputFlowX);
             successY = cv::imwrite(outputY.str(), NormImageOutputFlowY);
 
             if (!successX || !successY)
             {
                 std::cerr << "failed saving image " << outputX.str() << " or " << outputY.str() << std::endl;
+                break;
+            }
+
+            double reverseAlpha = -1.0;
+            double reverseBeta = 255.0;
+
+            NormImageOutputFlowX.convertTo(NormImageOutputFlowX, CV_8UC1, reverseAlpha, reverseBeta);
+            NormImageOutputFlowY.convertTo(NormImageOutputFlowY, CV_8UC1, reverseAlpha, reverseBeta);
+
+            std::stringstream negOutputX;
+            std::stringstream negOutputY;
+
+            negOutputX << currentOpticalOutputFolder << "/-X" << outputId << ".jpg";
+            negOutputY << currentOpticalOutputFolder << "/-Y" << outputId << ".jpg";
+
+            outputId++;
+
+            // write negative output
+            successX = cv::imwrite(negOutputX.str(), NormImageOutputFlowX);
+            successY = cv::imwrite(negOutputY.str(), NormImageOutputFlowY);
+
+            if (!successX || !successY)
+            {
+                std::cerr << "failed saving image " << negOutputX.str() << " or " << negOutputY.str() << std::endl;
                 break;
             }
 
