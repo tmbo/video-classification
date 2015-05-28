@@ -69,25 +69,28 @@ def stack_flows(filename_label_pair, stride, stacked_frames_count):
   # for every frame stack <sliding_window> many forwards and backwards
   sliding_window = stacked_frames_count / 2
 
-  def get_stacks(start, step):
-    for j in range(start, sliding_window, step):
+  def get_stacks(start, stop, step):
+    for j in range(start, stop, step):
       # if sliding window exceeds boundarys fill with empty frames
-      if j < 0 or j > file_count:
+      if j < 0 or j >= file_count:
+        print "wow", j
         yield (FILENAME_EMPTY_FLOW, first_label)
       else:
-        print filename_label_pair[j]
         yield filename_label_pair[j]
 
   # Collect forward / backward stacks
   for i in range(0, file_count, stride):
 
     #backward
-    for frame in get_stacks(i - 1, -1):
+    for frame in get_stacks(i - 1, i - sliding_window, -1):
       yield frame
 
     #forward
-    for frame in get_stacks(i, +1):
+    for frame in get_stacks(i, i + sliding_window, +1):
       yield frame
+
+    # DEBUG - TODO REMOVE
+    yield ("\n", "\n")
 
 
 def write_to_file(filename_label_pair):
