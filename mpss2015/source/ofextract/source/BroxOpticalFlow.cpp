@@ -97,7 +97,7 @@ namespace ofextract
         bool success, successX, successY;
 
         while (videoCapture.grab()){
-            std::cout << "extracting image " << i << std::endl;
+            // std::cout << "extracting image " << i << std::endl;
             i++;
 
             CurrentFrameGray.copyTo(PreviousFrameGray);

@@ -10,9 +10,9 @@ namespace ofextract
     {
     public:
         BroxOpticalFlow(
-            std::string sourceFolder = "/opt/data_sets/UCF-101/frames/MoppingFloor/v_MoppingFloor_g01_c01/",
-            std::string resizedOutputFolder = "/opt/data_sets/UCF-101/resizedFrames/MoppingFloor/v_MoppingFloor_g01_c01/",
-            std::string opticalFlowOutputFolder = "/opt/data_sets/UCF-101/broxoptflow/MoppingFloor/v_MoppingFloor_g01_c01/"
+            std::string sourceFolder = "/opt/data_sets/UCF-101/frames/MilitaryParade/",
+            std::string resizedOutputFolder = "/opt/data_sets/UCF-101/resizedFrames/MilitaryParade/",
+            std::string opticalFlowOutputFolder = "/opt/data_sets/UCF-101/broxoptflow/MilitaryParade/"
         );
         virtual ~BroxOpticalFlow();
 

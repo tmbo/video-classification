@@ -19,11 +19,11 @@ int main(int argc, char* argv[])
 
         broxOpticalFlow->runAll();
     } else {
-        // std::cout << "usage: <source_root_dir> <resized_output_root_dir> <optical_output_root_dir>" << std::endl;
+        std::cout << "usage: <source_root_dir> <resized_output_root_dir> <optical_output_root_dir>" << std::endl;
 
-        ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow();
+        //ofextract::BroxOpticalFlow* broxOpticalFlow = new ofextract::BroxOpticalFlow();
 
-        broxOpticalFlow->runAll();
+        //broxOpticalFlow->runAll();
     }
     return 0;
 }
