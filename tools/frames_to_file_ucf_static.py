@@ -18,21 +18,25 @@
 ###
 
 from natsort import natsorted
+from random import shuffle
 import os, sys, collections
 
-def run(root_dir, n):
+OUTPUT_FILE = "files_with_labels.txt"
 
+def run(root_dir, n):
   # read the content of the root directory and filter all directories
   directory_names = map(lambda f: os.path.join(root_dir, f), os.listdir(root_dir))
+  directory_names = filter(lambda f: os.path.basename(f).startswith('M'), directory_names)
   directories = filter(os.path.isdir, directory_names)
 
   # assign each 'top-level' directory to a topic id
-  topics = {dir : topicId for (topicId, dir) in enumerate(directories)}
+  topics = { dir : topicId for (topicId, dir) in enumerate(directories) }
 
   # open ouput file
-  filename = os.path.join(root_dir, "files_with_labels.txt")
+  filename = os.path.join(root_dir, OUTPUT_FILE)
   output_file = open(filename, "w")
 
+  videos = []
   # for every topic read all its image files
   for topic_dir in directories:
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
@@ -53,28 +57,37 @@ def run(root_dir, n):
         count = (file_count - 5) / (n - 1)
         start = 5
 
+      current_sequence = []
       for i in range(start, len(files), count):
         absolute_file = os.path.join(parent_dir, files[i])
 
         if (files[i].endswith(("jpeg", "jpg", "png"))):
           # write absolute file path and the corresponding topic Id to the output file
           line = '{} {}\n'.format(absolute_file, topics[topic_dir])
-          output_file.write(line)
+          current_sequence.append(line)
+      videos.append(current_sequence)
+
+  shuffle(videos)
+  for sequence in videos:
+    for line in sequence:
+      output_file.write(line)
 
   # close output file
   output_file.close()
 
   # just some logging
-  sys.stdout.write("Done. Exported %s/files.txt \n" % root_dir)
+  sys.stdout.write("Done. Exported %s/%s \n\n" % (root_dir, OUTPUT_FILE))
   sys.stdout.write("Please, call Caffee's 'convert_image' tool now:\n")
-  sys.stdout.write("$CAFFE_ROOT/build/tools/convert_image \"\" files.txt UCF101 \n")
+  sys.stdout.write("$CAFFE_ROOT/build/tools/convert_image \"\" %s UCF101\n" % OUTPUT_FILE)
 
 
 if __name__ == "__main__":
 
   if len(sys.argv) < 2:
-    sys.exit("Usage: %s <root_directory> <number_of_frames_per_video>" % sys.argv[0])
-    sys.exit("<number_of_frames_per_video>: '-all' for all frames")
+    print("Usage: %s <root_directory> <number_of_frames_per_video>" % sys.argv[0])
+    print("       %s /opt/data_sets/UCF-101/frames/ 16 (you usually want this)" % sys.argv[0])
+    print("<number_of_frames_per_video>: '-all' for all frames")
+    sys.exit("Exiting.")
 
   root_dir = os.path.abspath(sys.argv[1])
   if (sys.argv[2] == '-all'):
