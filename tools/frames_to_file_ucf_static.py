@@ -17,16 +17,13 @@
 #
 ###
 
-
-from __future__ import print_function
 from natsort import natsorted
-import os, sys, glob, collections
+import os, sys, collections
 
 def run(root_dir, n):
 
   # read the content of the root directory and filter all directories
   directory_names = map(lambda f: os.path.join(root_dir, f), os.listdir(root_dir))
-  #directory_names = filter(lambda f: os.path.basename(f).startswith('v_'), directory_names)
   directories = filter(os.path.isdir, directory_names)
 
   # assign each 'top-level' directory to a topic id
@@ -61,8 +58,8 @@ def run(root_dir, n):
 
         if (files[i].endswith(("jpeg", "jpg", "png"))):
           # write absolute file path and the corresponding topic Id to the output file
-          line = '{} {}'.format(absolute_file, topics[topic_dir])
-          print(line, file = output_file)
+          line = '{} {}\n'.format(absolute_file, topics[topic_dir])
+          output_file.write(line)
 
   # close output file
   output_file.close()
