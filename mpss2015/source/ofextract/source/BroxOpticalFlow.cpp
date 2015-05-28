@@ -53,7 +53,7 @@ namespace ofextract
         cv::VideoCapture videoCapture(videoCapturePath.str());
 
         std::string currentOpticalOutputFolder = replaceString(currentFolder, m_sourceFolder, m_opticalOutputFolder);
-        std::string currentResizedOutputFolder = replaceString(currentFolder, m_sourceFolder, m_resizedOutputFolder);
+        std::string currentResizedOutputFolder = replaceString(currentFolder, m_opticalOutputFolder, m_resizedOutputFolder);
         
         // create neccessary directories
         boost::filesystem::path opticalOutputPath(currentOpticalOutputFolder);
