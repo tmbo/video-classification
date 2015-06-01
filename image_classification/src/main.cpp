@@ -11,13 +11,18 @@
 
 using namespace ic;
 
+
 int main(int argc, char** argv) {
-    // text file with frames
+    /**
+     * CONFIG
+     */
+
+    // text file with frames and classes
     std::string txtFile = "../resources/files.txt";
     // sequence size
-    int sequenceSize = 1;
+    int sequenceSize = 2;
     // Result file
-    std::string outputFile = "results.txt";
+    std::string outputFile = "../resources/results.txt";
     // Caffee parameters
     bool cpuSetting = true;
     std::string preModel = "../resources/model/bvlc_reference_caffenet.caffemodel";
@@ -27,6 +32,10 @@ int main(int argc, char** argv) {
     bool isDebug = false;
     std::string resultLayer = "argmax";
     std::string dataLayer = "data";
+
+    /**
+     * MAIN
+     */
 
     // Get all sequences with frame paths and class value
     std::vector<Sequence> sequences;
@@ -43,17 +52,19 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < sequences.size(); i++) {
         Sequence sequence = sequences[i];
+        std::vector<cv::Mat> frames = std::vector<cv::Mat>();
         for (int j = 0; j < sequence.frames.size(); j++) {
             std::string frame = sequence.frames[j];
-
-            std::vector<float> predictions;
             cv::Mat img = cv::imread(frame);
-            classifier.predict(img, resultLayer, dataLayer, predictions);
+            frames.push_back(img);
+        }
 
-            writer.writeLine(frame);
-            for (int k = 0; k < predictions.size(); k++) {
-                writer.writeLine(predictions[k]);
-            }
+        std::vector<float> predictions;
+        classifier.predict(frames, resultLayer, dataLayer, predictions);
+
+        writer.writeLine("True class: " + sequence.clazz);
+        for (int k = 0; k < predictions.size(); k++) {
+            writer.writeLine(predictions[k]);
         }
     }
 

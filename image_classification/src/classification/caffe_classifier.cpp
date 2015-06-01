@@ -58,32 +58,36 @@ namespace ic {
      * @param dataLayer   the name of the data layer
      * @param predictions the predictions
      */
-    void CaffeClassifier::predict(Mat originImage, string resultLayer, string dataLayer, vector<float> & predictions) {
-        if(!originImage.data) {
-            cerr << "Warning: input image for caffe calssifier is empty." << endl;
-            return;
-        }
-
-        // resize image if the size is not equal the image size in proto definition.
-        std::cout << "Resize image..." << std::endl;
-        Mat image;
-        if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
-            resize(originImage, image, imageSize);
-        else
-            image = originImage;
-
-        // check channels
-        if(channels != image.channels()){
-            cerr << "Error: the channel number of input image is invalid for CNN classifier!" << endl;
-            exit(1);
-        }
-
-        // mat to datum
-        std::cout << "Converting Mat to Datum..." << std::endl;
-        Datum datum;
-        CVMatToDatum(image, &datum);
+    void CaffeClassifier::predict(std::vector<cv::Mat> originImages, string resultLayer, string dataLayer, vector<float> & predictions) {
         vector<Datum> vecDatum;
-        vecDatum.push_back(datum);
+
+        for (cv::Mat originImage : originImages) {
+            // check if image contains data
+            if(!originImage.data) {
+                cerr << "Warning: input image for caffe calssifier is empty." << endl;
+                return;
+            }
+
+            // resize image
+            std::cout << "Resize image..." << std::endl;
+            Mat image;
+            if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
+                resize(originImage, image, imageSize);
+            else
+                image = originImage;
+
+            // check channels
+            if(channels != image.channels()){
+                cerr << "Error: the channel number of input image is invalid for CNN classifier!" << endl;
+                exit(1);
+            }
+
+            // mat to datum
+            std::cout << "Converting Mat to Datum..." << std::endl;
+            Datum datum;
+            CVMatToDatum(image, &datum);
+            vecDatum.push_back(datum);
+        }
 
         // get the data layer
         std::cout << "Building data layer..." << std::endl;
@@ -92,13 +96,13 @@ namespace ic {
 
         // push new image data
         memDataLayer->AddDatumVector(vecDatum);
-//        memDataLayer->AddMatVector(image, );
 
         // do forward pass
         std::cout << "Doing forward pass..." << std::endl;
         vector<Blob<float>*> inputVec;
         caffeNet->Forward(inputVec);
 
+        // get results
         std::cout << "Get results..." << std::endl;
         const caffe::shared_ptr<Blob<float> > featureBlob = caffeNet->blob_by_name(resultLayer);
         int batchSize = featureBlob->num();
@@ -113,7 +117,10 @@ namespace ic {
                  predictions = feature_vector;
             }
         }
-        image.release();
+
+        // release data
+        for (Datum d : vecDatum)
+            d.release_data();
     }
 
 }
