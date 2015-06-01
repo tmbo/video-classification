@@ -109,7 +109,7 @@ find_package( Caffe )
 #################################################
 
 set(sources
-	src/main.cpp
+        src/main.cpp
         src/main.hpp
         src/forwarddeclarations.hpp
         src/classification/caffe_classifier.cpp
@@ -134,11 +134,11 @@ add_executable(${target} ${sources})
 
 
 include_directories(
-	${CMAKE_SOURCE_DIR}
-	${OpenCV_INCLUDE_DIR}
-        ${Caffe_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIR}
-	${PROJECT_BINARY_DIR} #for the generated files
+    ${CMAKE_SOURCE_DIR}
+    ${OpenCV_INCLUDE_DIR}
+    ${Caffe_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
+    ${PROJECT_BINARY_DIR} #for the generated files
 )
 
 add_definitions(${Caffe_DEFINITIONS})
