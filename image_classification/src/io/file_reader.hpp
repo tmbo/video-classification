@@ -4,9 +4,16 @@
 
 namespace ic {
 
+    struct Sequence {
+        std::vector<std::string> frames;
+        std::string clazz;
+    };
+
     class FileReader {
         public:
-            static void load(std::string dir, std::vector<std::string>& paths);
+        static std::vector<Sequence> load(std::string dir, int sequenceSize, std::vector<Sequence>& sequences);
+        private:
+        static std::vector<std::string> splitLine(std::string basic_string);
     };
 
 }

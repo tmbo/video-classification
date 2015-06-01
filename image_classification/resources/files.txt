@@ -1,0 +1,1 @@
+/home/tanja/Repositories/video-classification/image_classification/resources/images/cat.jpg 1
