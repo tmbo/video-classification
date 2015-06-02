@@ -6,7 +6,7 @@ namespace ic {
 
     struct Sequence {
         std::vector<std::string> frames;
-        std::string clazz;
+        const char *clazz;
     };
 
     class FileReader {

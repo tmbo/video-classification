@@ -18,7 +18,7 @@ std::vector<Sequence> FileReader::load(std::string txtFile, int sequenceSize, st
             // read line and get frame path and class
             std::vector<std::string> tokens = splitLine(line);
             std::string file = tokens.at(0);
-            std::string clazz = tokens.at(1);
+            const char* clazz = (const char *) tokens.at(1);
             // add frame to frames vector
             frames.push_back(file);
 

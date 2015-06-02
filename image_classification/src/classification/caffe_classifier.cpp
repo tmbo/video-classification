@@ -58,10 +58,13 @@ namespace ic {
      * @param dataLayer   the name of the data layer
      * @param predictions the predictions
      */
-    void CaffeClassifier::predict(std::vector<cv::Mat> originImages, string resultLayer, string dataLayer, vector<float> & predictions) {
+    void CaffeClassifier::predict(std::vector<cv::Mat> originImages, std::vector<int> labels, string resultLayer,
+                                  string dataLayer, vector<float> & predictions) {
         vector<Datum> vecDatum;
 
-        for (cv::Mat originImage : originImages) {
+        for (int i = 0; i < originImages.size(); i++) {
+            cv::Mat originImage = originImages[i];
+
             // resize image
             Mat image;
             if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
@@ -78,6 +81,7 @@ namespace ic {
             // mat to datum
             Datum datum;
             CVMatToDatum(image, &datum);
+            datum.set_label(labels[i]);
             vecDatum.push_back(datum);
         }
 
