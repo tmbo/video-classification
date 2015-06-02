@@ -3,6 +3,7 @@ import inspect
 import os
 import random
 import sys
+import csv
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
@@ -11,7 +12,7 @@ import matplotlib.markers as mks
 
 def get_log_parsing_script():
     dirname = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    return dirname + '/parse_log.sh'
+    return dirname + '/parse_log.py'
 
 def get_log_file_suffix():
     return '.log'
@@ -70,20 +71,19 @@ def get_field_descriptions(chart_type):
     x_axis_field = description[1]
     return x_axis_field, y_axis_field    
 
-def get_field_indecies(x_axis_field, y_axis_field):    
+def get_field_indecies(chart_type, x_axis_field, y_axis_field):    
     data_file_type = get_data_file_type(chart_type)
     fields = create_field_index()[0][data_file_type]
     return fields[x_axis_field], fields[y_axis_field]
 
 def load_data(data_file, field_idx0, field_idx1):
     data = [[], []]
-    with open(data_file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line[0] != '#':
-                fields = line.split()
-                data[0].append(float(fields[field_idx0].strip()))
-                data[1].append(float(fields[field_idx1].strip()))
+    with open(data_file, 'rb') as f:
+        reader = csv.reader(f)
+        next(reader, None)
+        for row in reader:
+            data[0].append(float(row[field_idx0].strip()))
+            data[1].append(float(row[field_idx1].strip()))
     return data
 
 def random_marker():
@@ -107,12 +107,12 @@ def get_legend_loc(chart_type):
     return loc
 
 def plot_chart(path_to_out_dir, path_to_log_list):
-    for chart_type in (0 : len(get_supported_chart_types())):
+    for chart_type in range(0, len(get_supported_chart_types())):
         for path_to_log in path_to_log_list:
-            os.system('%s %s' % (get_log_parsing_script(), path_to_log))
+            os.system('%s %s .' % (get_log_parsing_script(), path_to_log))
             data_file = get_data_file(chart_type, path_to_log)
             x_axis_field, y_axis_field = get_field_descriptions(chart_type)
-            x, y = get_field_indecies(x_axis_field, y_axis_field)
+            x, y = get_field_indecies(chart_type, x_axis_field, y_axis_field)
             data = load_data(data_file, x, y)
             ## TODO: more systematic color cycle for lines
             color = [random.random(), random.random(), random.random()]
@@ -140,10 +140,11 @@ def plot_chart(path_to_out_dir, path_to_log_list):
         plt.title(get_chart_type_description(chart_type))
         plt.xlabel(x_axis_field)
         plt.ylabel(y_axis_field)  
-        plt.savefig("%s/%s.png" % (
-            path_to_out_dir, 
-            get_chart_type_description(chart_type).replace(" ", "_"))
-        plt.show()
+        plt.savefig("%s/%s.png" % ( \
+            path_to_out_dir, \
+            get_chart_type_description(chart_type).replace(" ", "_")))
+        plt.close()
+        #plt.show()
 
 def print_help():
     print """Usage:
