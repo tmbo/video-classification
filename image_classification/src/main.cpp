@@ -66,6 +66,8 @@ int main(int argc, char** argv) {
     FileWriter writer(outputFile);
 
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
+    int correct_predictions = 0;
+    int nr_predictions = 0;
     for (int i = 0; i < sequences.size(); i += 4) {
 
         std::cout << "Predicting sequence " << i + 1 << " - " << i + 4 << std::endl;
@@ -88,7 +90,7 @@ int main(int argc, char** argv) {
                 }
 
                 frames.push_back(frame);
-                labels.push_back(atoi(sequence.clazz));
+                labels.push_back(sequence.clazz);
             }
         }
 
@@ -99,16 +101,23 @@ int main(int argc, char** argv) {
         // write predictions
         for (int k = 0; k < predictions.size(); k++) {
             boost::format line("%1% %2%");
-            line % predictions[k];
-            line % sequences[i + (k / 16)].clazz;
+            int pred   = predictions[k];
+            int actual = sequences[i + k / 16].clazz;
+            nr_predictions += 1;
+            if (pred == actual)
+                correct_predictions += 1;
+            line % pred;
+            line % actual;
             writer.writeLine(line.str());
         }
 
         frames.clear();
         labels.clear();
-    }   
+    }
 
     writer.close();
-    
+
+    std::cout << correct_predictions << "/" << nr_predictions << " = " << static_cast<float>(correct_predictions) / nr_predictions << std::endl;
+
     return 0;
 }
