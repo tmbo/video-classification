@@ -110,11 +110,10 @@ namespace ic {
 
         // get output from each channel
         for (int n = 0; n < batchSize; ++n) {
-            float* fs = featureBlob->mutable_cpu_data()
-                    + featureBlob->offset(n);
+            float* fs = featureBlob->mutable_cpu_data() + featureBlob->offset(n);
             if (sizeof(fs) > 0) {
                 vector<float> feature_vector(fs, fs + dimFeatures);
-                 predictions = feature_vector;
+                 predictions.insert(predictions.begin(), feature_vector.begin(), feature_vector.end());
             }
         }
 
