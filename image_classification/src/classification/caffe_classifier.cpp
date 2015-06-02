@@ -26,7 +26,7 @@ namespace ic {
     }
 
     CaffeClassifier::~CaffeClassifier() {
-        //release everything
+        // release everything
         if(caffeNet != 0)
             delete caffeNet;
     }
@@ -62,12 +62,6 @@ namespace ic {
         vector<Datum> vecDatum;
 
         for (cv::Mat originImage : originImages) {
-            // check if image contains data
-            if(!originImage.data) {
-                cerr << "Warning: input image for caffe calssifier is empty." << endl;
-                return;
-            }
-
             // resize image
             Mat image;
             if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
@@ -76,7 +70,7 @@ namespace ic {
                 image = originImage;
 
             // check channels
-            if(channels != image.channels()){
+            if (channels != image.channels()){
                 cerr << "Error: the channel number of input image is invalid for CNN classifier!" << endl;
                 exit(1);
             }
@@ -88,11 +82,11 @@ namespace ic {
         }
 
         // get the data layer
-        const caffe::shared_ptr<MemoryDataLayer<float> > memDataLayer =
-                boost::static_pointer_cast<MemoryDataLayer<float>> (caffeNet->layer_by_name(dataLayer));
+        const caffe::shared_ptr<MemoryDataLayer<float>> memDataLayer = boost::static_pointer_cast<MemoryDataLayer<float>> (caffeNet->layer_by_name(dataLayer));
 
         // push new image data
         memDataLayer->AddDatumVector(vecDatum);
+        //memDataLayer->ExactNumBottomBlobs();
 
         // do forward pass
         vector<Blob<float>*> inputVec;
