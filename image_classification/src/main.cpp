@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
     writer.close();
 
     std::cout << "Frame-Level: " << frameEval.correct() << "/" << frameEval.nr() << " = " << frameEval.accuracy() << std::endl;
-    std::cout << "Video-Level: " << frameEval.correct() << "/" << frameEval.nr() << " = " << frameEval.accuracy() << std::endl;
+    std::cout << "Video-Level: " << videoEval.correct() << "/" << videoEval.nr() << " = " << videoEval.accuracy() << std::endl;
 
     return 0;
 }
