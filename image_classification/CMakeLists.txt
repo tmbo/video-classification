@@ -130,7 +130,7 @@ source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"
 # Set target name
 set(target ${META_PROJECT_NAME})
 
-add_executable(${target} ${sources})
+add_executable(${target} ${sources} src/util.hpp src/util.cpp)
 
 
 include_directories(

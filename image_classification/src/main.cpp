@@ -9,42 +9,12 @@
 #include "io/file_writer.hpp"
 #include "classification/caffe_classifier.hpp"
 #include "main.hpp"
+#include "util.hpp"
 #include <boost/format.hpp>
 
 using namespace ic;
 
-
-SequenceBatch getSequenceBatch(std::vector<Sequence> sequences, int start, int nrSequences) {
-    std::vector<cv::Mat> frames;
-    std::vector<int> labels;
-
-    for (int i = start; i < start + nrSequences; i++) {
-        Sequence sequence = sequences[i];
-
-        // reading frames and labels of sequence
-        for (int j = 0; j < sequence.frames.size(); j++) {
-            std::string frameFile = sequence.frames[j];
-            cv::Mat frame = cv::imread(frameFile);
-
-            // check if image contains data
-            if (!frame.data) {
-                std::cerr << "Warning: input image (" << frameFile << ") for caffe classifier is empty." << std::endl;
-                exit(1);
-            }
-
-            frames.push_back(frame);
-            labels.push_back(sequence.clazz);
-        }
-    }
-
-    SequenceBatch sequenceBatch;
-    sequenceBatch.frames = frames;
-    sequenceBatch.labels = labels;
-    return sequenceBatch;
-}
-
 int main(int argc, char** argv) {
-    // Check the number of parameters
     if (argc != 7) {
         std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer>" << std::endl;
         std::cerr << "<model>         path to the caffe model file" << std::endl;
@@ -61,8 +31,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Disable logging, just print warnings
-    FLAGS_minloglevel = 1;
+    // Disable logging (1: log warnings, 3: log nothing)
+    FLAGS_minloglevel = 3;
 
     // Caffee parameters
     std::string preModel = argv[1];
@@ -104,7 +74,7 @@ int main(int argc, char** argv) {
         std::cout << "Predicting sequence " << i + 1 << " - " << i + sequenceBatchSize << std::endl;
 
         // get data for the batch of sequences
-        SequenceBatch sequenceBatch = getSequenceBatch(sequences, i, sequenceBatchSize);
+        SequenceBatch sequenceBatch = Util::getSequenceBatch(sequences, i, sequenceBatchSize);
 
         // get prediction for frames
         std::vector<float> predictions;
@@ -112,17 +82,22 @@ int main(int argc, char** argv) {
 
         // write predictions
         for (int k = 0; k < predictions.size(); k++) {
+            Sequence sequence = sequences[i + k / sequenceSize];
+
             int pred   = (int) predictions[k];
-            int actual = sequences[i + k / sequenceSize].clazz;
-            std::string clazzName = sequences[i + k / sequenceSize].clazzName;
+            int actual = sequence.clazz;
+            std::string clazzName = sequence.clazzName;
+            std::string videoName = sequence.videoName;
 
             nr_predictions += 1;
             if (pred == actual)
                 correct_predictions += 1;
 
-            boost::format line("%1% %2%");
+            boost::format line("Predicted: %1% Actual: %2% Class Name: %3% Video Name: %4");
             line % pred;
+            line % actual;
             line % clazzName;
+            line % videoName;
             writer.writeLine(line.str());
         }
     }

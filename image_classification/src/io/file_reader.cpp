@@ -26,14 +26,15 @@ std::vector<Sequence> FileReader::load(std::string txtFile, int sequenceSize, st
             // add it to the sequence vector
             if (count == sequenceSize) {
                 // get clazz name
-                ///opt/data_sets/UCF-101/resized_frames/FloorGymnastics/v_FloorGymnastics_g07_c05/7.jpg
                 boost::filesystem::path path(file);
                 std::string clazzName = boost::filesystem::basename(path.parent_path().parent_path());
+                std::string videoName = boost::filesystem::basename(path.parent_path());
 
                 Sequence seq;
                 seq.frames = frames;
                 seq.clazz = clazz;
                 seq.clazzName = clazzName;
+                seq.videoName = videoName;
                 sequences.push_back(seq);
 
                 // clear count and frames vector

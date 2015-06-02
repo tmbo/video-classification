@@ -8,6 +8,7 @@ namespace ic {
         std::vector<std::string> frames;
         int clazz;
         std::string clazzName;
+        std::string videoName;
     };
 
     class FileReader {
