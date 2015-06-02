@@ -31,7 +31,7 @@ def print_table(headers, data):
     print row_format.format("[sum]", *(row + [sum(row)]))
 
 # Example:
-# python crosseval.py --proto examples/deploy.prototxt --model snapshots/_iter_50000.caffemodel --lmdb MY_LMDB
+# python crosseval.py --proto an-finetune/deploy.prototxt --model snapshots/_iter_50000.caffemodel --lmdb MMI_OAO_TEST#
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--proto', type=str, required=True)
@@ -45,36 +45,54 @@ if __name__ == "__main__":
     labels_set = set()
 
     net = caffe.Net(args.proto, args.model, caffe.TEST)
+    transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
+    transformer.set_mean('data', np.load("/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy").mean(1).mean(1))
+
     caffe.set_mode_cpu()
     lmdb_env = lmdb.open(args.lmdb)
     lmdb_txn = lmdb_env.begin()
     lmdb_cursor = lmdb_txn.cursor()
+    batch_size = 4
+    batched_frames = np.zeros((16 * batch_size, 3, 227, 227))
+    labels = [0] * (16 * batch_size)
+    i = 0
 
     # iterate through lmdb and test all datums
     for key, value in  lmdb_cursor:
         datum = caffe.proto.caffe_pb2.Datum()
         datum.ParseFromString(value)
-        label = int(datum.label)
+        labels[i] = int(datum.label)
         image = caffe.io.datum_to_array(datum)
-        image = image.astype(np.uint8)
+        image = image.astype(np.int32)
 
-        out = net.forward_all(data=np.asarray([image])[:, :, 0:227, 0:227])
-        plabel = int(out['prob'][0].argmax(axis=0))
+        image[0] = image[0] - 104
+        image[1] = image[1] - 117
+        image[2] = image[2] - 123
 
-        count = count + 1
-        iscorrect = label == plabel
-        correct = correct + (1 if iscorrect else 0)
-        matrix[(label, plabel)] += 1
-        labels_set.update([label, plabel])
+        batched_frames[i,:,:,:] = image
+        i += 1
+        if i == (16 * batch_size):
+            # mean_frames = transformer.preprocess('data', batched_frames)
 
-        if not iscorrect:
-            print("\rError: key=%s, expected %i but predicted %i" \
-                    % (key, label, plabel))
+            out = net.forward_all(data=np.asarray(batched_frames))
+            predictions = np.append([], out['argmax'])
 
-        sys.stdout.write("\rAccuracy: %.1f%%" % (100.*correct/count))
-        sys.stdout.flush()
+            for label, plabel in zip(labels, predictions):
+                count = count + 1
+                iscorrect = label == plabel
+                correct = correct + (1 if iscorrect else 0)
+                matrix[(label, plabel)] += 1
+                labels_set.update([label, plabel])
 
-    print(str(correct) + " out of " + str(count) + " were classified correctly")
+                # if not iscorrect:
+                #     print("\rError: key=%s, expected %i but predicted %i" \
+                #             % (key, label, plabel))
+
+            sys.stdout.write("\rAccuracy: %.1f%% Current: %d" % (100.*correct/count, count))
+            sys.stdout.flush()
+            i = 0
+
+    print("\n" + str(correct) + " out of " + str(count) + " were classified correctly")
 
     print ""
     print "Confusion matrix:"
