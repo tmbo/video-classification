@@ -22,7 +22,7 @@ from natsort import natsorted
 import os, sys, collections, re
 
 FILENAME_FLOW_RE = re.compile(r"^X|^Y")
-FILENAME_EMPTY_FLOW = "empty_flow.jpg"
+FILENAME_EMPTY_FLOW = "empty_flow"
 
 DIRECTORY_RE = re.compile(r"((\w+/){2})([0-9]+)\.(jpg|png)$")
 
@@ -67,8 +67,8 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
         filename_x = "X%s" % stack_number
         filename_y = "Y%s" % stack_number
 
-    line_x = '{}/{}{}.jpg {}\n'.format(root_dir, complete_dir, filename_x, label)
-    line_y = '{}/{}{}.jpg {}\n'.format(root_dir, complete_dir, filename_y, label)
+    line_x = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
+    line_y = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
     output_file.write(line_x)
     output_file.write(line_y)
 
