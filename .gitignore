@@ -4,6 +4,9 @@
 # Caffe
 *.caffemodel
 *.tlog*
+*.caffemodel
+*.solverstate
+*.binaryproto
 
 # Temporary files
 *.log
