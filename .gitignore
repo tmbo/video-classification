@@ -10,6 +10,13 @@
 
 # Temporary files
 *.log
+.idea/
+*.iml
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
 target/
 build/
 *.autosave

@@ -16,7 +16,6 @@ IMAGE_FILE = 'images/cat.jpg'
 if not os.path.isfile(PRETRAINED):
     print("Did not find pretrained model file.")
 
-
 caffe.set_mode_cpu()
 net = caffe.Classifier(MODEL_FILE, PRETRAINED,
                        mean=np.load(caffe_root + '/python/caffe/imagenet/ilsvrc_2012_mean.npy').mean(1).mean(1),
