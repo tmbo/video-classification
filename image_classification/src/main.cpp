@@ -12,6 +12,7 @@
 #include "main.hpp"
 #include "util.hpp"
 #include <boost/format.hpp>
+#include <boost/bind.hpp>
 
 using namespace ic;
 
@@ -68,7 +69,8 @@ int main(int argc, char** argv) {
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
 
     Evaluation frameEval(101);
-    Evaluation videoEval(101);
+    Evaluation videoEvalLast(101);
+    Evaluation videoEvalMaj(101);
     FileWriter writer(outputFile);
 
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
@@ -105,15 +107,33 @@ int main(int argc, char** argv) {
             std::vector<float> predictionBatch(first, last);
             assert(predictionBatch.size() == 16);
             int actual = sequences[i + k].clazz;
-            videoEval.prediction(static_cast<int>(predictionBatch.back()), actual);
+            int predLast = static_cast<int>(predictionBatch.back());
+            int predMajority = majorityVoting(predictionBatch);
+            videoEvalLast.prediction(predLast, actual);
+            videoEvalMaj.prediction(predMajority, actual);
         }
     }
 
     writer.close();
 
-    std::cout << "Frame-Level: " << frameEval.correct() << "/" << frameEval.nr() << " = " << frameEval.accuracy() << std::endl;
-    std::cout << "Video-Level: " << videoEval.correct() << "/" << videoEval.nr() << " = " << videoEval.accuracy() << std::endl;
+    std::cout << "Frame-Level:            " << frameEval.correct()     << "/" << frameEval.nr()     << " = " << frameEval.accuracy()     << std::endl;
+    std::cout << "Video-Level (last):     " << videoEvalLast.correct() << "/" << videoEvalLast.nr() << " = " << videoEvalLast.accuracy() << std::endl;
+    std::cout << "Video-Level (majority): " << videoEvalMaj.correct()  << "/" << videoEvalMaj.nr()  << " = " << videoEvalMaj.accuracy()  << std::endl;
 
     return 0;
+}
+
+int majorityVoting(std::vector<float> predictions) {
+    std::map<float, int> occurrences;
+
+    for (std::vector<float>::const_iterator cit = predictions.begin(); cit != predictions.end(); ++cit)
+        ++occurrences[*cit];
+
+    std::map<float, int>::const_iterator found = std::max_element(occurrences.begin(), occurrences.end(), (
+        boost::bind(&std::map<float, int>::value_type::second, _1) <
+        boost::bind(&std::map<float, int>::value_type::second, _2 )
+    ));
+
+    return found->first;
 }
 
