@@ -67,7 +67,8 @@ int main(int argc, char** argv) {
     // Predict all images
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
 
-    Evaluation eval(101);
+    Evaluation frameEval(101);
+    Evaluation videoEval(101);
     FileWriter writer(outputFile);
 
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
@@ -89,7 +90,7 @@ int main(int argc, char** argv) {
             std::string clazzName = sequence.clazzName;
             std::string videoName = sequence.videoName;
 
-            eval.prediction(pred, actual);
+            frameEval.prediction(pred, actual);
 
             boost::format line("Predicted: %d Actual: %d Class Name: %s Video Name: %s");
             line % pred;
@@ -98,11 +99,20 @@ int main(int argc, char** argv) {
             line % videoName;
             writer.writeLine(line.str());
         }
+        for (int k = 0; k < sequenceBatchSize; k++) {
+            std::vector<float>::const_iterator first = predictions.begin() + k * sequenceSize;
+            std::vector<float>::const_iterator last = predictions.begin() + (k + 1) * sequenceSize;
+            std::vector<float> predictionBatch(first, last);
+            assert(predictionBatch.size() == 16);
+            int actual = sequences[i + k].clazz;
+            videoEval.prediction(static_cast<int>(predictionBatch.back()), actual);
+        }
     }
 
     writer.close();
 
-    std::cout << eval.correct() << "/" << eval.nr() << " = " << eval.accuracy() << std::endl;
+    std::cout << "Frame-Level: " << frameEval.correct() << "/" << frameEval.nr() << " = " << frameEval.accuracy() << std::endl;
+    std::cout << "Video-Level: " << frameEval.correct() << "/" << frameEval.nr() << " = " << frameEval.accuracy() << std::endl;
 
     return 0;
 }
