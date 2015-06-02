@@ -14,14 +14,44 @@
 using namespace ic;
 
 
+SequenceBatch getSequenceBatch(std::vector<Sequence> sequences, int start, int nrSequences) {
+    std::vector<cv::Mat> frames;
+    std::vector<int> labels;
+
+    for (int i = start; i < start + nrSequences; i++) {
+        Sequence sequence = sequences[i];
+
+        // reading frames and labels of sequence
+        for (int j = 0; j < sequence.frames.size(); j++) {
+            std::string frameFile = sequence.frames[j];
+            cv::Mat frame = cv::imread(frameFile);
+
+            // check if image contains data
+            if (!frame.data) {
+                std::cerr << "Warning: input image (" << frameFile << ") for caffe classifier is empty." << std::endl;
+                exit(1);
+            }
+
+            frames.push_back(frame);
+            labels.push_back(sequence.clazz);
+        }
+    }
+
+    SequenceBatch sequenceBatch;
+    sequenceBatch.frames = frames;
+    sequenceBatch.labels = labels;
+    return sequenceBatch;
+}
+
 int main(int argc, char** argv) {
     // Check the number of parameters
-    if (argc != 6) {
-        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <result-layer>" << std::endl;
+    if (argc != 7) {
+        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer>" << std::endl;
         std::cerr << "<model>         path to the caffe model file" << std::endl;
         std::cerr << "<prototxt>      path to the deploy.prototxt" << std::endl;
         std::cerr << "<txt-file>      txt-file containing the frames and labels" << std::endl;
         std::cerr << "<sequence-size> size of the sequence" << std::endl;
+        std::cerr << "<batch-size>    the batch size" << std::endl;
         std::cerr << "<result-layer>  name of the result layer" << std::endl;
 
         for (int i = 0; i < argc; i++) {
@@ -34,11 +64,6 @@ int main(int argc, char** argv) {
     // Disable logging, just print warnings
     FLAGS_minloglevel = 1;
 
-    // programm parameter
-    std::string txtFile = argv[3];
-    int sequenceSize = atoi(argv[4]);
-    std::string outputFile = "../resources/results.txt";
-
     // Caffee parameters
     std::string preModel = argv[1];
     std::string protoFile = argv[2];
@@ -46,9 +71,15 @@ int main(int argc, char** argv) {
     cv::Size size(227, 227);
     int channels = 3;
     bool isDebug = false;
-    std::string resultLayer = argv[5];
+    std::string resultLayer = argv[6];
     std::string dataLayer = "data";
+    int batch_size = atoi(argv[5]);
 
+    // programm parameter
+    std::string txtFile = argv[3];
+    int sequenceSize = atoi(argv[4]);
+    std::string outputFile = "../resources/results.txt";
+    int sequenceBatchSize = batch_size / sequenceSize;
 
     /**
      * MAIN
@@ -63,56 +94,37 @@ int main(int argc, char** argv) {
     CaffeClassifier classifier(cpuSetting, preModel, protoFile, size, channels, isDebug);
 
     // Predict all images
-    FileWriter writer(outputFile);
-
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
+
     int correct_predictions = 0;
     int nr_predictions = 0;
-    for (int i = 0; i < sequences.size(); i += 4) {
+    FileWriter writer(outputFile);
 
-        std::cout << "Predicting sequence " << i + 1 << " - " << i + 4 << std::endl;
+    for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
+        std::cout << "Predicting sequence " << i + 1 << " - " << i + sequenceBatchSize << std::endl;
 
-        std::vector<cv::Mat> frames = std::vector<cv::Mat>();
-        std::vector<int> labels = std::vector<int>();
-
-        for (int n = i; n < i + 4; n++) {
-            Sequence sequence = sequences[n];
-
-            // reading frames and labels of sequence
-            for (int j = 0; j < sequence.frames.size(); j++) {
-                std::string frameFile = sequence.frames[j];
-                cv::Mat frame = cv::imread(frameFile);
-
-                // check if image contains data
-                if(!frame.data) {
-                    std::cerr << "Warning: input image (" << frameFile << ") for caffe classifier is empty." << std::endl;
-                    exit(1);
-                }
-
-                frames.push_back(frame);
-                labels.push_back(sequence.clazz);
-            }
-        }
+        // get data for the batch of sequences
+        SequenceBatch sequenceBatch = getSequenceBatch(sequences, i, sequenceBatchSize);
 
         // get prediction for frames
         std::vector<float> predictions;
-        classifier.predict(frames, labels, resultLayer, dataLayer, predictions);
+        classifier.predict(sequenceBatch.frames, sequenceBatch.labels, resultLayer, dataLayer, predictions);
 
         // write predictions
         for (int k = 0; k < predictions.size(); k++) {
-            boost::format line("%1% %2%");
-            int pred   = predictions[k];
-            int actual = sequences[i + k / 16].clazz;
+            int pred   = (int) predictions[k];
+            int actual = sequences[i + k / sequenceSize].clazz;
+            std::string clazzName = sequences[i + k / sequenceSize].clazzName;
+
             nr_predictions += 1;
             if (pred == actual)
                 correct_predictions += 1;
+
+            boost::format line("%1% %2%");
             line % pred;
-            line % actual;
+            line % clazzName;
             writer.writeLine(line.str());
         }
-
-        frames.clear();
-        labels.clear();
     }
 
     writer.close();
@@ -121,3 +133,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
