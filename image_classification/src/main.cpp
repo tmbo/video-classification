@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
 
             frameEval.prediction(pred, actual);
 
-            boost::format line("Predicted: %d Actual: %d Class Name: %s Video Name: %s");
+            boost::format line("Predicted: %-3d Actual: %-3d Class Name: %-19s Video Name: %-20s");
             line % pred;
             line % actual;
             line % clazzName;
