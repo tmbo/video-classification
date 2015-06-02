@@ -69,7 +69,6 @@ namespace ic {
             }
 
             // resize image
-            std::cout << "Resize image..." << std::endl;
             Mat image;
             if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
                 resize(originImage, image, imageSize);
@@ -83,14 +82,12 @@ namespace ic {
             }
 
             // mat to datum
-            std::cout << "Converting Mat to Datum..." << std::endl;
             Datum datum;
             CVMatToDatum(image, &datum);
             vecDatum.push_back(datum);
         }
 
         // get the data layer
-        std::cout << "Building data layer..." << std::endl;
         const caffe::shared_ptr<MemoryDataLayer<float> > memDataLayer =
                 boost::static_pointer_cast<MemoryDataLayer<float>> (caffeNet->layer_by_name(dataLayer));
 
@@ -98,12 +95,10 @@ namespace ic {
         memDataLayer->AddDatumVector(vecDatum);
 
         // do forward pass
-        std::cout << "Doing forward pass..." << std::endl;
         vector<Blob<float>*> inputVec;
         caffeNet->Forward(inputVec);
 
         // get results
-        std::cout << "Get results..." << std::endl;
         const caffe::shared_ptr<Blob<float> > featureBlob = caffeNet->blob_by_name(resultLayer);
         int batchSize = featureBlob->num();
         int dimFeatures = featureBlob->count() / batchSize;

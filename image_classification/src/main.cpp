@@ -8,11 +8,13 @@
 #include "io/file_writer.hpp"
 #include "classification/caffe_classifier.hpp"
 #include "main.hpp"
+#include <glog/logging.h>
 
 using namespace ic;
 
 
 int main(int argc, char** argv) {
+    FLAGS_minloglevel = 1;
     /**
      * CONFIG
      */
@@ -51,6 +53,7 @@ int main(int argc, char** argv) {
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
 
     for (int i = 0; i < sequences.size(); i++) {
+        std::cout << "Predicting sequence " << i << std::endl;
         Sequence sequence = sequences[i];
         std::vector<cv::Mat> frames = std::vector<cv::Mat>();
         for (int j = 0; j < sequence.frames.size(); j++) {
