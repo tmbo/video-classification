@@ -17,7 +17,7 @@ using namespace ic;
 int main(int argc, char** argv) {
     // Check the number of parameters
     if (argc < 7) {
-        std::cerr << "Usage: " << argv[0] << "<model> <prototxt> <txt-file> <sequence-size> <result-layer>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <result-layer>" << std::endl;
         std::cerr << "<model>         path to the caffe model file" << std::endl;
         std::cerr << "<prototxt>      path to the deploy.prototxt" << std::endl;
         std::cerr << "<txt-file>      txt-file containing the frames and labels" << std::endl;
