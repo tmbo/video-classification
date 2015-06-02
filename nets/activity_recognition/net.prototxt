@@ -22,7 +22,7 @@ layer {
   }
   data_param {
     backend: LMDB
-    source: "/opt/data_sets/UCF-101/recurrent_lmdb_train/"
+    source: "/opt/data_sets/UCF-101/lmdbs/recurrent/train/"
     batch_size: 64
   }
 }
@@ -43,7 +43,7 @@ layer {
   }
   data_param {
     backend: LMDB
-    source: "/opt/data_sets/UCF-101/recurrent_lmdb_test/"
+    source: "/opt/data_sets/UCF-101/lmdbs/recurrent/test/"
     batch_size: 64
   }
 }
@@ -364,10 +364,6 @@ layer {
   bottom: "reshape-prediction"
   bottom: "label"
   top: "loss"
-  # loss_weight: 20
-  # softmax_param {
-  #   axis: 2
-  # }
 }
 layer {
   name: "accuracy"
@@ -378,8 +374,4 @@ layer {
   include {
     phase: TEST
   }
-  # accuracy_param {
-  #   axis: 2
-  #   ignore_label: -1
-  # }
 }
