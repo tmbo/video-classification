@@ -114,6 +114,8 @@ set(sources
         src/forwarddeclarations.hpp
         src/classification/caffe_classifier.cpp
         src/classification/caffe_classifier.hpp
+        src/classification/evaluation.hpp
+        src/classification/evaluation.cpp
         src/io/file_reader.cpp
         src/io/file_reader.hpp
         src/io/file_writer.hpp

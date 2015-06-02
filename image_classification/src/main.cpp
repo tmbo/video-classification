@@ -8,6 +8,7 @@
 #include "io/file_reader.hpp"
 #include "io/file_writer.hpp"
 #include "classification/caffe_classifier.hpp"
+#include "classification/evaluation.hpp"
 #include "main.hpp"
 #include "util.hpp"
 #include <boost/format.hpp>
@@ -32,7 +33,7 @@ int main(int argc, char** argv) {
     }
 
     // Disable logging (1: log warnings, 3: log nothing)
-    FLAGS_minloglevel = 3;
+    FLAGS_minloglevel = 1;
 
     // Caffee parameters
     std::string preModel = argv[1];
@@ -66,8 +67,7 @@ int main(int argc, char** argv) {
     // Predict all images
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
 
-    int correct_predictions = 0;
-    int nr_predictions = 0;
+    Evaluation eval(101);
     FileWriter writer(outputFile);
 
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
@@ -89,11 +89,9 @@ int main(int argc, char** argv) {
             std::string clazzName = sequence.clazzName;
             std::string videoName = sequence.videoName;
 
-            nr_predictions += 1;
-            if (pred == actual)
-                correct_predictions += 1;
+            eval.prediction(pred, actual);
 
-            boost::format line("Predicted: %1% Actual: %2% Class Name: %3% Video Name: %4");
+            boost::format line("Predicted: %d Actual: %d Class Name: %s Video Name: %s");
             line % pred;
             line % actual;
             line % clazzName;
@@ -104,7 +102,7 @@ int main(int argc, char** argv) {
 
     writer.close();
 
-    std::cout << correct_predictions << "/" << nr_predictions << " = " << static_cast<float>(correct_predictions) / nr_predictions << std::endl;
+    std::cout << eval.correct() << "/" << eval.nr() << " = " << eval.accuracy() << std::endl;
 
     return 0;
 }
