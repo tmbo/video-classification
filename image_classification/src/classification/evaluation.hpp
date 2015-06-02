@@ -15,9 +15,9 @@ class Evaluation {
         int nrClasses();
 
     protected:
-        int _nr;
-        int _correct;
-        int _nrClasses;
+        int _nr = 0;
+        int _correct = 0;
+        int _nrClasses = 0;
     };
 
 }
