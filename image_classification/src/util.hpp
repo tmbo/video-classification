@@ -8,11 +8,17 @@ namespace ic {
     struct SequenceBatch {
         std::vector<cv::Mat> frames;
         std::vector<int> labels;
+
+        ~SequenceBatch() {
+            frames.clear();
+            labels.clear();
+        }
     };
 
     class Util {
         public:
         static SequenceBatch getSequenceBatch(std::vector<Sequence> sequences, int start, int nrSequences);
+        static int majorityVoting(std::vector<float> predictions);
     };
 
 }

@@ -2,6 +2,8 @@
 
 #include "forwarddeclarations.hpp"
 
-
-int majorityVoting(std::vector<float>);
-
+void writePrediction(std::vector<ic::Sequence> sequences,
+                     std::vector<float> predictions,
+                     ic::Evaluation frameEval,
+                     int i, int sequenceSize,
+                     ic::FileWriter &writer);

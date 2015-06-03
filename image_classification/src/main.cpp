@@ -82,36 +82,28 @@ int main(int argc, char** argv) {
         // get prediction for frames
         std::vector<float> predictions;
         classifier.predict(sequenceBatch.frames, sequenceBatch.labels, resultLayer, dataLayer, predictions);
+//        delete sequenceBatch;
 
         // write predictions
-        for (int k = 0; k < predictions.size(); k++) {
-            Sequence sequence = sequences[i + k / sequenceSize];
+        writePrediction(sequences, predictions, frameEval, i,  sequenceSize, writer);
 
-            int pred   = (int) predictions[k];
-            int actual = sequence.clazz;
-            std::string clazzName = sequence.clazzName;
-            std::string videoName = sequence.videoName;
-
-            frameEval.prediction(pred, actual);
-
-            boost::format line("Predicted: %-3d Actual: %-3d Class Name: %-19s Video Name: %-20s");
-            line % pred;
-            line % actual;
-            line % clazzName;
-            line % videoName;
-            writer.writeLine(line.str());
-        }
+        // evaluation
         for (int k = 0; k < sequenceBatchSize; k++) {
             std::vector<float>::const_iterator first = predictions.begin() + k * sequenceSize;
             std::vector<float>::const_iterator last = predictions.begin() + (k + 1) * sequenceSize;
             std::vector<float> predictionBatch(first, last);
-            assert(predictionBatch.size() == 16);
+
+            assert(predictionBatch.size() == sequenceSize);
+
             int actual = sequences[i + k].clazz;
             int predLast = static_cast<int>(predictionBatch.back());
-            int predMajority = majorityVoting(predictionBatch);
+            int predMajority = Util::majorityVoting(predictionBatch);
+
             videoEvalLast.prediction(predLast, actual);
             videoEvalMaj.prediction(predMajority, actual);
         }
+
+        predictions.clear();
     }
 
     writer.close();
@@ -123,17 +115,32 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-int majorityVoting(std::vector<float> predictions) {
-    std::map<float, int> occurrences;
+void writePrediction(std::vector<Sequence> sequences,
+                     std::vector<float> predictions,
+                     Evaluation frameEval,
+                     int i, int sequenceSize,
+                     FileWriter &writer) {
 
-    for (std::vector<float>::const_iterator cit = predictions.begin(); cit != predictions.end(); ++cit)
-        ++occurrences[*cit];
+    for (int k = 0; k < predictions.size(); k++) {
+        Sequence sequence = sequences[i + k / sequenceSize];
 
-    std::map<float, int>::const_iterator found = std::max_element(occurrences.begin(), occurrences.end(), (
-        boost::bind(&std::map<float, int>::value_type::second, _1) <
-        boost::bind(&std::map<float, int>::value_type::second, _2 )
-    ));
+        int pred   = (int) predictions[k];
+        int actual = sequence.clazz;
+        std::string clazzName = sequence.clazzName;
+        std::string videoName = sequence.videoName;
 
-    return found->first;
+        frameEval.prediction(pred, actual);
+
+        boost::format line("Predicted: %-3d Actual: %-3d Class Name: %-19s Video Name: %-20s");
+        line % pred;
+        line % actual;
+        line % clazzName;
+        line % videoName;
+        writer.writeLine(line.str());
+    }
 }
+
+
+
+
 
