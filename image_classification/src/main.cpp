@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     FileWriter writer(outputFile);
 
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
-        std::cout << "Predicting sequence " << i + 1 << " - " << i + sequenceBatchSize << std::endl;
+        std::cout << (i * 100) / sequences.size() << "% " << std::flush;
 
         // get data for the batch of sequences
         SequenceBatch sequenceBatch = Util::getSequenceBatch(sequences, i, sequenceBatchSize);
@@ -105,6 +105,7 @@ int main(int argc, char** argv) {
 
         predictions.clear();
     }
+    std::cout << std::endl;
 
     writer.close();
 
