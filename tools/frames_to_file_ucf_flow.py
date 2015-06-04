@@ -32,24 +32,19 @@ INPUT = "/Users/therold/Dropbox/Uni/MasterProjekt/data/frames/Archery/v_Archery_
 
 def get_flow_for_line(line, root_dir, stacked_frames_count):
 
-
   filename, label = line.split(" ")
   complete_dir, sub_dir, frame_number, file_type = re.findall(DIRECTORY_RE, filename)[0]
   frame_number = int(frame_number)
 
   absolute_directory = os.path.join(root_dir, complete_dir)
 
-  file_count = len(os.listdir(absolute_directory))
-
-
-
+  # divided by 4, because of positive and negative and x and y flow
+  file_count = (len(os.listdir(absolute_directory)) - 1) / 4
 
   # for every frame stack <sliding_window> many forwards and backwards
   sliding_window = stacked_frames_count / 2
 
-
   stacks = range(frame_number - sliding_window, frame_number + sliding_window)
-
 
   # open ouput file
   filename = os.path.join(root_dir, "files_with_labels.txt")
