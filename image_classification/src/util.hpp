@@ -6,10 +6,11 @@
 namespace ic {
 
     struct SequenceBatch {
-        std::vector<cv::Mat> frames;
+        std::vector<std::shared_ptr<cv::Mat>> frames;
         std::vector<int> labels;
 
         ~SequenceBatch() {
+//            std::cout << "Calling the sequence batch destructor" << std::endl;
             frames.clear();
             labels.clear();
         }

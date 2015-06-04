@@ -4,16 +4,19 @@
 using namespace ic;
 
 SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start, int nrSequences) {
-    std::vector<cv::Mat> frames;
+    std::vector<std::shared_ptr<cv::Mat>> frames;
     std::vector<int> labels;
 
     for (int i = start; i < start + nrSequences; i++) {
         Sequence sequence = sequences[i];
 
+        cv::Mat frame;
+
         // reading frames and labels of sequence
         for (int j = 0; j < sequence.frames.size(); j++) {
             std::string frameFile = sequence.frames[j];
-            cv::Mat frame = cv::imread(frameFile);
+            frame = cv::imread(frameFile);
+            std::cout << "Refcount (bef): " << *frame.refcount << std::endl;
 
             // check if image contains data
             if (!frame.data) {
@@ -21,8 +24,12 @@ SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start,
                 exit(1);
             }
 
-            frames.push_back(frame);
+            std::shared_ptr<cv::Mat> frame_ptr = new cv::Mat(frame);
+
+            frames.push_back(frame_ptr);
             labels.push_back(sequence.clazz);
+            frame = nullptr;
+            std::cout << "Refcount (aft): " << *frame.refcount << std::endl;
         }
     }
 

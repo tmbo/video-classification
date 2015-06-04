@@ -63,14 +63,18 @@ namespace ic {
                                   string dataLayer, vector<float> & predictions) {
         vector<Datum> vecDatum;
 
+        std::cout << "Prediction" << std::endl;
         for (int i = 0; i < originImages.size(); i++) {
             cv::Mat originImage = originImages[i];
+            std::cout << "Refcount (bef): " << *originImage.refcount << std::endl;
 
             // resize image
             Mat image;
-            if(originImage.cols != imageSize.width || originImage.rows != imageSize.height)
-                resize(originImage, image, imageSize);
-            else
+            if (originImage.cols != imageSize.width || originImage.rows != imageSize.height) {
+//                resize(originImage, image, imageSize);
+                std::cout << "Image does not have correct size. Exiting." << std::endl;
+                exit(99);
+            } else
                 image = originImage;
 
             // check channels
@@ -84,6 +88,8 @@ namespace ic {
             CVMatToDatum(image, &datum);
             datum.set_label(labels[i]);
             vecDatum.push_back(datum);
+            image.release();
+            std::cout << "Refcount (aft): " << *originImage.refcount << std::endl;
         }
 
         // get the data layer

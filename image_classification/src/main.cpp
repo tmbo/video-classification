@@ -82,7 +82,6 @@ int main(int argc, char** argv) {
         // get prediction for frames
         std::vector<float> predictions;
         classifier.predict(sequenceBatch.frames, sequenceBatch.labels, resultLayer, dataLayer, predictions);
-//        delete sequenceBatch;
 
         // write predictions
         writePrediction(sequences, predictions, frameEval, i,  sequenceSize, writer);
