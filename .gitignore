@@ -18,7 +18,7 @@ docs/_build/
 
 # PyBuilder
 target/
-build/
+build*/
 *.autosave
 
 # IDE
