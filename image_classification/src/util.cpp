@@ -10,13 +10,11 @@ SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start,
     for (int i = start; i < start + nrSequences; i++) {
         Sequence sequence = sequences[i];
 
-        cv::Mat frame;
-
         // reading frames and labels of sequence
         for (int j = 0; j < sequence.frames.size(); j++) {
             std::string frameFile = sequence.frames[j];
-            frame = cv::imread(frameFile);
-            std::cout << "Refcount (bef): " << *frame.refcount << std::endl;
+            cv::Mat frame = cv::imread(frameFile);
+//            std::cout << "Refcount (bef): " << *frame.refcount << std::endl;
 
             // check if image contains data
             if (!frame.data) {
@@ -26,10 +24,12 @@ SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start,
 
             frames.push_back(frame);
             labels.push_back(sequence.clazz);
-            std::cout << "Refcount (aft): " << *frame.refcount << std::endl;
         }
     }
 
+//    for (int j = 0; j < frames.size(); j++) {
+//        std::cout << "Refcount (aft): " << *frames[j].refcount << std::endl;
+//    }
     SequenceBatch sequenceBatch;
     sequenceBatch.frames = frames;
     sequenceBatch.labels = labels;

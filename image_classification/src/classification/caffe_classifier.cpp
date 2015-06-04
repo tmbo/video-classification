@@ -59,14 +59,14 @@ namespace ic {
      * @param dataLayer   the name of the data layer
      * @param predictions the predictions
      */
-    void CaffeClassifier::predict(std::vector<cv::Mat> originImages, std::vector<int> labels, string resultLayer,
+    void CaffeClassifier::predict(std::vector<cv::Mat>& originImages, std::vector<int> labels, string resultLayer,
                                   string dataLayer, vector<float> & predictions) {
         vector<Datum> vecDatum;
 
         std::cout << "Prediction" << std::endl;
         for (int i = 0; i < originImages.size(); i++) {
             cv::Mat originImage = originImages[i];
-            std::cout << "Refcount (bef): " << *originImage.refcount << std::endl;
+//            std::cout << "Refcount (bef): " << *originImage.refcount << std::endl;
 
             // resize image
             Mat image;
@@ -78,7 +78,7 @@ namespace ic {
                 image = originImage;
 
             // check channels
-            if (channels != image.channels()){
+            if (channels != image.channels()) {
                 cerr << "Error: the channel number of input image is invalid for CNN classifier!" << endl;
                 exit(1);
             }
@@ -89,7 +89,7 @@ namespace ic {
             datum.set_label(labels[i]);
             vecDatum.push_back(datum);
             image.release();
-            std::cout << "Refcount (aft): " << *originImage.refcount << std::endl;
+//            std::cout << "Refcount (aft): " << *originImage.refcount << std::endl;
         }
 
         // get the data layer
@@ -118,9 +118,9 @@ namespace ic {
         }
 
         // release data
-        for (Datum d : vecDatum)
-            d.release_data();
+        // for (Datum d : vecDatum) {
+        //     d.release_data();
+        // }
     }
-
 }
 
