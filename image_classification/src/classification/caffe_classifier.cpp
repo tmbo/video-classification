@@ -63,7 +63,6 @@ namespace ic {
                                   string dataLayer, vector<float> & predictions) {
         vector<Datum> vecDatum;
 
-        std::cout << "Prediction" << std::endl;
         for (int i = 0; i < originImages.size(); i++) {
             cv::Mat originImage = originImages[i];
 
