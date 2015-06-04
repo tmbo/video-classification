@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     // Caffee parameters
     std::string preModel = argv[1];
     std::string protoFile = argv[2];
-    bool cpuSetting = true;
+    bool cpuSetting = false;
     cv::Size size(227, 227);
     int channels = 3;
     bool isDebug = true;
@@ -73,26 +73,11 @@ int main(int argc, char** argv) {
     Evaluation videoEvalMaj(101);
     FileWriter writer(outputFile);
 
-    std::vector<int*> refcounts;
-
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
-        if (i > 0)
-        {
-            for (int j = 0; j < refcounts.size(); j++)
-            {
-                std::cout << "Refcount (end): " << *refcounts[j] << std::endl;
-            }
-        }
         std::cout << (i * 100) / sequences.size() << "% " << std::flush;
 
         // get data for the batch of sequences
         SequenceBatch sequenceBatch = Util::getSequenceBatch(sequences, i, sequenceBatchSize);
-
-        refcounts.resize(sequenceBatch.frames.size());
-        for (int j = 0; j < sequenceBatch.frames.size(); j++) {
-            refcounts[j] = sequenceBatch.frames[j].refcount;
-            std::cout << "Refcount (bef): " << *refcounts[j] << std::endl;
-        }
 
         // get prediction for frames
         std::vector<float> predictions;

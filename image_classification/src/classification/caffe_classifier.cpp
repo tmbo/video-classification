@@ -66,7 +66,6 @@ namespace ic {
         std::cout << "Prediction" << std::endl;
         for (int i = 0; i < originImages.size(); i++) {
             cv::Mat originImage = originImages[i];
-//            std::cout << "Refcount (bef): " << *originImage.refcount << std::endl;
 
             // resize image
             Mat image;
@@ -89,7 +88,6 @@ namespace ic {
             datum.set_label(labels[i]);
             vecDatum.push_back(datum);
             image.release();
-//            std::cout << "Refcount (aft): " << *originImage.refcount << std::endl;
         }
 
         // get the data layer
