@@ -6,7 +6,7 @@
 namespace ic {
 
     struct SequenceBatch {
-        std::vector<std::shared_ptr<cv::Mat>> frames;
+        std::vector<cv::Mat> frames;
         std::vector<int> labels;
 
         ~SequenceBatch() {

@@ -4,7 +4,7 @@
 using namespace ic;
 
 SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start, int nrSequences) {
-    std::vector<std::shared_ptr<cv::Mat>> frames;
+    std::vector<cv::Mat> frames;
     std::vector<int> labels;
 
     for (int i = start; i < start + nrSequences; i++) {
@@ -24,11 +24,8 @@ SequenceBatch Util::getSequenceBatch(std::vector<Sequence> sequences, int start,
                 exit(1);
             }
 
-            std::shared_ptr<cv::Mat> frame_ptr = new cv::Mat(frame);
-
-            frames.push_back(frame_ptr);
+            frames.push_back(frame);
             labels.push_back(sequence.clazz);
-            frame = nullptr;
             std::cout << "Refcount (aft): " << *frame.refcount << std::endl;
         }
     }

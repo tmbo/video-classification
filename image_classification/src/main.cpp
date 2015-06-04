@@ -39,10 +39,10 @@ int main(int argc, char** argv) {
     // Caffee parameters
     std::string preModel = argv[1];
     std::string protoFile = argv[2];
-    bool cpuSetting = false;
+    bool cpuSetting = true;
     cv::Size size(227, 227);
     int channels = 3;
-    bool isDebug = false;
+    bool isDebug = true;
     std::string resultLayer = argv[6];
     std::string dataLayer = "data";
     int batch_size = atoi(argv[5]);
