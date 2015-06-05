@@ -286,11 +286,9 @@ layer {
   bottom: "sequence"
   top: "lstm"
   recurrent_param {
-    num_output: 256
+    num_output: 1024
     weight_filler {
-        type: "uniform"
-        min: -0.08
-        max: 0.08
+        type: "xavier"
     }
     bias_filler {
       type: "constant"
