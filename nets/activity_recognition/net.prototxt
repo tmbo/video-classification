@@ -242,10 +242,10 @@ layer {
   bottom: "pool5"
   top: "fc6"
   param {
-    lr_mult: 0.0
+    lr_mult: 0.1
   }
   param {
-    lr_mult: 0.0
+    lr_mult: 0.1
   }
   inner_product_param {
     num_output: 4096
@@ -288,9 +288,9 @@ layer {
   recurrent_param {
     num_output: 256
     weight_filler {
-      type: "uniform"
-      min: -0.08
-      max: 0.08
+        type: "uniform"
+        min: -0.08
+        max: 0.08
     }
     bias_filler {
       type: "constant"
@@ -314,9 +314,7 @@ layer {
   inner_product_param {
     num_output: 101
     weight_filler {
-      type: "uniform"
-      min: -0.08
-      max: 0.08
+      type: "xavier"
     }
     bias_filler {
       type: "constant"
