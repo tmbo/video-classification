@@ -286,7 +286,24 @@ layer {
   bottom: "sequence"
   top: "lstm"
   recurrent_param {
-    num_output: 1024
+    num_output: 512
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "lstm2"
+  type: "LSTM"
+  bottom: "lstm"
+  bottom: "sequence"
+  top: "lstm2"
+  recurrent_param {
+    num_output: 256
     weight_filler {
         type: "xavier"
     }
@@ -299,7 +316,7 @@ layer {
 layer {
   name: "prediction"
   type: "InnerProduct"
-  bottom: "lstm"
+  bottom: "lstm2"
   top: "prediction"
   param {
     lr_mult: 1
