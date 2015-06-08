@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "spatial_net"
 layer {
   name: "data"
   type: "Data"
@@ -8,20 +8,10 @@ layer {
     phase: TRAIN
   }
   transform_param {
-#    mirror: true
     crop_size: 227
-#    mean_file: "data/ilsvrc12/imagenet_mean.binaryproto"
   }
-# mean pixel / channel-wise mean instead of mean image
-#  transform_param {
-#    crop_size: 227
-#    mean_value: 104
-#    mean_value: 117
-#    mean_value: 123
-#    mirror: true
-#  }
   data_param {
-    source: "/opt/data_sets/UCF-101/spatial_training_lmdb"
+    source: "/opt/data_sets/UCF-101/lmdbs/spatial/train"
     batch_size: 16
     backend: LMDB
   }
@@ -34,23 +24,13 @@ layer {
   include {
     phase: TEST
   }
-# mean pixel / channel-wise mean instead of mean image
-#  transform_param {
-#    crop_size: 227
-#    mean_value: 104
-#    mean_value: 117
-#    mean_value: 123
-#    mirror: true
-#  }
+  transform_param {
+    crop_size: 227
+  }
   data_param {
-    source: "/opt/data_sets/UCF-101/spatial_test_lmdb"
+    source: "/opt/data_sets/UCF-101/lmdbs/spatial/test"
     batch_size: 8
     backend: LMDB
-  }
-  transform_param {
-#    mirror: true
-    crop_size: 227
-#    mean_file: "data/ilsvrc12/imagenet_mean.binaryproto"
   }
 }
 layer {

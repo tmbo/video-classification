@@ -1,35 +1,36 @@
-name: "activity_recognition_caffenet"
+name: "optical_flow_net"
 layer {
   name: "data"
-  type: "MemoryData"
+  type: "Data"
   top: "data"
   top: "label"
+  include {
+    phase: TRAIN
+  }
   transform_param {
     crop_size: 227
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
   }
-  memory_data_param {
-    batch_size: 64
-    channels: 3
-    width: 227
-    height: 227
+  data_param {
+    source: "/opt/data_sets/UCF-101/lmdbs/flow/train"
+    batch_size: 16
+    backend: LMDB
   }
 }
 layer {
-  name: "sequence"
-  type: "DummyData"
-  top: "sequence"
-  dummy_data_param {
-    shape {
-      dim: 16
-      dim: 4
-    }
-    data_filler {
-      type: "sequence"
-      value: 16
-    }
+  name: "data"
+  type: "Data"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    crop_size: 227
+  }
+  data_param {
+    source: "/opt/data_sets/UCF-101/lmdbs/flow/test"
+    batch_size: 8
+    backend: LMDB
   }
 }
 layer {
@@ -47,6 +48,14 @@ layer {
     num_output: 96
     kernel_size: 11
     stride: 4
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -83,16 +92,24 @@ layer {
   bottom: "norm1"
   top: "conv2"
   param {
-    lr_mult: 0.0
+    lr_mult: 0
   }
   param {
-    lr_mult: 0.0
+    lr_mult: 0
   }
   convolution_param {
     num_output: 256
     pad: 2
     kernel_size: 5
     group: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
   }
 }
 layer {
@@ -129,16 +146,23 @@ layer {
   bottom: "norm2"
   top: "conv3"
   param {
-    lr_mult: 0.0
+    lr_mult: 0
   }
   param {
-    lr_mult: 0.0
+    lr_mult: 0
   }
-
   convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
@@ -153,16 +177,24 @@ layer {
   bottom: "conv3"
   top: "conv4"
   param {
-    lr_mult: 0.01
+    lr_mult: 0
   }
   param {
-    lr_mult: 0.01
+    lr_mult: 0
   }
   convolution_param {
     num_output: 384
     pad: 1
     kernel_size: 3
     group: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
   }
 }
 layer {
@@ -177,16 +209,24 @@ layer {
   bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 0.1
+    lr_mult: 0
   }
   param {
-    lr_mult: 0.1
+    lr_mult: 0
   }
   convolution_param {
     num_output: 256
     pad: 1
     kernel_size: 3
     group: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
   }
 }
 layer {
@@ -212,13 +252,21 @@ layer {
   bottom: "pool5"
   top: "fc6"
   param {
-    lr_mult: 0.1
+    lr_mult: 0
   }
   param {
-    lr_mult: 0.1
+    lr_mult: 0
   }
   inner_product_param {
     num_output: 4096
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
   }
 }
 layer {
@@ -237,102 +285,82 @@ layer {
   }
 }
 layer {
-  name: "reshape-fc6"
-  type: "Reshape"
-  top: "reshape-fc6"
-  bottom: "fc6"
-  reshape_param {
-    shape {
-      dim: 16
-      dim: 4
-      dim: 4096
-    }
-  }
-}
-layer {
-  name: "lstm"
-  type: "LSTM"
-  bottom: "reshape-fc6"
-  bottom: "sequence"
-  top: "lstm"
-  recurrent_param {
-    num_output: 1024
-    weight_filler {
-        type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "lstm2"
-  type: "LSTM"
-  bottom: "lstm"
-  bottom: "sequence"
-  top: "lstm2"
-  recurrent_param {
-    num_output: 512
-    weight_filler {
-        type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "prediction"
+  name: "fc7"
   type: "InnerProduct"
-  bottom: "lstm2"
-  top: "prediction"
+  bottom: "fc6"
+  top: "fc7"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
   }
   inner_product_param {
-    num_output: 101
+    num_output: 4096
     weight_filler {
-      type: "xavier"
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
+  }
+}
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "fc7"
+  top: "fc7"
+}
+layer {
+  name: "drop7"
+  type: "Dropout"
+  bottom: "fc7"
+  top: "fc7"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+layer {
+  name: "fc8changed"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8changed"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
     }
     bias_filler {
       type: "constant"
       value: 0
     }
-    axis: 2
   }
 }
 layer {
-  name: "reshape-prediction"
-  type: "Reshape"
-  top: "reshape-prediction"
-  bottom: "prediction"
-  reshape_param {
-    shape {
-      dim: 64
-      dim: 101
-    }
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "fc8changed"
+  bottom: "label"
+  top: "accuracy"
+  include {
+    phase: TEST
   }
 }
 layer {
   name: "loss"
-  type: "Softmax"
-  bottom: "reshape-prediction"
+  type: "SoftmaxWithLoss"
+  bottom: "fc8changed"
+  bottom: "label"
   top: "loss"
 }
-layer {
-  name:"argmax"
-  type: "ArgMax"
-  bottom: "loss"
-  top: "argmax"
-  argmax_param {
-    top_k: 1
-  }
-}
-

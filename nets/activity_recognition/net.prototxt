@@ -183,10 +183,10 @@ layer {
   bottom: "conv3"
   top: "conv4"
   param {
-    lr_mult: 0.0
+    lr_mult: 0.01
   }
   param {
-    lr_mult: 0.0
+    lr_mult: 0.01
   }
   convolution_param {
     num_output: 384
@@ -207,10 +207,10 @@ layer {
   bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 0.0
+    lr_mult: 0.1
   }
   param {
-    lr_mult: 0.0
+    lr_mult: 0.1
   }
   convolution_param {
     num_output: 256
@@ -286,7 +286,7 @@ layer {
   bottom: "sequence"
   top: "lstm"
   recurrent_param {
-    num_output: 512
+    num_output: 1024
     weight_filler {
         type: "xavier"
     }
@@ -303,7 +303,7 @@ layer {
   bottom: "sequence"
   top: "lstm2"
   recurrent_param {
-    num_output: 256
+    num_output: 512
     weight_filler {
         type: "xavier"
     }
