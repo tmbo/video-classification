@@ -17,15 +17,16 @@
 using namespace ic;
 
 int main(int argc, char** argv) {
-    if (argc != 8) {
-        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer> <nr-classes>" << std::endl;
+    if (argc != 9) {
+        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer> <nr-classes> <result-file>" << std::endl;
         std::cerr << "<model>         path to the caffe model file" << std::endl;
         std::cerr << "<prototxt>      path to the deploy.prototxt" << std::endl;
         std::cerr << "<txt-file>      txt-file containing the frames and labels" << std::endl;
         std::cerr << "<sequence-size> size of the sequence" << std::endl;
         std::cerr << "<batch-size>    the batch size" << std::endl;
         std::cerr << "<result-layer>  name of the result layer" << std::endl;
-        std::cerr << "<nr-classes>  name of the result layer" << std::endl;
+        std::cerr << "<nr-classes>    name of the result layer" << std::endl;
+        std::cerr << "<result-file>   path to result file" << std::endl;
 
         for (int i = 0; i < argc; i++) {
             std::cout << argv[i] << std::endl;
@@ -52,7 +53,7 @@ int main(int argc, char** argv) {
     // programm parameter
     std::string txtFile = argv[3];
     int sequenceSize = atoi(argv[4]);
-    std::string outputFile = "../resources/results.txt";
+    std::string outputFile = argv[8];
     int sequenceBatchSize = batchSize / sequenceSize;
 
     /**
