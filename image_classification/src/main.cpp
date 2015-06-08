@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 
 void writePrediction(std::vector<Sequence> sequences,
                      std::vector<float> predictions,
-                     Evaluation frameEval,
+                     Evaluation &frameEval,
                      int i, int sequenceSize,
                      FileWriter &writer) {
 
