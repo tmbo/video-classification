@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     // programm parameter
     std::string txtFile = argv[3];
     int sequenceSize = atoi(argv[4]);
-    std::string outputFile = "resources/results.txt";
+    std::string outputFile = "../resources/results.txt";
     int sequenceBatchSize = batch_size / sequenceSize;
 
     /**
