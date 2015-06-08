@@ -17,14 +17,15 @@
 using namespace ic;
 
 int main(int argc, char** argv) {
-    if (argc != 7) {
-        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer>" << std::endl;
+    if (argc != 8) {
+        std::cerr << "Usage: " << argv[0] << " <model> <prototxt> <txt-file> <sequence-size> <batch-size> <result-layer> <nr-classes>" << std::endl;
         std::cerr << "<model>         path to the caffe model file" << std::endl;
         std::cerr << "<prototxt>      path to the deploy.prototxt" << std::endl;
         std::cerr << "<txt-file>      txt-file containing the frames and labels" << std::endl;
         std::cerr << "<sequence-size> size of the sequence" << std::endl;
         std::cerr << "<batch-size>    the batch size" << std::endl;
         std::cerr << "<result-layer>  name of the result layer" << std::endl;
+        std::cerr << "<nr-classes>  name of the result layer" << std::endl;
 
         for (int i = 0; i < argc; i++) {
             std::cout << argv[i] << std::endl;
@@ -45,13 +46,14 @@ int main(int argc, char** argv) {
     bool isDebug = true;
     std::string resultLayer = argv[6];
     std::string dataLayer = "data";
-    int batch_size = atoi(argv[5]);
+    int batchSize = atoi(argv[5]);
+    int nrClasses = atoi(argv[7]);
 
     // programm parameter
     std::string txtFile = argv[3];
     int sequenceSize = atoi(argv[4]);
     std::string outputFile = "../resources/results.txt";
-    int sequenceBatchSize = batch_size / sequenceSize;
+    int sequenceBatchSize = batchSize / sequenceSize;
 
     /**
      * MAIN
@@ -61,6 +63,11 @@ int main(int argc, char** argv) {
     std::vector<Sequence> sequences;
     FileReader::load(txtFile, sequenceSize, sequences);
 
+    if (sequences.size() % 4 != 0) {
+        std::cout << "Number of sequences (" << sequences.size() << ") modulo 4 is not equal to 0!" << std::endl;
+        exit(99);
+    }
+
     // Initialize classifier
     std::cout << "Initialize classifier ..." << std::endl;
     CaffeClassifier classifier(cpuSetting, preModel, protoFile, size, channels, isDebug);
@@ -68,9 +75,9 @@ int main(int argc, char** argv) {
     // Predict all images
     std::cout << "Predicting " << sequences.size() << " sequences ..." << std::endl;
 
-    Evaluation frameEval(101);
-    Evaluation videoEvalLast(101);
-    Evaluation videoEvalMaj(101);
+    Evaluation frameEval(nrClasses);
+    Evaluation videoEvalLast(nrClasses);
+    Evaluation videoEvalMaj(nrClasses);
     FileWriter writer(outputFile);
 
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
