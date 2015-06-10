@@ -16,6 +16,12 @@ namespace ic {
         _nr += 1;
     }
 
+    std::string Evaluation::summaryString() {
+        std::ostringstream stream;
+        stream << this->correct() << "/" << this->nr() << " = " << this->accuracy() << std::endl;
+        return stream.str();
+    }
+
     float Evaluation::accuracy() {
         return static_cast<float>(_correct) / _nr;
     }

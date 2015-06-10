@@ -81,6 +81,10 @@ int main(int argc, char** argv) {
     Evaluation videoEvalMaj(nrClasses);
     FileWriter writer(outputFile);
 
+    std::vector<Evaluation> positionEvaluation;
+    for (int i = 0; i < nrClasses; i++)
+        positionEvaluation.push_back(Evaluation(nrClasses));
+
     for (int i = 0; i < sequences.size(); i += sequenceBatchSize) {
         std::cout << (i * 100) / sequences.size() << "% " << std::flush;
 
@@ -105,6 +109,8 @@ int main(int argc, char** argv) {
             int actual = sequences[i + k].clazz;
             int predLast = static_cast<int>(predictionBatch.back());
             int predMajority = Util::majorityVoting(predictionBatch);
+            for (int j = 0; j < sequenceSize; j++)
+                positionEvaluation[j].prediction(static_cast<int>(predictions[j]), actual);
 
             videoEvalLast.prediction(predLast, actual);
             videoEvalMaj.prediction(predMajority, actual);
@@ -116,9 +122,13 @@ int main(int argc, char** argv) {
 
     writer.close();
 
-    std::cout << "Frame-Level:            " << frameEval.correct()     << "/" << frameEval.nr()     << " = " << frameEval.accuracy()     << std::endl;
-    std::cout << "Video-Level (last):     " << videoEvalLast.correct() << "/" << videoEvalLast.nr() << " = " << videoEvalLast.accuracy() << std::endl;
-    std::cout << "Video-Level (majority): " << videoEvalMaj.correct()  << "/" << videoEvalMaj.nr()  << " = " << videoEvalMaj.accuracy()  << std::endl;
+    std::cout << "Frame-Level:            " << frameEval.summaryString() << std::endl;
+    std::cout << "Video-Level (last):     " << videoEvalLast.summaryString() << std::endl;
+    std::cout << "Video-Level (majority): " << videoEvalMaj.summaryString() << std::endl;
+
+    std::cout << "Evaluating at different positions: " << std::endl;
+    for (int j = 0; j < sequenceSize; j++)
+        std::cout << std::setw(2) << j << ": " << positionEvaluation[j].summaryString() << std::endl;
 
     return 0;
 }

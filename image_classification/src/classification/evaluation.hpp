@@ -9,6 +9,7 @@ class Evaluation {
         Evaluation(int nrClasses);
 
         void prediction(int pred, int actual);
+        std::string summaryString();
         int correct();
         int nr();
         float accuracy();
