@@ -12,7 +12,7 @@ gamma: 0.5
 stepsize: 20000
 momentum: 0.9
 # Regularization parameter for the weights
-weight_decay: 0.0
+weight_decay: 0.00001
 
 # Display training loss every nth iteration
 display: 100
