@@ -24,7 +24,7 @@ snapshot: 5000
 snapshot_prefix: "./snapshots/"
 
 random_seed: 1701
-# Display the loss averaged over the last average_loss iterations
+# Display the loss averaged over the last average_loss iterations - this does not work for accuracy
 average_loss: 100
 clip_gradients: 10
 

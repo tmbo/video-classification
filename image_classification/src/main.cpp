@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
             int predLast = static_cast<int>(predictionBatch.back());
             int predMajority = Util::majorityVoting(predictionBatch);
             for (int j = 0; j < sequenceSize; j++)
-                positionEvaluation[j].prediction(static_cast<int>(predictions[j]), actual);
+                positionEvaluation[j].prediction(static_cast<int>(predictionBatch[j]), actual);
 
             videoEvalLast.prediction(predLast, actual);
             videoEvalMaj.prediction(predMajority, actual);
