@@ -133,6 +133,7 @@ source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"
 set(target ${META_PROJECT_NAME})
 
 add_executable(${target} ${sources} src/util.hpp src/util.cpp)
+add_executable(heatmap src/heatmap.cpp)
 
 
 include_directories(

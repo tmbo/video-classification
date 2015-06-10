@@ -104,6 +104,7 @@ namespace ic {
         const caffe::shared_ptr<Blob<float> > featureBlob = caffeNet->blob_by_name(resultLayer);
         int batchSize = featureBlob->num();
         int dimFeatures = featureBlob->count() / batchSize;
+        std::cout << "Batch size is " << batchSize << "/ dim features is " << dimFeatures << std::endl;
 
         // get output from each channel
         for (int n = 0; n < batchSize; ++n) {
