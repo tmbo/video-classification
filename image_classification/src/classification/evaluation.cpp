@@ -18,7 +18,7 @@ namespace ic {
 
     std::string Evaluation::summaryString() {
         std::ostringstream stream;
-        stream << this->correct() << "/" << this->nr() << " = " << this->accuracy() << std::endl;
+        stream << this->correct() << "/" << this->nr() << " = " << this->accuracy();
         return stream.str();
     }
 
