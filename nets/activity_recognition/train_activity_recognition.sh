@@ -2,7 +2,7 @@
 
 export CAFFE_ROOT="$HOME/caffe-tmbo"
 
-WEIGHTS=$CAFFE_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel
+WEIGHTS=$CAFFE_ROOT/models/VGG_ILSVRC_19_layers/VGG_ILSVRC_19_layers.caffemodel
 
 $CAFFE_ROOT/build/tools/caffe train \
     -solver $MP_HOME/nets/activity_recognition/solver.prototxt \
