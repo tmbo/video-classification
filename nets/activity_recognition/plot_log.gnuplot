@@ -18,9 +18,9 @@
 reset
 #set terminal dumb
 set style data lines
-set key right
+set key right center
 
-file(test_or_train) = sprintf("uc101.tlog.%s", test_or_train)
+file(test_or_train) = sprintf("%s.%s", filename, test_or_train)
 ucf_101_title = "Learning on six classes of UCF 101"
 
 ###### Fields in the training data
@@ -52,6 +52,7 @@ plot file("train") using 1:4 title "learning rate"
 # Test loss vs. training iterations
 set title "Training iterations vs. test accuracy"
 set xlabel "Training iterations"
-set ylabel "Accuracy"
-set terminal wxt 3
+set ylabel "Test accuracy"
+set terminal png
+set output "it_vs_acc.png"
 plot file("test") using 1:3 title "accuracy"
