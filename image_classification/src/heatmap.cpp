@@ -56,7 +56,10 @@ int main(int argc, char** argv) {
     applyColorMap(color, falseColorsMap, cv::COLORMAP_AUTUMN);
 
     cv::namedWindow("Out", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("Orig", cv::WINDOW_AUTOSIZE);
+
     cv::imshow("Out", falseColorsMap);
+    cv::imshow("Orig", inputImage);
     cv::waitKey(0);
 
 

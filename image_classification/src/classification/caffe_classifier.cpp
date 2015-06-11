@@ -57,7 +57,7 @@ namespace ic {
 
         int STEP_SIZE = 13;
         int START_OFFSET = STEP_SIZE / 2;
-        int FILLER_SIZE = 100;
+        int FILLER_SIZE = 50;
 
         std::vector<Point> middlePoints;
         for (int i = START_OFFSET; i < 227; i += STEP_SIZE) {
@@ -80,11 +80,11 @@ namespace ic {
                           Point(min(226, p.x + FILLER_SIZE), min(226, p.y + FILLER_SIZE)),
                           Scalar(127, 127, 127),
                           CV_FILLED);
-                std::ostringstream o;
-                o << "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/";
-                o << index;
-                o << "_heat.png";
-                cv::imwrite(o.str(), image);
+//                std::ostringstream o;
+//                o << "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/";
+//                o << index;
+//                o << "_heat.png";
+//                cv::imwrite(o.str(), image);
 
                 // check channels
                 if (channels != image.channels()) {
