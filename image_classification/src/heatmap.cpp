@@ -34,12 +34,32 @@ int main(int argc, char** argv) {
     cv::Mat inputImage = cv::imread("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/8.jpg", CV_LOAD_IMAGE_COLOR);
 
     cv::Mat heatMap;
-    classifier.predictHeatMap(inputImage, 18, "reshape-prediction", "data", heatMap);
+    classifier.predictHeatMap(inputImage, 18, "loss", "data", heatMap);
+
+    double min;
+    double max;
+    cv::minMaxIdx(heatMap, &min, &max);
+    cv::Mat color;
+    heatMap.convertTo(color, CV_8UC1, 255 / (max - min), -min);
+    std::cout << "Min: " << min << ", Max: " << max << std::endl;
+    std::cout << color << std::endl;
 
     std::vector<int> compression_params;
     compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
     compression_params.push_back(9);
 
-    cv::imwrite("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/8_heat.png", heatMap, compression_params);
+    // this is great. It converts your grayscale image into a tone-mapped one,
+    // much more pleasing for the eye
+    // function is found in contrib module, so include contrib.hpp
+    // and link accordingly
+    cv::Mat falseColorsMap;
+    applyColorMap(color, falseColorsMap, cv::COLORMAP_AUTUMN);
+
+    cv::namedWindow("Out", cv::WINDOW_AUTOSIZE);
+    cv::imshow("Out", falseColorsMap);
+    cv::waitKey(0);
+
+
+    cv::imwrite("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/heatmap.png", falseColorsMap, compression_params);
     return 0;
 }

@@ -53,7 +53,89 @@ namespace ic {
     }
 
     void CaffeClassifier::predictHeatMap(cv::Mat& inputImage, int label, string predictionLayer, string dataLayer, cv::Mat& heatMap) {
-        heatMap = cv::Mat(227, 227, CV_8UC3, Scalar(127, 127, 127));
+        heatMap = cv::Mat(227, 227, CV_32FC1, Scalar(0));
+
+        int STEP_SIZE = 13;
+        int START_OFFSET = STEP_SIZE / 2;
+        int FILLER_SIZE = 100;
+
+        std::vector<Point> middlePoints;
+        for (int i = START_OFFSET; i < 227; i += STEP_SIZE) {
+            for (int j = START_OFFSET; j < 227; j += STEP_SIZE) {
+                middlePoints.push_back(Point(i, j));
+            }
+        }
+//        assert(middlePoints.size() == 76 * 76);
+
+        for (int i = 0; i < middlePoints.size(); i += 64) {
+            std::cout << (i * 100) / middlePoints.size() << "% " << std::flush;
+            vector<Datum> vecDatum;
+
+            for (int j = 0; j < 64; j++) {
+                int index = min(static_cast<int>(middlePoints.size() - 1), i + j);
+                Point p = middlePoints[index];
+                cv::Mat image = inputImage.clone();
+                rectangle(image,
+                          Point(max(0, p.x - FILLER_SIZE), max(0, p.y - FILLER_SIZE)),
+                          Point(min(226, p.x + FILLER_SIZE), min(226, p.y + FILLER_SIZE)),
+                          Scalar(127, 127, 127),
+                          CV_FILLED);
+                std::ostringstream o;
+                o << "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/";
+                o << index;
+                o << "_heat.png";
+                cv::imwrite(o.str(), image);
+
+                // check channels
+                if (channels != image.channels()) {
+                    cerr << "Error: the channel number of input image is invalid for CNN classifier!" << endl;
+                    exit(1);
+                }
+
+                // mat to datum
+                Datum datum;
+                CVMatToDatum(image, &datum);
+                datum.set_label(label);
+                vecDatum.push_back(datum);
+                image.release();
+            }
+
+            // get the data layer
+            const caffe::shared_ptr<MemoryDataLayer<float>> memDataLayer = boost::static_pointer_cast<MemoryDataLayer<float>> (caffeNet->layer_by_name(dataLayer));
+
+            // push new image data
+            memDataLayer->AddDatumVector(vecDatum);
+
+            // do forward pass
+            vector<Blob<float>*> inputVec;
+            caffeNet->Forward(inputVec);
+
+            // get results
+            const caffe::shared_ptr<Blob<float> > featureBlob = caffeNet->blob_by_name(predictionLayer);
+            int batchSize = featureBlob->num(); // 64
+            int dimFeatures = featureBlob->count() / batchSize; // 101
+//        std::cout << "Batch size is " << batchSize << "/ dim features is " << dimFeatures << std::endl;
+
+            // get output from each channel
+            for (int j = 0; j < batchSize; ++j) {
+                int index = min(static_cast<int>(middlePoints.size() - 1), i + j);
+                Point p = middlePoints[index];
+
+                float* fs = featureBlob->mutable_cpu_data() + featureBlob->offset(j);
+                vector<float> featureVector(fs, fs + dimFeatures);
+                std::vector<float>::iterator result = std::max_element(featureVector.begin(), featureVector.end());
+//                assert(result - featureVector.begin() - 1 == label);
+                float confidence = featureVector[label + 1];
+
+
+                rectangle(heatMap,
+                    Point(p.x - STEP_SIZE, p.y - STEP_SIZE),
+                    Point(p.x + STEP_SIZE, p.y + STEP_SIZE),
+                    Scalar(confidence),
+                    CV_FILLED);
+//                std::cout << confidence << std::endl;
+            }
+        }
     }
 
     /**
@@ -108,7 +190,7 @@ namespace ic {
         const caffe::shared_ptr<Blob<float> > featureBlob = caffeNet->blob_by_name(resultLayer);
         int batchSize = featureBlob->num();
         int dimFeatures = featureBlob->count() / batchSize;
-        std::cout << "Batch size is " << batchSize << "/ dim features is " << dimFeatures << std::endl;
+//        std::cout << "Batch size is " << batchSize << "/ dim features is " << dimFeatures << std::endl;
 
         // get output from each channel
         for (int n = 0; n < batchSize; ++n) {
