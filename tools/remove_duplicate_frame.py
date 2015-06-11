@@ -89,7 +89,7 @@ def contains_motion(file_path):
 
   for r in range(IMAGE_SIZE):
     for c in range(IMAGE_SIZE):
-      if img[r, c] != 127:
+      if abs(img[r, c] - 127) > 2:
         return True
 
   return False
