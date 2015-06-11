@@ -40,6 +40,10 @@ def remove_duplicates(flow_root_dir, resized_frames_root_dir, duplicate_root_dir
   # for every topic read all its image files
   for topic_dir in directories:
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
+      file_count = len(files)
+      if file_count == 0:
+        continue
+
       files = natsorted(files)
       # the flow is calculated from frame x to x + 1
       del files[-1]
@@ -77,7 +81,7 @@ def remove_duplicates(flow_root_dir, resized_frames_root_dir, duplicate_root_dir
           new_flow_negative_Y_path = os.path.join(duplicate_flow_dir, "-Y" + f)
 
           # move the files
-          os.rename(frame_path, new_frame_path)
+#          os.rename(frame_path, new_frame_path)
           os.rename(flow_negative_X_path, new_flow_negative_X_path)
           os.rename(flow_negative_Y_path, new_flow_negative_Y_path)
           os.rename(flow_positive_X_path, new_flow_positive_X_path)
