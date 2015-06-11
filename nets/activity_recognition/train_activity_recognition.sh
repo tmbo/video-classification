@@ -24,7 +24,7 @@ $CAFFE_ROOT/build/tools/caffe train \
 #    -snapshot snapshots/_iter_50000.solverstate
 
 cp -r snapshots/ $FOLDER_NAME
-$CAFFE_ROOT/tools/extra/parse_log.sh 
+$CAFFE_ROOT/tools/extra/parse_log.sh $TRAINING_LOG_NAME
 gnuplot -e "filename='$TRAINING_LOG_NAME'" -p plot_log.gnuplot
 
 mv *.png $FOLDER_NAME
