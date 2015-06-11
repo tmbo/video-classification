@@ -49,7 +49,7 @@ namespace ofextract
     void BroxOpticalFlow::runOnFolder(std::string currentFolder)
     {
         std::stringstream videoCapturePath;
-        videoCapturePath << currentFolder << "/%d.jpg";
+        videoCapturePath << currentFolder << "/%3d.jpg";
         cv::VideoCapture videoCapture(videoCapturePath.str());
 
         std::string currentOpticalOutputFolder = replaceString(currentFolder, m_sourceFolder, m_opticalOutputFolder);
@@ -94,7 +94,7 @@ namespace ofextract
 
         int outputId = 0;
 
-        bool success, successX, successY;
+        bool successX, successY;
 
         while (videoCapture.grab()){
             // std::cout << "extracting image " << i << std::endl;
@@ -177,16 +177,16 @@ namespace ofextract
                 break;
             }
 
-            // write resized output
-            std::stringstream resizedOutput;
-            resizedOutput << currentResizedOutputFolder << "/" << outputId << ".jpg";
-            success = cv::imwrite(resizedOutput.str(), ResizedFrame);
+            // // write resized output
+            // std::stringstream resizedOutput;
+            // resizedOutput << currentResizedOutputFolder << "/" << outputId << ".jpg";
+            // success = cv::imwrite(resizedOutput.str(), ResizedFrame);
 
-            if (!success)
-            {
-                std::cerr << "failed saving image " << resizedOutput.str() << std::endl;
-                break;
-            }
+            // if (!success)
+            // {
+            //     std::cerr << "failed saving image " << resizedOutput.str() << std::endl;
+            //     break;
+            // }
 
             // // debug output
             // cv::imshow("flowX", FlowX);
