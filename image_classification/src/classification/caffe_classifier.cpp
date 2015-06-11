@@ -52,6 +52,10 @@ namespace ic {
         caffeNet->CopyTrainedLayersFrom(modelFile);
     }
 
+    void CaffeClassifier::predictHeatMap(cv::Mat& inputImage, int label, string predictionLayer, string dataLayer, cv::Mat& heatMap) {
+        heatMap = cv::Mat(227, 227, CV_8UC3, Scalar(127, 127, 127));
+    }
+
     /**
      * Get the prediction response for the given image.
      * @param originImage image, which should be predicted

@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     bool cpuSetting = false;
     cv::Size size(227, 227);
     int channels = 3;
-    bool isDebug = true;
+    bool isDebug = false;
     std::string resultLayer = argv[6];
     std::string dataLayer = "data";
     int batchSize = atoi(argv[5]);

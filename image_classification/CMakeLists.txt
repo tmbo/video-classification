@@ -109,8 +109,8 @@ find_package( Caffe )
 #################################################
 
 set(sources
-        src/main.cpp
-        src/main.hpp
+        src/util.cpp
+        src/util.hpp
         src/forwarddeclarations.hpp
         src/classification/caffe_classifier.cpp
         src/classification/caffe_classifier.hpp
@@ -131,9 +131,10 @@ source_group_by_path("${CMAKE_CURRENT_SOURCE_DIR}/src"
 
 # Set target name
 set(target ${META_PROJECT_NAME})
+set(heatmap "heatmap")
 
-add_executable(${target} ${sources} src/util.hpp src/util.cpp)
-add_executable(heatmap src/heatmap.cpp)
+add_executable(${target} ${sources} src/main.cpp src/main.hpp)
+add_executable(${heatmap} ${sources} src/heatmap.cpp)
 
 
 include_directories(
@@ -150,6 +151,11 @@ link_directories(${Boost_LIBRARY_DIR})
 
 target_link_libraries( ${target}
     ${OpenCV_LIBS}
-    ${Boost_LIBRARIES} 
+    ${Boost_LIBRARIES}
+    ${Caffe_LIBRARIES}
+)
+target_link_libraries( ${heatmap}
+    ${OpenCV_LIBS}
+    ${Boost_LIBRARIES}
     ${Caffe_LIBRARIES}
 )
