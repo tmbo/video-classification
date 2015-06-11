@@ -9,10 +9,10 @@ if [ $# -ne 1 ]; then
 fi
 FOLDER_NAME="${DATE}_$1"
 TRAINING_LOG_NAME="uc101.tlog"
-echo "Saving experiment in experiment/$FOLDER_NAME"
+echo "Saving experiment in experiments/$FOLDER_NAME"
 
-mkdir $FOLDER_NAME
-cp net.prototxt solver.prototxt deploy.prototxt train_activity_recognition.sh $FOLDER_NAME
+mkdir experiments/$FOLDER_NAME
+cp net.prototxt solver.prototxt deploy.prototxt train_activity_recognition.sh experiments/$FOLDER_NAME
 
 export CAFFE_ROOT="$HOME/caffe-tmbo"
 
@@ -23,9 +23,9 @@ $CAFFE_ROOT/build/tools/caffe train \
     -weights $WEIGHTS 2>&1 > $TRAINING_LOG_NAME
 #    -snapshot snapshots/_iter_50000.solverstate
 
-cp -r snapshots/ $FOLDER_NAME
+cp -r snapshots/ experiments/$FOLDER_NAME
 $CAFFE_ROOT/tools/extra/parse_log.sh $TRAINING_LOG_NAME
 gnuplot -e "filename='$TRAINING_LOG_NAME'" -p plot_log.gnuplot
 
-mv *.png $FOLDER_NAME
+mv *.png experiments/$FOLDER_NAME
 rm ${TRAINING_LOG_NAME}.test ${TRAINING_LOG_NAME}.train
