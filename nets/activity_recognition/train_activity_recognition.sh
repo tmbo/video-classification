@@ -10,6 +10,8 @@ fi
 FOLDER_NAME="${DATE}_$1"
 TRAINING_LOG_NAME="uc101.tlog"
 echo "Saving experiment in experiment/$FOLDER_NAME"
+
+mkdir $FOLDER_NAME
 cp net.prototxt solver.prototxt deploy.prototxt train_activity_recognition.sh $FOLDER_NAME
 
 export CAFFE_ROOT="$HOME/caffe-tmbo"
@@ -18,10 +20,10 @@ WEIGHTS=$CAFFE_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffe
 
 $CAFFE_ROOT/build/tools/caffe train \
     -solver $MP_HOME/nets/activity_recognition/solver.prototxt \
-    -weights $WEIGHTS 2>&1 | tee $TRAINING_LOG_NAME | less
+    -weights $WEIGHTS 2>&1 > $TRAINING_LOG_NAME
 #    -snapshot snapshots/_iter_50000.solverstate
 
-
+cp -r snapshots/ $FOLDER_NAME
 $CAFFE_ROOT/tools/extra/parse_log.sh 
 gnuplot -e "filename='$TRAINING_LOG_NAME'" -p plot_log.gnuplot
 
