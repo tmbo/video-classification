@@ -9,6 +9,7 @@ layer {
   }
   transform_param {
     crop_size: 227
+    mean_value: 127
   }
   data_param {
     source: "/opt/data_sets/UCF-101/lmdbs/flow/train"
@@ -26,6 +27,7 @@ layer {
   }
   transform_param {
     crop_size: 227
+    mean_value: 127
   }
   data_param {
     source: "/opt/data_sets/UCF-101/lmdbs/flow/test"
@@ -293,7 +295,7 @@ layer {
   bottom: "fc6"
   top: "fc6"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.9
   }
 }
 layer {
@@ -310,7 +312,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 2048
     weight_filler {
       type: "gaussian"
       std: 0.005
@@ -333,34 +335,34 @@ layer {
   bottom: "fc7"
   top: "fc7"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.9
   }
 }
-#layer {
-#  name: "fc8"
-#  type: "InnerProduct"
-#  bottom: "fc7"
-#  top: "fc8"
-#  param {
-#    lr_mult: 1
-#    decay_mult: 1
-#  }
-#  param {
-#    lr_mult: 2
-#    decay_mult: 0
-#  }
-#  inner_product_param {
-#    num_output: 1000
-#    weight_filler {
-#      type: "gaussian"
-#      std: 0.01
-#    }
-#    bias_filler {
-#      type: "constant"
-#      value: 0
-#    }
-#  }
-#}
+layer {
+  name: "fc8"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 101
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
 layer {
   name: "accuracy"
   type: "Accuracy"
