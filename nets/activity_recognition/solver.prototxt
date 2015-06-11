@@ -4,20 +4,20 @@ test_interval: 2000
 # How many iterations per test
 test_iter: 200
 # Base learning rate
-base_lr: 0.01
+base_lr: 0.001
 
 # Policy for changing the learning rate - multiply by gamma every stepsize iterations
 lr_policy: "step"
 gamma: 0.5
-stepsize: 20000
+stepsize: 15000
 momentum: 0.9
 # Regularization parameter for the weights
-weight_decay: 0.00001
+weight_decay: 0.0005
 
 # Display training loss every nth iteration
 display: 100
 # After how many iterations to stop
-max_iter: 100000
+max_iter: 500000
 
 # Snapshot every nth iteration in the specified directory
 snapshot: 5000
@@ -26,7 +26,7 @@ snapshot_prefix: "./snapshots/"
 random_seed: 1701
 # Display the loss averaged over the last average_loss iterations - this does not work for accuracy
 average_loss: 100
-clip_gradients: 10
+#clip_gradients: 10
 
 # GPU for the win!
 solver_mode: GPU
