@@ -52,9 +52,9 @@
 ./run Knitting
 ./run LongJump
 ./run Lunges
-# ./run MilitaryParade
-# ./run Mixing
-# ./run MoppingFloor
+./run MilitaryParade
+./run Mixing
+./run MoppingFloor
 ./run Nunchucks
 ./run ParallelBars
 ./run PizzaTossing
