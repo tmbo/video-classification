@@ -104,17 +104,6 @@ namespace ofextract
             videoCapture.retrieve(CurrentFrame);
             cv::resize(CurrentFrame, ResizedFrame, cv::Size(227, 227));
 
-            // write resized output
-            std::stringstream resizedOutput;
-            resizedOutput << currentResizedOutputFolder << "/" << outputId << ".jpg";
-            success = cv::imwrite(resizedOutput.str(), ResizedFrame);
-
-            if (!success)
-            {
-                std::cerr << "failed saving image " << resizedOutput.str() << std::endl;
-                break;
-            }
-
             cv::cvtColor(ResizedFrame, CurrentFrameGray, CV_RGB2GRAY);
 
             if (PreviousFrameGray.empty() || CurrentFrameGray.empty()){
@@ -135,16 +124,34 @@ namespace ofextract
             FlowXGPU.download(FlowX);
             FlowYGPU.download(FlowY);
 
-            FlowX.convertTo(NormImageOutputFlowX, CV_8UC1, m_alpha, m_beta);
-            FlowY.convertTo(NormImageOutputFlowY, CV_8UC1, m_alpha, m_beta);
+            int flowFormat = CV_8UC1;
+            std::string flowFileEnding = ".jpg";
 
+            FlowX.convertTo(NormImageOutputFlowX, flowFormat, m_alpha, m_beta);
+            FlowY.convertTo(NormImageOutputFlowY, flowFormat, m_alpha, m_beta);
+
+            // check for equal frames
+            double minVal; double maxVal; 
+            minMaxLoc(NormImageOutputFlowX, &minVal, &maxVal);
+            std::cout << outputId << ": " << minVal << " | " << maxVal << std::endl;
+            int tolerance = (int) std::floor(m_alpha / 2.0);
+            if (minVal > 127 - tolerance && maxVal < 127 + tolerance) {
+                continue;
+            }
+
+            double reverseAlpha = -1.0;
+            double reverseBeta = 255.0;
+
+            NormImageOutputFlowX.convertTo(NormImageOutputFlowX, flowFormat, reverseAlpha, reverseBeta);
+            NormImageOutputFlowY.convertTo(NormImageOutputFlowY, flowFormat, reverseAlpha, reverseBeta);
+
+            // write positive output
             std::stringstream outputX;
             std::stringstream outputY;
 
-            outputX << currentOpticalOutputFolder << "/X" << outputId << ".jpg";
-            outputY << currentOpticalOutputFolder << "/Y" << outputId << ".jpg";
+            outputX << currentOpticalOutputFolder << "/X" << outputId << flowFileEnding;
+            outputY << currentOpticalOutputFolder << "/Y" << outputId << flowFileEnding;
 
-            // write positive output
             successX = cv::imwrite(outputX.str(), NormImageOutputFlowX);
             successY = cv::imwrite(outputY.str(), NormImageOutputFlowY);
 
@@ -154,21 +161,13 @@ namespace ofextract
                 break;
             }
 
-            double reverseAlpha = -1.0;
-            double reverseBeta = 255.0;
-
-            NormImageOutputFlowX.convertTo(NormImageOutputFlowX, CV_8UC1, reverseAlpha, reverseBeta);
-            NormImageOutputFlowY.convertTo(NormImageOutputFlowY, CV_8UC1, reverseAlpha, reverseBeta);
-
+            // write negative output
             std::stringstream negOutputX;
             std::stringstream negOutputY;
 
-            negOutputX << currentOpticalOutputFolder << "/-X" << outputId << ".jpg";
-            negOutputY << currentOpticalOutputFolder << "/-Y" << outputId << ".jpg";
+            negOutputX << currentOpticalOutputFolder << "/-X" << outputId << flowFileEnding;
+            negOutputY << currentOpticalOutputFolder << "/-Y" << outputId << flowFileEnding;
 
-            outputId++;
-
-            // write negative output
             successX = cv::imwrite(negOutputX.str(), NormImageOutputFlowX);
             successY = cv::imwrite(negOutputY.str(), NormImageOutputFlowY);
 
@@ -178,10 +177,23 @@ namespace ofextract
                 break;
             }
 
+            // write resized output
+            std::stringstream resizedOutput;
+            resizedOutput << currentResizedOutputFolder << "/" << outputId << ".jpg";
+            success = cv::imwrite(resizedOutput.str(), ResizedFrame);
+
+            if (!success)
+            {
+                std::cerr << "failed saving image " << resizedOutput.str() << std::endl;
+                break;
+            }
+
             // // debug output
             // cv::imshow("flowX", FlowX);
             // cv::imshow("flowY", FlowY);
             // cv::waitKey(0);
+
+            outputId++;
         }
     }
 

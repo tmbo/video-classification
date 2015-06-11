@@ -21,7 +21,7 @@ namespace ofextract
     private:
         std::string replaceString(std::string &s, std::string toReplace, std::string replaceWith);
 
-        double m_alpha = 7.0;
+        double m_alpha = 12.0;
         double m_beta = 127.0;
 
         std::string m_sourceFolder;
