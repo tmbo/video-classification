@@ -27,32 +27,35 @@ ucf_101_title = "Learning on six classes of UCF 101"
 ###### Iters Seconds TrainingLoss LearningRate
 
 # Training loss vs. training iterations
+set terminal png
+set output "it_vs_train-loss.png"
 set title "Training loss vs. training iterations"
 set xlabel "Training iterations"
 set ylabel "Training loss"
-set terminal wxt 0
 plot file("train") using 1:3 title "loss"
 
 # Training loss vs. training time
-set title "Training time vs. training loss"
-set xlabel "Training time"
-set ylabel "Training loss"
-set terminal wxt 1
-plot file("train") using 2:3 title "loss"
+#set terminal png
+#set output "time_vs_train-loss.png"
+#set title "Training time vs. training loss"
+#set xlabel "Training time"
+#set ylabel "Training loss"
+#plot file("train") using 2:3 title "loss"
 
 # Learning rate vs. training iterations;
+set terminal png
+set output "it_vs_lr.png"
 set xlabel "Training iterations"
 set ylabel "Learning rate"
-set terminal wxt 2
 plot file("train") using 1:4 title "learning rate"
 
 ###### Fields in the test data
 ###### Iters Seconds TestAccuracy TestLoss
 
 # Test loss vs. training iterations
+set terminal png
+set output "it_vs_test-acc.png"
 set title "Training iterations vs. test accuracy"
 set xlabel "Training iterations"
 set ylabel "Test accuracy"
-set terminal png
-set output "it_vs_acc.png"
 plot file("test") using 1:3 title "accuracy"
