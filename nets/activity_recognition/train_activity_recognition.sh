@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DATE=`date +%Y%m%d-%H%M%S`
-if [ $# -ne 2 ]; then
+if [ $# -ne 1 ]; then
     echo "Usage: $0 [experiment_name]"
 	echo "       experiment_name: Name of the subfolder in ./experiments/ for the current experiment."
 	echo "Exiting."
