@@ -130,14 +130,14 @@ namespace ofextract
             FlowX.convertTo(NormImageOutputFlowX, flowFormat, m_alpha, m_beta);
             FlowY.convertTo(NormImageOutputFlowY, flowFormat, m_alpha, m_beta);
 
-            // check for equal frames
-            double minVal; double maxVal; 
-            minMaxLoc(NormImageOutputFlowX, &minVal, &maxVal);
-            std::cout << outputId << ": " << minVal << " | " << maxVal << std::endl;
-            int tolerance = (int) std::floor(m_alpha / 2.0);
-            if (minVal > 127 - tolerance && maxVal < 127 + tolerance) {
-                continue;
-            }
+            // // check for equal frames
+            // double minVal; double maxVal; 
+            // minMaxLoc(NormImageOutputFlowX, &minVal, &maxVal);
+            // std::cout << outputId << ": " << minVal << " | " << maxVal << std::endl;
+            // int tolerance = (int) std::floor(m_alpha / 2.0);
+            // if (minVal > 127 - tolerance && maxVal < 127 + tolerance) {
+            //     continue;
+            // }
 
             double reverseAlpha = -1.0;
             double reverseBeta = 255.0;
