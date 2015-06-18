@@ -34,35 +34,32 @@ int main(int argc, char** argv) {
     cv::Mat inputImage = cv::imread("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/8.jpg", CV_LOAD_IMAGE_COLOR);
 
     cv::Mat heatMap;
-    classifier.predictHeatMap(inputImage, 18, "loss", "data", heatMap);
+    classifier.predictHeatMap(inputImage, 18, "reshape-prediction", "data", heatMap);
 
-    double min;
-    double max;
-    cv::minMaxIdx(heatMap, &min, &max);
-    cv::Mat color;
-    heatMap.convertTo(color, CV_8UC1, 255 / (max - min), -min);
-    std::cout << "Min: " << min << ", Max: " << max << std::endl;
-    std::cout << color << std::endl;
+    cv::Mat normalized;
+    cv::normalize(heatMap, normalized, 0.0, 255.0, cv::NORM_MINMAX, CV_8UC1);
+    std::cout << heatMap << std::endl;
+    std::cout << "===============================================" << std::endl;
+    std::cout << "===============================================" << std::endl;
+    std::cout << "===============================================" << std::endl;
+    std::cout << "===============================================" << std::endl;
+    std::cout << normalized << std::endl;
 
-    std::vector<int> compression_params;
-    compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
-    compression_params.push_back(9);
+    std::vector<int> compressionParams;
+    compressionParams.push_back(CV_IMWRITE_PNG_COMPRESSION);
+    compressionParams.push_back(9);
 
-    // this is great. It converts your grayscale image into a tone-mapped one,
-    // much more pleasing for the eye
-    // function is found in contrib module, so include contrib.hpp
-    // and link accordingly
-    cv::Mat falseColorsMap;
-    applyColorMap(color, falseColorsMap, cv::COLORMAP_AUTUMN);
+    cv::Mat colorMap = normalized;
+//    applyColorMap(normalized, colorMap, cv::COLORMAP_AUTUMN);
 
-    cv::namedWindow("Out", cv::WINDOW_AUTOSIZE);
-    cv::namedWindow("Orig", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("Image", cv::WINDOW_AUTOSIZE);
+    cv::namedWindow("Heatmap", cv::WINDOW_AUTOSIZE);
 
-    cv::imshow("Out", falseColorsMap);
-    cv::imshow("Orig", inputImage);
+    cv::imshow("Image", inputImage);
+    cv::imshow("Heatmap", colorMap);
     cv::waitKey(0);
 
 
-    cv::imwrite("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/heatmap.png", falseColorsMap, compression_params);
+    cv::imwrite("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/heatmap.png", colorMap, compressionParams);
     return 0;
 }
