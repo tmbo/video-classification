@@ -1,15 +1,15 @@
 net: "net.prototxt"
 # Test every nth iteration
-test_interval: 2000
+test_interval: 8000
 # How many iterations per test
-test_iter: 200
+test_iter: 800
 # Base learning rate
 base_lr: 0.001
 
 # Policy for changing the learning rate - multiply by gamma every stepsize iterations
 lr_policy: "step"
 gamma: 0.5
-stepsize: 15000
+stepsize: 50000
 momentum: 0.9
 # Regularization parameter for the weights
 weight_decay: 0.0005
@@ -17,7 +17,7 @@ weight_decay: 0.0005
 # Display training loss every nth iteration
 display: 100
 # After how many iterations to stop
-max_iter: 500000
+max_iter: 1000000
 
 # Snapshot every nth iteration in the specified directory
 snapshot: 5000
