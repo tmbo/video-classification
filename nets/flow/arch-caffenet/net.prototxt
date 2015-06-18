@@ -10,6 +10,7 @@ layer {
   transform_param {
     crop_size: 227
     mean_value: 127
+    mirror : 1
   }
   data_param {
     source: "/opt/data_sets/UCF-101/lmdbs/flow/train_random"
