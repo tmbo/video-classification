@@ -15,7 +15,7 @@ layer {
   data_param {
     backend: LMDB
     source: "/opt/data_sets/UCF-101/lmdbs/recurrent/train_random/"
-    batch_size: 16
+    batch_size: 64
   }
 }
 layer {
@@ -217,6 +217,14 @@ layer {
   top: "fc6"
   name: "fc6"
   type: "InnerProduct"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  } 
   inner_product_param {
     num_output: 4096
   }
@@ -233,7 +241,7 @@ layer {
   name: "drop6"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.1
   }
 }
 layer {
@@ -241,6 +249,14 @@ layer {
   top: "fc7"
   name: "fc7"
   type: "InnerProduct"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
   inner_product_param {
     num_output: 2048
   }
@@ -257,7 +273,7 @@ layer {
   name: "drop7"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.1
   }
 }
 layer {
@@ -266,11 +282,11 @@ layer {
   name: "prediction"
   type: "InnerProduct"
   param {
-    lr_mult: 10
+    lr_mult: 1
     decay_mult: 1
   }
   param {
-    lr_mult: 20
+    lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
@@ -282,6 +298,15 @@ layer {
       type: "constant"
       value: 0
     }
+  }
+}
+layer {
+  bottom: "prediction"
+  top: "prediction"
+  name: "dropPrediction"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.1
   }
 }
 layer {
