@@ -89,7 +89,7 @@ def run(root_dir, list_file_path, n):
             line = '{} {}\n'.format(absolute_file, topics[topic_dir])
             current_sequence.append(line)
 
-      if len(current_sequence) != n:
+      if n >= 0 and len(current_sequence) != n:
         print("file_count")
         print(file_count)
         print("count")
@@ -101,7 +101,7 @@ def run(root_dir, list_file_path, n):
 
 #      if len(current_sequence) != n:
 #        print(len(current_sequence))
-      assert(len(current_sequence) == n)
+      assert(n==-1 or len(current_sequence) == n)
       videos.append(current_sequence)
 
       if (len(videos) % 500 == 0):

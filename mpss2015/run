@@ -8,5 +8,5 @@ fi
 
 class=$1
 
-./build/ofextractcmd /opt/data_sets/UCF-101/frames_10fps/$class /opt/data_sets/UCF-101/resized_frames_10fps/$class /opt/data_sets/UCF-101/broxoptflow_10fps/$class
+./build/ofextractcmd $UCF101_HOME/frames/$class $UCF101_HOME/flow/$class
 

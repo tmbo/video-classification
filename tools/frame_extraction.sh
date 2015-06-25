@@ -25,7 +25,6 @@ while read file; do
     outputfolder="${file%.*}"
     outputfolder=$(sed -e "s|${indir}|${outdir}|g" <<< $outputfolder)
     mkdir -p "$outputfolder"
-    echo "$file > $outputfolder/%3d.jpg" 
-    echo "/home/mpss2015/ffmpeg-2.7/ffmpeg -i $file -r $framerate -s 227x227 $outputfolder/%3d.jpg"
-    /home/mpss2015/ffmpeg-2.7/ffmpeg -n -nostdin -i "$file" -r "$framerate" -s "227x227" -qscale:v 2 "$outputfolder/%3d.jpg"
+    # echo "$file > $outputfolder/%3d.jpg" 
+    /home/mpss2015m_1/ffmpeg-2.7.1/ffmpeg -n -nostdin -i "$file" -r "$framerate" -qscale:v 2 "$outputfolder/%3d.jpg"
 done < list.tmp

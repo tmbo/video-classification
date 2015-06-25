@@ -1,85 +1,85 @@
 #!/bin/bash
 
-# ./run ApplyEyeMakeup
-# ./run ApplyLipstick
-# ./run Archery
-# ./run BabyCrawling
-# ./run BalanceBeam
-# ./run BandMarching
-# ./run BaseballPitch
-# ./run Basketball
-# ./run BasketballDunk
-# ./run BenchPress
-# ./run Biking
-# ./run Billiards
-# ./run BlowDryHair
-# ./run BlowingCandles
-# ./run BodyWeightSquats
-# ./run Bowling
-# ./run BoxingPunchingBag
-# ./run BoxingSpeedBag
-# ./run BreastStroke
-# ./run BrushingTeeth
-# ./run CleanAndJerk
-# ./run CliffDiving
-# ./run CricketBowling
-# ./run CricketShot
-# ./run CuttingInKitchen
-# ./run Diving
-# ./run Drumming
-# ./run Fencing
-# ./run FieldHockeyPenalty
-# ./run FloorGymnastics
-# ./run FrisbeeCatch
-# ./run FrontCrawl
-# ./run GolfSwing
-# ./run Haircut
-# ./run Hammering
-# ./run HammerThrow
-# ./run HandstandPushups
-# ./run HandstandWalking
-# ./run HeadMassage
-# ./run HighJump
-# ./run HorseRace
-# ./run HorseRiding
-# ./run HulaHoop
-# ./run IceDancing
-# ./run JavelinThrow
-# ./run JugglingBalls
-# ./run JumpingJack
-# ./run JumpRope
-# ./run Kayaking
-# ./run Knitting
-# ./run LongJump
-# ./run Lunges
-# ./run MilitaryParade
-# ./run Mixing
-# ./run MoppingFloor
-# ./run Nunchucks
-# ./run ParallelBars
-# ./run PizzaTossing
-# ./run PlayingCello
-# ./run PlayingDaf
-# ./run PlayingDhol
-# ./run PlayingFlute
-# ./run PlayingGuitar
-# ./run PlayingPiano
-# ./run PlayingSitar
-# ./run PlayingTabla
-# ./run PlayingViolin
-# ./run PoleVault
-# ./run PommelHorse
-# ./run PullUps
-# ./run Punch
-# ./run PushUps
-# ./run Rafting
-# ./run RockClimbingIndoor
-# ./run RopeClimbing
-# ./run Rowing
-# ./run SalsaSpin
-# ./run ShavingBeard
-# ./run Shotput
-# ./run SkateBoarding
+./run ApplyEyeMakeup
+./run ApplyLipstick
+./run Archery
+./run BabyCrawling
+./run BalanceBeam
+./run BandMarching
+./run BaseballPitch
+./run Basketball
+./run BasketballDunk
+./run BenchPress
+./run Biking
+./run Billiards
+./run BlowDryHair
+./run BlowingCandles
+./run BodyWeightSquats
+./run Bowling
+./run BoxingPunchingBag
+./run BoxingSpeedBag
+./run BreastStroke
+./run BrushingTeeth
+./run CleanAndJerk
+./run CliffDiving
+./run CricketBowling
+./run CricketShot
+./run CuttingInKitchen
+./run Diving
+./run Drumming
+./run Fencing
+./run FieldHockeyPenalty
+./run FloorGymnastics
+./run FrisbeeCatch
+./run FrontCrawl
+./run GolfSwing
+./run Haircut
+./run Hammering
+./run HammerThrow
+./run HandstandPushups
+./run HandstandWalking
+./run HeadMassage
+./run HighJump
+./run HorseRace
+./run HorseRiding
+./run HulaHoop
+./run IceDancing
+./run JavelinThrow
+./run JugglingBalls
+./run JumpingJack
+./run JumpRope
+./run Kayaking
+./run Knitting
+./run LongJump
+./run Lunges
+./run MilitaryParade
+./run Mixing
+./run MoppingFloor
+./run Nunchucks
+./run ParallelBars
+./run PizzaTossing
+./run PlayingCello
+./run PlayingDaf
+./run PlayingDhol
+./run PlayingFlute
+./run PlayingGuitar
+./run PlayingPiano
+./run PlayingSitar
+./run PlayingTabla
+./run PlayingViolin
+./run PoleVault
+./run PommelHorse
+./run PullUps
+./run Punch
+./run PushUps
+./run Rafting
+./run RockClimbingIndoor
+./run RopeClimbing
+./run Rowing
+./run SalsaSpin
+./run ShavingBeard
+./run Shotput
+./run SkateBoarding
 ./run Skiing
 ./run Skijet
 ./run SkyDiving
