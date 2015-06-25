@@ -38,13 +38,13 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
 
   absolute_directory = os.path.join(root_dir, complete_dir)
 
-  # divided by 4, because of positive and negative and x and y flow
-  file_count = (len(os.listdir(absolute_directory)) - 1) / 4
+  # divided by 2, because of x and y flow
+  file_count = (len(os.listdir(absolute_directory)) - 1) / 2
 
-  # for every frame stack <sliding_window> many forwards and backwards
-  sliding_window = stacked_frames_count / 2
+  # for every frame stack <sliding_window> many forwards
+  sliding_window = stacked_frames_count
 
-  stacks = range(frame_number - sliding_window, frame_number + sliding_window)
+  stacks = range(frame_number, frame_number + sliding_window)
 
   # open ouput file
   filename = os.path.join(root_dir, "files_with_labels.txt")
@@ -57,12 +57,8 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
       line_x = '{}/{}.jpg {}'.format(root_dir, filename_x, label)
       line_y = '{}/{}.jpg {}'.format(root_dir, filename_y, label)
     else:
-      if stack_number < frame_number:
-        filename_x = "-X%s" % stack_number
-        filename_y = "-Y%s" % stack_number
-      else:
-        filename_x = "X%s" % stack_number
-        filename_y = "Y%s" % stack_number
+      filename_x = "X%s" % stack_number
+      filename_y = "Y%s" % stack_number
       line_x = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
       line_y = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
 
