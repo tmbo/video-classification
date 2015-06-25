@@ -21,12 +21,13 @@ from __future__ import generators
 import os, sys, collections, re
 
 FILENAME_EMPTY_FLOW = "empty_flow"
-DIRECTORY_RE = re.compile(r"((\w+/){2})([0-9]+)\.(jpg|png)$")
+DIRECTORY_RE = re.compile(r"(\w+)\/(\w+)\/([brltm_]+)([0-9]+)\.(jpg|png)$")
 
 def get_flow_for_line(line, root_dir, stacked_frames_count):
   filename, label = line.split(" ")
-  complete_dir, sub_dir, frame_number, file_type = re.findall(DIRECTORY_RE, filename)[0]
+  topic_dir, sub_dir, prefix, frame_number, file_type = re.findall(DIRECTORY_RE, filename)[0]
   frame_number = int(frame_number)
+  complete_dir = os.path.join(topic_dir, sub_dir)
 
   absolute_directory = os.path.join(root_dir, complete_dir)
 
@@ -49,8 +50,8 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
       line_x = '{}/{}.jpg {}'.format(root_dir, filename_x, label)
       line_y = '{}/{}.jpg {}'.format(root_dir, filename_y, label)
     else:
-      filename_x = "X%s" % stack_number
-      filename_y = "Y%s" % stack_number
+      filename_x = '{}X{}'.format(prefix, stack_number)
+      filename_y = '{}Y{}'.format(prefix, stack_number)
       line_x = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
       line_y = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
 
