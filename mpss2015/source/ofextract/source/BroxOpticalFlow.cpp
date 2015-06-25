@@ -3,7 +3,9 @@
 #include <iostream>
 #include <sstream>
 
-#include <boost/filesystem.hpp>
+#include <Poco/RecursiveDirectoryIterator.h>
+#include <Poco/File.h>
+#include <Poco/Path.h>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -23,24 +25,15 @@ namespace ofextract
 
     void BroxOpticalFlow::runAll()
     {
-        boost::filesystem::recursive_directory_iterator rdi(m_sourceFolder);
-        boost::filesystem::recursive_directory_iterator end_rdi;
+        Poco::DirectoryIterator rdi(m_sourceFolder);
+        Poco::DirectoryIterator end_rdi;
 
         std::string parentFolder = m_sourceFolder;
         bool dirProcessed = false;
-        for (; rdi != end_rdi; rdi++) {
-            if (boost::filesystem::is_directory((*rdi).path()))
+        for (; rdi != end_rdi; ++rdi) {
+            if ((*rdi).isDirectory())
             {
-                parentFolder = (*rdi).path().string();
-                dirProcessed = false;
-            }
-            else
-            {
-                if (!dirProcessed && boost::filesystem::extension((*rdi).path()).compare(".jpg") == 0)
-                {
-                    runOnFolder(parentFolder);
-                    dirProcessed = true;
-                }
+                runOnFolder(rdi.path().toString());
             }
         }
     }
@@ -54,11 +47,9 @@ namespace ofextract
         std::string currentOpticalOutputFolder = replaceString(currentFolder, m_sourceFolder, m_opticalOutputFolder);
         
         // create neccessary directories
-        boost::filesystem::path opticalOutputPath(currentOpticalOutputFolder);
-        if(boost::filesystem::create_directories(opticalOutputPath))
-        {
-            std::cout << "Directory Created: " << opticalOutputPath << std::endl;
-        }
+        Poco::File opticalOutputPath(currentOpticalOutputFolder);
+        opticalOutputPath.createDirectories();
+        std::cout << "Directory Created: " << opticalOutputPath.path() << std::endl;
 
         cv::Mat CurrentFrame;
         cv::Mat ResizedFrame;

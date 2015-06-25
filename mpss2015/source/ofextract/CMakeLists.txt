@@ -17,6 +17,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} /usr/local/cuda/lib64/)
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIR}
+    /home/mpss2015m_1/poco-1.6.0/Foundation/include
 )
 
 include_directories(
@@ -29,7 +30,8 @@ include_directories(
 
 set(libs
     ${OpenCV_LIBRARIES}
-    ${Boost_LIBRARIES} 
+    ${Boost_LIBRARIES}
+    /home/mpss2015m_1/poco-1.6.0/lib/Linux/x86_64/libPocoFoundation.so
 )
 
 
