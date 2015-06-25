@@ -53,7 +53,8 @@ trap 'cleanup "Training interrupted"; exit 1' INT
 WEIGHTS=$CAFFE_ROOT/models/CNN_M_2048/VGG_CNN_M_2048.caffemodel
 $CAFFE_ROOT/build/tools/caffe train \
     -solver $MP_HOME/nets/activity_recognition/solver.prototxt \
-    -weights $WEIGHTS 2> $TRAINING_LOG_NAME
+    -weights $WEIGHTS 2> $TRAINING_LOG_NAME \
+    -gpu 1
 #    -snapshot snapshots/_iter_50000.solverstate
 
 # Resetting interrupt handling

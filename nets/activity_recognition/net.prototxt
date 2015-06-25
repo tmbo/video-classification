@@ -14,7 +14,7 @@ layer {
  }
   data_param {
     backend: LMDB
-    source: "/opt/data_sets/UCF-101/lmdbs/recurrent/train_random/"
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_10fps/"
     batch_size: 64
   }
 }
@@ -35,7 +35,7 @@ layer {
 }
   data_param {
     backend: LMDB
-    source: "/opt/data_sets/UCF-101/lmdbs/recurrent/test_random/"
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_10fps/"
     batch_size: 16
   }
 }
