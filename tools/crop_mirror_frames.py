@@ -31,6 +31,7 @@ def crop_mirror_frames(original_frames_directory, cropped_frames_directory):
 
   # for every topic read all its image files
   for topic_dir in directories:
+    print topic_dir
     for parent_dir, sub_dirs, files in os.walk(topic_dir):
       # we iterate over the frame images and crop it
       for f in files:
@@ -91,13 +92,13 @@ def crop_mirror(original, left, upper, right, lower, dir_path, prefix, frame_pat
   # crop
   cropped_frame = original.crop((left, upper, right, lower))
   crop_path = os.path.join(dir_path, prefix + frame_path)
-  cropped_frame.save(crop_path)
+  cropped_frame.save(crop_path, quality=95)
   assert cropped_frame.size == (224, 224)
 
   # mirror
   mirrored_frame = ImageOps.mirror(cropped_frame)
   mirror_path = os.path.join(dir_path, prefix + "m_" + frame_path)
-  mirrored_frame.save(mirror_path)
+  mirrored_frame.save(mirror_path, quality=95)
   assert mirrored_frame.size == (224, 224)
 
 
