@@ -11,9 +11,8 @@
 
 namespace ofextract
 {
-    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string resizedOutputFolder, std::string opticalFlowOutputFolder):
+    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string opticalFlowOutputFolder):
     m_sourceFolder(sourceFolder)
-    , m_resizedOutputFolder(resizedOutputFolder)
     , m_opticalOutputFolder(opticalFlowOutputFolder)
     {
     }
@@ -53,19 +52,12 @@ namespace ofextract
         cv::VideoCapture videoCapture(videoCapturePath.str());
 
         std::string currentOpticalOutputFolder = replaceString(currentFolder, m_sourceFolder, m_opticalOutputFolder);
-        std::string currentResizedOutputFolder = replaceString(currentFolder, m_opticalOutputFolder, m_resizedOutputFolder);
         
         // create neccessary directories
         boost::filesystem::path opticalOutputPath(currentOpticalOutputFolder);
         if(boost::filesystem::create_directories(opticalOutputPath))
         {
             std::cout << "Directory Created: " << opticalOutputPath << std::endl;
-        }
-
-        boost::filesystem::path resizedOutputPath(currentResizedOutputFolder);
-        if(boost::filesystem::create_directories(resizedOutputPath))
-        {
-            std::cout << "Directory Created: " << resizedOutputPath << std::endl;
         }
 
         cv::Mat CurrentFrame;
@@ -88,7 +80,7 @@ namespace ofextract
         cv::Mat NormImageOutputFlowY;
 
         // Create optical flow object
-        cv::gpu::BroxOpticalFlow OpticalFlowGPU = cv::gpu::BroxOpticalFlow(0.197f, 50.0f, 0.8f, 10, 77, 10);
+        cv::gpu::BroxOpticalFlow broxOpticalFlow = cv::gpu::BroxOpticalFlow(0.197f, 50.0f, 0.8f, 10, 77, 10);
 
         int i = 0;
 
@@ -118,7 +110,7 @@ namespace ofextract
             cv::gpu::GpuMat CurrentFrameGPU(CurrentFrameGrayFloat);
 
             // Perform optical flow
-            OpticalFlowGPU(PreviousFrameGPU, CurrentFrameGPU, FlowXGPU, FlowYGPU);
+            broxOpticalFlow(PreviousFrameGPU, CurrentFrameGPU, FlowXGPU, FlowYGPU);
 
             // Download flow from GPU
             FlowXGPU.download(FlowX);
@@ -149,8 +141,18 @@ namespace ofextract
             std::stringstream outputX;
             std::stringstream outputY;
 
-            outputX << currentOpticalOutputFolder << "/X" << outputId << flowFileEnding;
-            outputY << currentOpticalOutputFolder << "/Y" << outputId << flowFileEnding;
+            if (outputId < 10) {
+                outputX << currentOpticalOutputFolder << "/X00" << outputId << flowFileEnding;
+                outputY << currentOpticalOutputFolder << "/Y00" << outputId << flowFileEnding;
+            } else {
+                if (outputId < 100) {
+                    outputX << currentOpticalOutputFolder << "/X0" << outputId << flowFileEnding;
+                    outputY << currentOpticalOutputFolder << "/Y0" << outputId << flowFileEnding;
+                } else {
+                    outputX << currentOpticalOutputFolder << "/X" << outputId << flowFileEnding;
+                    outputY << currentOpticalOutputFolder << "/Y" << outputId << flowFileEnding;
+                }
+            }
 
             successX = cv::imwrite(outputX.str(), NormImageOutputFlowX);
             successY = cv::imwrite(outputY.str(), NormImageOutputFlowY);
@@ -161,21 +163,21 @@ namespace ofextract
                 break;
             }
 
-            // write negative output
-            std::stringstream negOutputX;
-            std::stringstream negOutputY;
+            // // write negative output
+            // std::stringstream negOutputX;
+            // std::stringstream negOutputY;
 
-            negOutputX << currentOpticalOutputFolder << "/-X" << outputId << flowFileEnding;
-            negOutputY << currentOpticalOutputFolder << "/-Y" << outputId << flowFileEnding;
+            // negOutputX << currentOpticalOutputFolder << "/-X" << outputId << flowFileEnding;
+            // negOutputY << currentOpticalOutputFolder << "/-Y" << outputId << flowFileEnding;
 
-            successX = cv::imwrite(negOutputX.str(), NormImageOutputFlowX);
-            successY = cv::imwrite(negOutputY.str(), NormImageOutputFlowY);
+            // successX = cv::imwrite(negOutputX.str(), NormImageOutputFlowX);
+            // successY = cv::imwrite(negOutputY.str(), NormImageOutputFlowY);
 
-            if (!successX || !successY)
-            {
-                std::cerr << "failed saving image " << negOutputX.str() << " or " << negOutputY.str() << std::endl;
-                break;
-            }
+            // if (!successX || !successY)
+            // {
+            //     std::cerr << "failed saving image " << negOutputX.str() << " or " << negOutputY.str() << std::endl;
+            //     break;
+            // }
 
             // // write resized output
             // std::stringstream resizedOutput;

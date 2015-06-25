@@ -11,7 +11,6 @@ namespace ofextract
     public:
         BroxOpticalFlow(
             std::string sourceFolder = "/opt/data_sets/UCF-101/frames/MilitaryParade/",
-            std::string resizedOutputFolder = "/opt/data_sets/UCF-101/resizedFrames/MilitaryParade/",
             std::string opticalFlowOutputFolder = "/opt/data_sets/UCF-101/broxoptflow/MilitaryParade/"
         );
         virtual ~BroxOpticalFlow();
@@ -25,7 +24,6 @@ namespace ofextract
         double m_beta = 127.0;
 
         std::string m_sourceFolder;
-        std::string m_resizedOutputFolder;
         std::string m_opticalOutputFolder;
     };
 
