@@ -18,7 +18,6 @@
 ###
 
 from __future__ import generators
-from natsort import natsorted
 import os, sys, collections, re
 
 FILENAME_FLOW_RE = re.compile(r"^X|^Y")
