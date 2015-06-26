@@ -26,6 +26,7 @@
   "scripts": {
     "build": "webpack --progress",
     "watch": "webpack --watch",
-    "start": "webpack && cd ./dist && python -m  SimpleHTTPServer"
+    "start": "webpack && python server.py",
+    "server": "python server.py"
   }
 }
