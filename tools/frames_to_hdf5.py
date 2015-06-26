@@ -7,8 +7,6 @@ import h5py
 import numpy as np
 import cv2
 
-HDF5_DB_COUNTER = 0
-
 written_files = []
 
 def chunks(l, n):
@@ -17,65 +15,53 @@ def chunks(l, n):
         yield l[i:i+n]
 
 
-def save_as_hdf5(output_path, db_name, frame_data, labels):
-    global HDF5_DB_COUNTER
+def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
     global written_files
     try:
-        file_name = db_name + "_%s.h5" % HDF5_DB_COUNTER
+        file_name = db_name + "_%s.h5" % hdf5_db_counter
         db_path = os.path.join(output_path, file_name)
-        if os.path.isfile(db_path) and os.stat(db_path).st_size > 1000000 * 1024:
-            # file must not be bigger than 1GB
-            HDF5_DB_COUNTER += 1
-            file_name = db_name + "_%s.h5" % HDF5_DB_COUNTER
-            db_path = os.path.join(output_path, file_name)
-            written_files.append(db_path)
+        try:
+            os.remove(db_path)
+        except OSError:
+            pass
+        written_files.append(db_path)
 
         h5file = h5py.File(db_path)
 
-        try:
-            # get the datasets
-            frames_dataset = h5file["data"]
-            label_dataset = h5file["label"]
+        # try:
+        #     # get the datasets
+        #     frames_dataset = h5file["data"]
+        #     label_dataset = h5file["label"]
+        # 
+        #     # set the start indices
+        #     start_data = frames_dataset.shape[0]
+        #     start_label = label_dataset.shape[0]
+        # 
+        #     # resize the datasets so that the new data can fit in
+        #     frames_dataset.resize(start_data + frame_data.shape[0], 0)
+        #     label_dataset.resize(start_data + labels.shape[0], 0)
+        # 
+        # except KeyError:
+        h5file.create_dataset(
+            "data",
+            data = frame_data,
+            #shape=frame_data.shape,
+            #dtype="f",
+            compression="gzip"
+        )
 
-            # set the start indices
-            start_data = frames_dataset.shape[0]
-            start_label = label_dataset.shape[0]
+        h5file.create_dataset(
+            "/label",
+            data=labels,
+            # shape=labels.shape,
+            # dtype="f",
+            compression="gzip"
+        )
 
-            # resize the datasets so that the new data can fit in
-            frames_dataset.resize(start_data + frame_data.shape[0], 0)
-            label_dataset.resize(start_data + labels.shape[0], 0)
-
-        except KeyError:
-            frames_dataset = h5file.create_dataset(
-                "data",
-                shape=frame_data.shape,
-                maxshape=(
-                    None,
-                    frame_data.shape[1],
-                    frame_data.shape[2],
-                    frame_data.shape[3]
-                ),
-                dtype="f",
-                chunks=True,
-                compression="gzip"
-            )
-
-            label_dataset = h5file.create_dataset(
-                "/label",
-                shape=labels.shape,
-                maxshape=(None,),
-                dtype="f",
-                chunks=True,
-                compression="gzip"
-            )
-            # set the start indices in fourth dimension
-            start_data = 0
-            start_label = 0
-
-        if label_dataset is not None and frames_dataset is not None:
-            # write the given data into the hdf5 file
-            frames_dataset[start_data:start_data + frame_data.shape[0], :, :, :] = frame_data
-            label_dataset[start_label:start_label + labels.shape[0]] = labels
+        # if label_dataset is not None and frames_dataset is not None:
+        #     # write the given data into the hdf5 file
+        #     frames_dataset[start_data:start_data + frame_data.shape[0], :, :, :] = frame_data
+        #     label_dataset[start_label:start_label + labels.shape[0]] = labels
 
     finally:
 
@@ -120,5 +106,5 @@ if __name__ == "__main__":
                 transposed = np.transpose(img, [2, 0, 1])
                 batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed
                 labels[bid] = label
-        save_as_hdf5(options.out_dir, options.db_name, batch_data, labels)
+        save_as_hdf5(options.out_dir, options.db_name, cid, batch_data, labels)
         print "{0}%".format(cid * options.batch_size * options.stack_size * 100.0 / len(file_paths))
