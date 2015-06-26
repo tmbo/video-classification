@@ -23,3 +23,6 @@ build*/
 
 # IDE
 .idea
+
+# Web Server
+node_modules
