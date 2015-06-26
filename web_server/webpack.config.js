@@ -1,5 +1,8 @@
+var path = require("path");
+var webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var nodePath = "node_modules/";
+
+var nodePath = path.join(__dirname, "node_modules");
 
 module.exports = {
 
@@ -20,28 +23,35 @@ module.exports = {
     cache: true,
     alias: {
       "lodash" : "lodash",
+      "jQuery" : "jquery",
+      "materialize-css" : path.join(nodePath, "materialize-css", "bin", "materialize.css"),
+      "materialize-js" : path.join(nodePath, "materialize-css", "bin", "materialize.js")
     },
-    extensions: ['', '.js', '.json', '.coffee']
+    extensions: ["", ".js", ".json", ".coffee", ".css"]
    },
 
   module: {
     loaders: [
       {
-	test: /\.jsx?$/,
-	exclude: /node_modules/,
-	loaders: ["babel-loader"],
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loaders: ["babel-loader"],
       },
       {
-	test: /\.html$/,
-	loader: "file?name=[name].[ext]",
+        test: /\.html$/,
+        loader: "file?name=[name].[ext]",
       },
       {
-	test: /\.less$/,
-	loader: ("style!css!less"), // ExtractTextPlugin.extract()
+        test: /\.(woff2|woff|ttf|eot)$/,
+        loader: "file?name=fonts/[name].[ext]",
       },
       {
-	test: /\.(png|jpg)$/,
-	loader: 'file-loader?name=images/[name].[ext]'
+        test: /\.(css|less)$/,
+        loader: ExtractTextPlugin.extract("css-loader!less-loader")
+      },
+      {
+        test: /\.(png|jpg|svg|ico)$/,
+        loader: "file-loader?name=images/[name].[ext]"
       },
     ],
 
@@ -49,6 +59,10 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin("[name].css", {
       allChunks: true
+    }),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery"
     })
   ],
 
