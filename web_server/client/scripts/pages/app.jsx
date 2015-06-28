@@ -8,10 +8,12 @@ var App = React.createClass({
 
     return (
       <div>
-	<Header />
-	<div className="content">
-	  <RouteHandler/>
-	</div>
+        <Header />
+        <div className="container">
+          <div className="row">
+            <RouteHandler/>
+          </div>
+        </div>
       </div>
     );
   }

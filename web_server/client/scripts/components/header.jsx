@@ -5,14 +5,19 @@ var Header = React.createClass({
 
   render() {
     return (
-      <header className="clearfix">
-	Application Name
-
-	<nav className="clearfix">
-	  <div className="nav-item"><Link to="home">Home</Link></div>
-	  <div className="nav-item"><Link to="info">Info</Link></div>
-	</nav>
-      </header>
+      <nav>
+        <div className="nav-wrapper">
+          <div className="col s12">
+            <a href="#" className="brand-logo">
+              Video Classifier
+            </a>
+            <ul className="right hide-on-med-and-down">
+              <li><Link to="home">Home</Link></li>
+              <li><Link to="info">Info</Link></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
     );
   }
 
