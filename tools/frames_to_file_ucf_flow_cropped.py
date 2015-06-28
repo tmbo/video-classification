@@ -21,7 +21,7 @@ from __future__ import generators
 import os, sys, collections, re
 
 FILENAME_EMPTY_FLOW = "empty_flow"
-DIRECTORY_RE = re.compile(r"(\w+)\/(\w+)\/([brltm_]+)([0-9]+)\.(jpg|png)$")
+DIRECTORY_RE = re.compile(r"(\w+)\/(\w+)\/([brcltm_]+)([0-9]+)\.(jpg|png)$")
 
 def get_flow_for_line(line, root_dir, stacked_frames_count):
   filename, label = line.split(" ")
@@ -50,10 +50,10 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
       line_x = '{}/{}.jpg {}'.format(root_dir, filename_x, label)
       line_y = '{}/{}.jpg {}'.format(root_dir, filename_y, label)
     else:
-      filename_x = '{}X{}'.format(prefix, stack_number)
-      filename_y = '{}Y{}'.format(prefix, stack_number)
-      line_x = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
-      line_y = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
+      filename_x = '{}X{:0>3d}'.format(prefix, stack_number)
+      filename_y = '{}Y{:0>3d}'.format(prefix, stack_number)
+      line_x = '{}/{}/{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
+      line_y = '{}/{}/{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
 
     output_file.write(line_x)
     output_file.write(line_y)

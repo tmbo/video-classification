@@ -49,8 +49,8 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
       line_x = '{}/{}.jpg {}'.format(root_dir, filename_x, label)
       line_y = '{}/{}.jpg {}'.format(root_dir, filename_y, label)
     else:
-      filename_x = "X%s" % stack_number
-      filename_y = "Y%s" % stack_number
+      filename_x = "X%03d" % stack_number
+      filename_y = "Y%03d" % stack_number
       line_x = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_x, label)
       line_y = '{}/{}{}.jpg {}'.format(root_dir, complete_dir, filename_y, label)
 
