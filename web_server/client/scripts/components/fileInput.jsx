@@ -41,29 +41,28 @@ var FileInput = React.createClass({
   },
 
   render() {
-    console.log("fuuu");
 
     return (
       <div className="file-field input-field">
-	<div className="btn">
-	  <span>File</span>
-	  <input
-	    type="file"
-	    name="video"
-	    ref="fileInput"
-	    accept={this.props.fileFilter}
-	    onChange={this.handleChange} />
-	</div>
-	<div className="file-path-wrapper">
-	  <input
-	    value={this.state.fileNames}
-	    className="file-path validate"
-	    type="text"
-	    placeholder={this.props.placeholder}
-	    onClick={this.handleClick}
-	    ref="filePath"
-	     />
-	</div>
+        <div className="btn">
+          <span>File</span>
+          <input
+            type="file"
+            name="video"
+            ref="fileInput"
+            accept={this.props.fileFilter}
+            onChange={this.handleChange} />
+        </div>
+        <div className="file-path-wrapper">
+          <input
+            value={this.state.fileNames}
+            className="file-path validate"
+            type="text"
+            placeholder={this.props.placeholder}
+            onClick={this.handleClick}
+            ref="filePath"
+             />
+        </div>
       </div>
     );
   }

@@ -2,6 +2,7 @@ import React from "react";
 import API from "../lib/api"
 import GeneralMixin from "../mixins/generalMixin.js"
 import FileInput from "../components/fileInput.jsx"
+import Spinner from "../components/spinner.jsx"
 
 var Home = React.createClass({
 
@@ -30,9 +31,17 @@ var Home = React.createClass({
     }
   },
 
+  getIcon() {
+    if (this.state.isUploading) {
+      return <Spinner/>
+    } else {
+      return <i className="material-icons right">send</i>
+    }
+  },
+
   render() {
 
-    const icon = this.state.isUploading ? "uploading" : "send"
+    const icon =  this.getIcon();
 
     return (
       <div>
@@ -40,12 +49,12 @@ var Home = React.createClass({
         <div>
 
           <form action="" onSubmit={this.handleSubmit} >
-	    <FileInput placeholder="Upload a video file." fileFilter="video/*" ref="fileInput" />
+            <FileInput placeholder="Upload a video file." fileFilter="video/*" ref="fileInput" />
             <button
               className="btn waves-effect waves-light"
               type="submit">
               Submit
-	      <i className="material-icons right">{icon}</i>
+              {icon}
           </button>
         </form>
         </div>

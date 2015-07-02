@@ -31,9 +31,12 @@ def send_static(path):
 def uploadVideo():
 
     def isAllowed(filename):
-        return reduce(lambda result, ext: ext in filename, ["jpg", "png"])
+        return len(filter(lambda ext: ext in filename, ["avi", "mpg", "mpeg", "mkv"])) > 0
 
-    file = request.files["video"]
+    file = request.files.getlist("video")[0]
+
+    print file.filename
+    print isAllowed(file.filename)
 
     if file and isAllowed(file.filename):
         filename = secure_filename(file.filename)
