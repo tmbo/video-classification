@@ -14,8 +14,8 @@ layer {
  }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_10fps_full/"
-    batch_size: 128
+    source: "/extra/data_sets/UCF-101/lmdbs/cnn/train_10fps_full/"
+    batch_size: 64
   }
 }
 layer {
@@ -30,10 +30,10 @@ layer {
     mean_value: 104
     mean_value: 117
     mean_value: 123
-}
+  }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_10fps_full/"
+    source: "/extra/data_sets/UCF-101/lmdbs/cnn/test_10fps_full/"
     batch_size: 16
   }
 }
