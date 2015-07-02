@@ -13,10 +13,11 @@
 
 namespace ofextract
 {
-    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string opticalFlowOutputFolder):
+    BroxOpticalFlow::BroxOpticalFlow(std::string sourceFolder, std::string opticalFlowOutputFolder, int gpu):
     m_sourceFolder(sourceFolder)
     , m_opticalOutputFolder(opticalFlowOutputFolder)
     {
+        cv::gpu::setDevice(gpu);
     }
 
     BroxOpticalFlow::~BroxOpticalFlow()

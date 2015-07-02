@@ -11,7 +11,8 @@ namespace ofextract
     public:
         BroxOpticalFlow(
             std::string sourceFolder = "/opt/data_sets/UCF-101/frames/MilitaryParade/",
-            std::string opticalFlowOutputFolder = "/opt/data_sets/UCF-101/broxoptflow/MilitaryParade/"
+            std::string opticalFlowOutputFolder = "/opt/data_sets/UCF-101/broxoptflow/MilitaryParade/",
+            int gpu = 0
         );
         virtual ~BroxOpticalFlow();
 

@@ -7,6 +7,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 class=$1
+gpu=0
 
-./build/ofextractcmd $UCF101_HOME/frames/$class $UCF101_HOME/flow/$class
+./build/ofextractcmd $UCF101_HOME/frames/$class $UCF101_HOME/flow/$class $gpu
 
