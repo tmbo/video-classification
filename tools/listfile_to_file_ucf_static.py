@@ -63,50 +63,65 @@ def run(root_dir, list_file_path, n):
       if (not identifier in filter_dict):
         continue
 
-      file_count = len(files)
-      if file_count == 0:
+      if len(files) == 0:
         continue
+
+      def writeFiles(sub_files):
+        sub_file_count = len(sub_files)
+        # all frames
+        if (n == -1):
+          count = 1
+          start = 0
+        # every 'count' frames
+        else:
+          count = sub_file_count / n
+          start = int(ceil((sub_file_count - count * n) / 2.0))
+
+        current_sequence = []
+        for i in range(start, len(sub_files), count):
+          if len(current_sequence) != n:
+            absolute_file = os.path.join(parent_dir, sub_files[i])
+
+            if (sub_files[i].endswith(("jpeg", "jpg", "png"))):
+              # write absolute file path and the corresponding topic Id to the output file
+              line = '{} {}\n'.format(absolute_file, topics[topic_dir])
+              current_sequence.append(line)
+
+        if n >= 0 and len(current_sequence) != n:
+          print("sub_file_count")
+          print(sub_file_count)
+          print("count")
+          print(count)
+          print("n")
+          print(n)
+          print("len(current_sequence)")
+          print(len(current_sequence))
+
+        assert(n == -1 or len(current_sequence) == n)
+        videos.append(current_sequence)
+      # end writeFiles()
 
       # sort files
       files = natsort(files)
+      file_count = len(files)
+      sub_video_count = 10
+      assert(file_count % sub_video_count == 0)
+      nrFramesPerCrop = file_count / sub_video_count
+      writeFiles(files[0 * nrFramesPerCrop:1 * nrFramesPerCrop])
+      writeFiles(files[1 * nrFramesPerCrop:2 * nrFramesPerCrop])
+      writeFiles(files[2 * nrFramesPerCrop:3 * nrFramesPerCrop])
+      writeFiles(files[3 * nrFramesPerCrop:4 * nrFramesPerCrop])
+      writeFiles(files[4 * nrFramesPerCrop:5 * nrFramesPerCrop])
+      writeFiles(files[5 * nrFramesPerCrop:6 * nrFramesPerCrop])
+      writeFiles(files[6 * nrFramesPerCrop:7 * nrFramesPerCrop])
+      writeFiles(files[7 * nrFramesPerCrop:8 * nrFramesPerCrop])
+      writeFiles(files[8 * nrFramesPerCrop:9 * nrFramesPerCrop])
+      writeFiles(files[9 * nrFramesPerCrop:10 * nrFramesPerCrop])
 
-      # all frames
-      if (n == -1):
-        count = 1
-        start = 0
-      # every 'count' frames
-      else:
-        count = file_count / n
-        start = int(ceil((file_count - count * n) / 2.0))
+      if (len(videos) % 5000 == 0):
+        print "%d videos processed..." % (len(videos) / 10)
 
-      current_sequence = []
-      for i in range(start, len(files), count):
-        if len(current_sequence) != n:
-          absolute_file = os.path.join(parent_dir, files[i])
-
-          if (files[i].endswith(("jpeg", "jpg", "png"))):
-            # write absolute file path and the corresponding topic Id to the output file
-            line = '{} {}\n'.format(absolute_file, topics[topic_dir])
-            current_sequence.append(line)
-
-      if n >= 0 and len(current_sequence) != n:
-        print("file_count")
-        print(file_count)
-        print("count")
-        print(count)
-        print("n")
-        print(n)
-        print("len(current_sequence)")
-        print(len(current_sequence))
-
-#      if len(current_sequence) != n:
-#        print(len(current_sequence))
-      assert(n==-1 or len(current_sequence) == n)
-      videos.append(current_sequence)
-
-      if (len(videos) % 500 == 0):
-        print "%d videos processed..." % len(videos) 
-
+  # shuffle the video lists, not the frames inside one video
   shuffle(videos)
   video_number = len(videos)
   split_point = int(video_number * TRAIN_PERCENTAGE)
