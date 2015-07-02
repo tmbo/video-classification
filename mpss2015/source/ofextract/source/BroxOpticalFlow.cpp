@@ -109,8 +109,15 @@ namespace ofextract
             int flowFormat = CV_8UC1;
             std::string flowFileEnding = ".jpg";
 
-            FlowX.convertTo(NormImageOutputFlowX, flowFormat, m_alpha, m_beta);
-            FlowY.convertTo(NormImageOutputFlowY, flowFormat, m_alpha, m_beta);
+            // mean subtraction
+            cv:Scalar meanScalarX = mean(NormImageOutputFlowX);
+            cv:Scalar meanScalarY = mean(NormImageOutputFlowY);
+            FlowX.convertTo(NormImageOutputFlowX, flowFormat, 1, - meanScalarX[0]);
+            FlowY.convertTo(NormImageOutputFlowY, flowFormat, 1, - meanScalarY[0]);
+
+            // normalization
+            NormImageOutputFlowX.convertTo(NormImageOutputFlowX, flowFormat, m_alpha, m_beta);
+            NormImageOutputFlowY.convertTo(NormImageOutputFlowY, flowFormat, m_alpha, m_beta);
 
             // // check for equal frames
             // double minVal; double maxVal; 
