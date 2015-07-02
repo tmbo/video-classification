@@ -3,10 +3,6 @@ from optparse import OptionParser
 from multiprocessing import Pool
 import os
 
-import h5py
-import numpy as np
-import cv2
-
 written_files = []
 
 def chunks(l, n):
@@ -16,6 +12,7 @@ def chunks(l, n):
 
 
 def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
+    import h5py
     global written_files
     try:
         file_name = db_name + "_%s.h5" % hdf5_db_counter
@@ -30,14 +27,16 @@ def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
         
         h5file.create_dataset(
             "data",
-            data = frame_data,
-            compression="gzip"
+            data=frame_data,
+            compression="gzip",
+            compression_opts=4
         )
 
         h5file.create_dataset(
             "/label",
             data=labels,
-            compression="gzip"
+            compression="gzip",
+            compression_opts=4
         )
 
     finally:
@@ -45,8 +44,10 @@ def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
         h5file.flush()
         h5file.close()
 
-def store_to_hdf5(args):
-    cid, batch = args
+def store_to_hdf5(arguments):
+    import numpy as np
+    import cv2
+    cid, batch = arguments
     depth = options.channels * options.stack_size
     
     batch_data = np.zeros((options.batch_size, depth, options.image_height, options.image_width))
