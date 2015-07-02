@@ -52,7 +52,6 @@ namespace ofextract
         std::cout << "Directory Created: " << opticalOutputPath.path() << std::endl;
 
         cv::Mat CurrentFrame;
-        cv::Mat ResizedFrame;
 
         cv::Mat PreviousFrameGray;
         cv::Mat CurrentFrameGray;
@@ -85,9 +84,8 @@ namespace ofextract
 
             CurrentFrameGray.copyTo(PreviousFrameGray);
             videoCapture.retrieve(CurrentFrame);
-            cv::resize(CurrentFrame, ResizedFrame, cv::Size(227, 227));
 
-            cv::cvtColor(ResizedFrame, CurrentFrameGray, CV_RGB2GRAY);
+            cv::cvtColor(CurrentFrame, CurrentFrameGray, CV_RGB2GRAY);
 
             if (PreviousFrameGray.empty() || CurrentFrameGray.empty()){
                 continue;
