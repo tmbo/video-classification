@@ -1,6 +1,7 @@
 import React from "react";
 import API from "../lib/api"
-import GeneralMixin from "../mixins/generalMixin"
+import GeneralMixin from "../mixins/generalMixin.js"
+import FileInput from "../components/fileInput.jsx"
 
 var Home = React.createClass({
 
@@ -17,7 +18,7 @@ var Home = React.createClass({
     evt.preventDefault();
 
     const reader = new FileReader();
-    const file = this.refs.fileInput.getDOMNode().files[0];
+    const file = this.refs.fileInput.getFiles()[0];
 
     if (file) {
       const payload = {
@@ -38,17 +39,8 @@ var Home = React.createClass({
         <h1>Upload a video</h1>
         <div>
 
-
           <form action="" onSubmit={this.handleSubmit} >
-            <div className="file-field input-field">
-              <div className="btn">
-                <span>File</span>
-		<input type="file" name="video" ref="fileInput" accept="video/*"/>
-	      </div>
-	      <div className="file-path-wrapper">
-		<input className="file-path validate" type="text" placeholder="Upload a video file."/>
-              </div>
-            </div>
+	    <FileInput placeholder="Upload a video file." fileFilter="video/*" ref="fileInput" />
             <button
               className="btn waves-effect waves-light"
               type="submit">
