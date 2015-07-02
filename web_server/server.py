@@ -74,7 +74,8 @@ if __name__ == "__main__":
     app.config.update(
         DEBUG = True,
         SECRET_KEY = "asassdfs",
-        CORS_HEADERS = "Content-Type"
+        CORS_HEADERS = "Content-Type",
+        UPLOAD_FOLDER = "videos"
     )
 
     # Make sure all frontend assets are compiled

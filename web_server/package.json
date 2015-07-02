@@ -30,6 +30,7 @@
     "build": "webpack --progress",
     "watch": "webpack --watch",
     "start": "webpack && python server.py",
-    "server": "python server.py"
+    "server": "python server.py",
+    "postinstall" : "webpack --progress"
   }
 }

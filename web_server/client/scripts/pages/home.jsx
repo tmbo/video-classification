@@ -35,7 +35,7 @@ var Home = React.createClass({
     if (this.state.isUploading) {
       return <Spinner/>
     } else {
-      return <i className="material-icons right">send</i>
+      return
     }
   },
 
@@ -54,7 +54,7 @@ var Home = React.createClass({
               className="btn waves-effect waves-light"
               type="submit">
               Submit
-              {icon}
+              <i className="material-icons right">send</i>
           </button>
         </form>
         </div>

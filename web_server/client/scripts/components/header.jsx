@@ -14,8 +14,8 @@ var Header = React.createClass({
               Video Classifier
             </a>
             <ul className="right hide-on-med-and-down">
-              <li><Link to="home">Home</Link></li>
-              <li><Link to="info">Info</Link></li>
+              <li><Link to="home"><i className="material-icons left">launch</i>Upload video</Link></li>
+              <li><Link to="info"><i className="material-icons left">dashboard</i>Result</Link></li>
             </ul>
           </div>
         </div>
