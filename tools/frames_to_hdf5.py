@@ -1,6 +1,7 @@
 from __future__ import generators
 from optparse import OptionParser
 from collections import deque
+from multiprocessing import Pool
 import os
 
 import h5py
@@ -68,6 +69,22 @@ def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
         h5file.flush()
         h5file.close()
 
+def store_to_hdf5(args):
+    cid, batch = args
+    depth = options.channels * options.stack_size
+    
+    batch_data = np.zeros((options.batch_size, depth, options.image_height, options.image_width))
+    labels = np.zeros(options.batch_size)
+    for bid, each in enumerate(chunks(batch, options.stack_size)):
+        for idx, i in enumerate(each):
+            path, label = i.split(" ")
+            img = cv2.imread(path)
+            transposed = np.transpose(img, [2, 0, 1])
+            batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed
+            labels[bid] = label
+    save_as_hdf5(options.out_dir, options.db_name, cid, batch_data, labels)
+    print "{0}%".format(cid * options.batch_size * options.stack_size * 100.0 / len(file_paths))    
+
 
 if __name__ == "__main__":
     parser = OptionParser(usage="usage: %prog [options] -f filename")
@@ -87,6 +104,8 @@ if __name__ == "__main__":
                       help="output directory")
     parser.add_option("-d", "--db_name", dest="db_name", default="db",
                       help="name of the ouput database")
+    parser.add_option("-t", "--threads", dest="threads", type="int", default=8,
+                      help="Number of threads to use")
     (options, args) = parser.parse_args()
 
     if not options.filename:
@@ -94,17 +113,8 @@ if __name__ == "__main__":
 
     file_paths = map(str.strip, tuple(open(options.filename, 'r')))
 
-    depth = options.channels * options.stack_size
-
-    for cid, batch in enumerate(chunks(file_paths, options.stack_size * options.batch_size)):
-        batch_data = np.zeros((options.batch_size, depth, options.image_height, options.image_width))
-        labels = np.zeros(options.batch_size)
-        for bid, each in enumerate(chunks(batch, options.stack_size)):
-            for idx, i in enumerate(each):
-                path, label = i.split(" ")
-                img = cv2.imread(path)
-                transposed = np.transpose(img, [2, 0, 1])
-                batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed
-                labels[bid] = label
-        save_as_hdf5(options.out_dir, options.db_name, cid, batch_data, labels)
-        print "{0}%".format(cid * options.batch_size * options.stack_size * 100.0 / len(file_paths))
+    pool = Pool(options.threads)
+    pool.map(store_to_hdf5, enumerate(chunks(file_paths, options.stack_size * options.batch_size)))
+    pool.terminate()
+    pool.close()
+    
