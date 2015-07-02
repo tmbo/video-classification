@@ -381,8 +381,8 @@ layer {
 }
 layer {
   bottom: "lstm2"
-  top: "prediction"
-  name: "prediction"
+  top: "prediction-lstm"
+  name: "prediction-lstm"
   type: "InnerProduct"
   param {
     lr_mult: 1
@@ -405,9 +405,9 @@ layer {
   }
 }
 # layer {
-#   bottom: "prediction"
-#   top: "prediction"
-#   name: "dropPrediction"
+#   bottom: "prediction-lstm"
+#   top: "prediction-lstm"
+#   name: "dropPrediction-lstm"
 #   type: "Dropout"
 #   dropout_param {
 #     dropout_ratio: 0.1
@@ -417,7 +417,7 @@ layer {
   name: "reshape-prediction"
   type: "Reshape"
   top: "reshape-prediction"
-  bottom: "prediction"
+  bottom: "prediction-lstm"
   include { phase: TRAIN }
   reshape_param {
     shape {
@@ -430,7 +430,7 @@ layer {
   name: "reshape-prediction"
   type: "Reshape"
   top: "reshape-prediction"
-  bottom: "prediction"
+  bottom: "prediction-lstm"
   include { phase: TEST }
   reshape_param {
     shape {
