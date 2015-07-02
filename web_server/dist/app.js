@@ -22027,7 +22027,6 @@
 	          _react2["default"].createElement(
 	            "div",
 	            { className: "file-field input-field" },
-	            _react2["default"].createElement("input", { className: "file-path validate", type: "text" }),
 	            _react2["default"].createElement(
 	              "div",
 	              { className: "btn" },
@@ -22036,7 +22035,12 @@
 	                null,
 	                "File"
 	              ),
-	              _react2["default"].createElement("input", { type: "file", ref: "fileInput" })
+		      _react2["default"].createElement("input", { type: "file", name: "video", ref: "fileInput", accept: "video/*" })
+		    ),
+		    _react2["default"].createElement(
+		      "div",
+		      { className: "file-path-wrapper" },
+		      _react2["default"].createElement("input", { className: "file-path validate", type: "text", placeholder: "Upload a video file." })
 	            )
 	          ),
 	          _react2["default"].createElement(
@@ -22047,7 +22051,7 @@
 	            "Submit",
 	            _react2["default"].createElement(
 	              "i",
-	              { className: "material-icons" },
+		      { className: "material-icons right" },
 	              icon
 	            )
 	          )

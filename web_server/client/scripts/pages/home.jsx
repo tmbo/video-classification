@@ -37,19 +37,23 @@ var Home = React.createClass({
       <div>
         <h1>Upload a video</h1>
         <div>
+
+
           <form action="" onSubmit={this.handleSubmit} >
             <div className="file-field input-field">
-              <input className="file-path validate" type="text"/>
               <div className="btn">
                 <span>File</span>
-                <input type="file" ref="fileInput"/>
+		<input type="file" name="video" ref="fileInput" accept="video/*"/>
+	      </div>
+	      <div className="file-path-wrapper">
+		<input className="file-path validate" type="text" placeholder="Upload a video file."/>
               </div>
             </div>
             <button
               className="btn waves-effect waves-light"
               type="submit">
               Submit
-              <i className="material-icons">{icon}</i>
+	      <i className="material-icons right">{icon}</i>
           </button>
         </form>
         </div>
