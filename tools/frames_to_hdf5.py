@@ -80,7 +80,7 @@ def store_to_hdf5(args):
             path, label = i.split(" ")
             img = cv2.imread(path)
             transposed = np.transpose(img, [2, 0, 1])
-            batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed
+            batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed[0:options.channels, :, :]
             labels[bid] = label
     save_as_hdf5(options.out_dir, options.db_name, cid, batch_data, labels)
     print "{0}%".format(cid * options.batch_size * options.stack_size * 100.0 / len(file_paths))    
@@ -117,4 +117,3 @@ if __name__ == "__main__":
     pool.map(store_to_hdf5, enumerate(chunks(file_paths, options.stack_size * options.batch_size)))
     pool.terminate()
     pool.close()
-    
