@@ -1,6 +1,5 @@
 from __future__ import generators
 from optparse import OptionParser
-from collections import deque
 from multiprocessing import Pool
 import os
 
@@ -28,41 +27,18 @@ def save_as_hdf5(output_path, db_name, hdf5_db_counter, frame_data, labels):
         written_files.append(db_path)
 
         h5file = h5py.File(db_path)
-
-        # try:
-        #     # get the datasets
-        #     frames_dataset = h5file["data"]
-        #     label_dataset = h5file["label"]
-        # 
-        #     # set the start indices
-        #     start_data = frames_dataset.shape[0]
-        #     start_label = label_dataset.shape[0]
-        # 
-        #     # resize the datasets so that the new data can fit in
-        #     frames_dataset.resize(start_data + frame_data.shape[0], 0)
-        #     label_dataset.resize(start_data + labels.shape[0], 0)
-        # 
-        # except KeyError:
+        
         h5file.create_dataset(
             "data",
             data = frame_data,
-            #shape=frame_data.shape,
-            #dtype="f",
             compression="gzip"
         )
 
         h5file.create_dataset(
             "/label",
             data=labels,
-            # shape=labels.shape,
-            # dtype="f",
             compression="gzip"
         )
-
-        # if label_dataset is not None and frames_dataset is not None:
-        #     # write the given data into the hdf5 file
-        #     frames_dataset[start_data:start_data + frame_data.shape[0], :, :, :] = frame_data
-        #     label_dataset[start_label:start_label + labels.shape[0]] = labels
 
     finally:
 
@@ -79,10 +55,12 @@ def store_to_hdf5(args):
         for idx, i in enumerate(each):
             path, label = i.split(" ")
             img = cv2.imread(path)
-            transposed = np.transpose(img, [2, 0, 1])
-            batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = transposed
+            img = np.transpose(img, [2, 0, 1])
+            batch_data[bid, idx * options.channels: (idx + 1) * options.channels, :, :] = img[0:options.channels, :, :]
             labels[bid] = label
+            del img
     save_as_hdf5(options.out_dir, options.db_name, cid, batch_data, labels)
+    del batch_data
     print "{0}%".format(cid * options.batch_size * options.stack_size * 100.0 / len(file_paths))    
 
 
@@ -117,4 +95,3 @@ if __name__ == "__main__":
     pool.map(store_to_hdf5, enumerate(chunks(file_paths, options.stack_size * options.batch_size)))
     pool.terminate()
     pool.close()
-    

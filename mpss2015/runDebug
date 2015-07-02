@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+  echo "usage:"
+  echo "./runDebug <class-name>"
+  exit 1
+fi
+
+class=$1
+
+./build-debug/ofextractcmdd $UCF101_HOME/frames/$class $UCF101_HOME/flow/$class
+
