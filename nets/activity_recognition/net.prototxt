@@ -14,7 +14,7 @@ layer {
  }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/cnn/train_10fps_full/"
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_lstm_head_32000/"
     batch_size: 64
   }
 }
@@ -33,7 +33,7 @@ layer {
   }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/cnn/test_10fps_full/"
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_lstm_head_16000/"
     batch_size: 16
   }
 }
@@ -48,6 +48,38 @@ layer {
 # 		batch_size: 128
 # 	}
 # }
+layer {
+  name: "sequence"
+  type: "DummyData"
+  top: "sequence"
+  include { phase: TRAIN }
+  dummy_data_param {
+    shape {
+      dim: 16
+      dim: 4
+    }
+    data_filler {
+      type: "sequence"
+      value: 16
+    }
+  }
+}
+layer {
+  name: "sequence"
+  type: "DummyData"
+  top: "sequence"
+  include { phase: TEST }
+  dummy_data_param {
+    shape {
+      dim: 16
+      dim: 1
+    }
+    data_filler {
+      type: "sequence"
+      value: 16
+    }
+  }
+}
 layer {
   bottom: "data"
   top: "conv1"
@@ -227,11 +259,11 @@ layer {
   name: "fc6"
   type: "InnerProduct"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -253,40 +285,102 @@ layer {
     dropout_ratio: 0.7
   }
 }
+# layer {
+#   bottom: "fc6"
+#   top: "fc7"
+#   name: "fc7"
+#   type: "InnerProduct"
+#   param {
+#     lr_mult: 0
+#     decay_mult: 0
+#   }
+#   param {
+#     lr_mult: 0
+#     decay_mult: 0
+#   }
+#   inner_product_param {
+#     num_output: 2048
+#   }
+# }
+# layer {
+#   bottom: "fc7"
+#   top: "fc7"
+#   name: "relu7"
+#   type: "ReLU"
+# }
+# layer {
+#   bottom: "fc7"
+#   top: "fc7"
+#   name: "drop7"
+#   type: "Dropout"
+#   dropout_param {
+#     dropout_ratio: 0.7
+#   }
+# }
 layer {
+  name: "reshape-before"
+  type: "Reshape"
+  top: "reshape-before"
   bottom: "fc6"
-  top: "fc7"
-  name: "fc7"
-  type: "InnerProduct"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 16
+      dim: 4
+      dim: 4096
+    }
   }
 }
 layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "relu7"
-  type: "ReLU"
-}
-layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "drop7"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.7
+  name: "reshape-before"
+  type: "Reshape"
+  top: "reshape-before"
+  bottom: "fc6"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 16
+      dim: 1
+      dim: 4096
+    }
   }
 }
 layer {
-  bottom: "fc7"
+  name: "lstm1"
+  type: "LSTM"
+  bottom: "reshape-before"
+  bottom: "sequence"
+  top: "lstm1"
+  recurrent_param {
+    num_output: 1024
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "lstm2"
+  type: "LSTM"
+  bottom: "lstm1"
+  bottom: "sequence"
+  top: "lstm2"
+  recurrent_param {
+    num_output: 512
+    weight_filler {
+        type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  bottom: "lstm2"
   top: "prediction"
   name: "prediction"
   type: "InnerProduct"
@@ -307,6 +401,7 @@ layer {
       type: "constant"
       value: 0
     }
+    axis: 2
   }
 }
 # layer {
@@ -319,7 +414,33 @@ layer {
 #   }
 # }
 layer {
+  name: "reshape-prediction"
+  type: "Reshape"
+  top: "reshape-prediction"
   bottom: "prediction"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 64
+      dim: 101
+    }
+  }
+}
+layer {
+  name: "reshape-prediction"
+  type: "Reshape"
+  top: "reshape-prediction"
+  bottom: "prediction"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 16
+      dim: 101
+    }
+  }
+}
+layer {
+  bottom: "reshape-prediction"
   bottom: "label"
   top: "prob"
   name: "prob"
@@ -328,7 +449,7 @@ layer {
 layer {
   name: "accuracy"
   type: "Accuracy"
-  bottom: "prediction"
+  bottom: "reshape-prediction"
   bottom: "label"
   top: "accuracy"
 }
