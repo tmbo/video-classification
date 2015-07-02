@@ -30,13 +30,14 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
   complete_dir = os.path.join(topic_dir, sub_dir)
 
   absolute_directory = os.path.join(root_dir, complete_dir)
-
+  
+  # divided by 10, because of the 10 cropped frames
   # divided by 2, because of x and y flow
-  file_count = (len(os.listdir(absolute_directory)) - 1) / 2
-
+  file_count = len(os.listdir(absolute_directory)) / 10 / 2 - 1
+  
   # for every frame stack <sliding_window> many forwards
   sliding_window = stacked_frames_count
-
+  
   stacks = range(frame_number, frame_number + sliding_window)
 
   # open ouput file
