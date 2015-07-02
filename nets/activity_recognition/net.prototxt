@@ -13,8 +13,8 @@ layer {
     mean_value: 123
  }
   data_param {
-    backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_lstm_head_32000/"
+    backend: LEVELDB
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_lstm/"
     batch_size: 64
   }
 }
@@ -32,8 +32,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_lstm_head_16000/"
+    backend: LEVELDB
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_lstm/"
     batch_size: 16
   }
 }
