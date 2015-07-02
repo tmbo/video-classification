@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router";
 import Logo from "../../images/apple-icon-72x72.png";
 
-var Header = React.createClass({
+class Header extends React.Component {
 
   render() {
     return (
@@ -23,6 +23,6 @@ var Header = React.createClass({
     );
   }
 
-});
+};
 
-module.exports = Header;
+export default Header;

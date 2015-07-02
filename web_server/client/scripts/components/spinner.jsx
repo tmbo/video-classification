@@ -1,6 +1,6 @@
 import React from "react";
 
-var Spinner = React.createClass({
+class Spinner extends React.Component {
 
   render() {
     return (
@@ -50,6 +50,6 @@ var Spinner = React.createClass({
     );
   }
 
-});
+};
 
-module.exports = Spinner;
+export default Spinner;

@@ -1,23 +1,11 @@
 import React from "react";
 
-var ProgressBar = React.createClass({
-
-  mixins : [GeneralMixin],
-
-  propTypes: {
-    progress : React.PropTypes.number,
-  },
-
-  getDefaultProps() {
-    return {
-      progress: "",
-    };
-  },
+class ProgressBar extends React.Component {
 
   render() {
 
     styles = {
-      width : this.props.progress
+      width : this.props.progress + "%"
     }
 
     return (
@@ -27,6 +15,14 @@ var ProgressBar = React.createClass({
     );
   }
 
-});
+};
 
-module.exports = ProgressBar;
+ProgressBar.propTypes = {
+  progress : React.PropTypes.number,
+}
+
+ProgressBar.defaultProps = {
+  progress: 0
+}
+
+export default ProgressBar;

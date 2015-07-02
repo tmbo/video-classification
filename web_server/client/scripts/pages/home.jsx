@@ -1,18 +1,18 @@
 import React from "react";
-import API from "../lib/api"
-import GeneralMixin from "../mixins/generalMixin.js"
+import connectToStores from "alt/utils/connectToStores";
 import FileInput from "../components/fileInput.jsx"
-import Spinner from "../components/spinner.jsx"
+import ProgressBar from "../components/progressBar.jsx"
+import VideoStore from "../stores/videoStore.js"
 
-var Home = React.createClass({
+class Home extends React.Component {
 
-  mixins : [GeneralMixin],
+  static getStores() {
+    return [VideoStore];
+  }
 
-  getInitialState() {
-    return {
-      isUploading : false
-    }
-  },
+  static getPropsFromStores() {
+    return VideoStore.getState();
+  }
 
   handleSubmit(evt) {
 
@@ -25,31 +25,29 @@ var Home = React.createClass({
       const payload = {
         video : file
       }
-
-      this.updateState({isUploading :{$set : true}})
-      API.postVideo(payload)
     }
-  },
+  }
 
-  getIcon() {
-    if (this.state.isUploading) {
-      return <Spinner/>
+  getProgressBar() {
+    if (this.props.isUploading) {
+      uploadProgress = 50;
+      return <ProgressBar progress={uploadProgress}/>;
     } else {
-      return
+      return <span/>
     }
-  },
+  }
 
   render() {
 
-    const icon =  this.getIcon();
+    const progressBar =  this.getProgressBar();
 
     return (
       <div>
         <h1>Upload a video</h1>
         <div>
-
-          <form action="" onSubmit={this.handleSubmit} >
+          <form action="" onSubmit={this.handleSubmit.bind(this)} >
             <FileInput placeholder="Upload a video file." fileFilter="video/*" ref="fileInput" />
+            {progressBar}
             <button
               className="btn waves-effect waves-light"
               type="submit">
@@ -61,7 +59,6 @@ var Home = React.createClass({
       </div>
     );
   }
+}
 
-});
-
-module.exports = Home;
+export default connectToStores(Home);
