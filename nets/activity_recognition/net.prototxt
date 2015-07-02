@@ -14,8 +14,8 @@ layer {
  }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_10fps/"
-    batch_size: 64
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/train_10fps_full/"
+    batch_size: 128
   }
 }
 layer {
@@ -23,9 +23,7 @@ layer {
   type: "Data"
   top: "data"
   top: "label"
-  include {
-    phase: TEST
-  }
+  include { phase: TEST }
   transform_param {
     mirror: true
     crop_size: 224
@@ -35,10 +33,21 @@ layer {
 }
   data_param {
     backend: LMDB
-    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_10fps/"
+    source: "/extra/data_sets/UCF-101/lmdbs/recurrent/test_10fps_full/"
     batch_size: 16
   }
 }
+# layer {
+# 	name: "data"
+# 	type: "HDF5Data"
+# 	top: "data"
+# 	top: "label"
+# 	include { phase: TRAIN }
+# 	hdf5_data_param {
+# 		source: "/extra/data_sets/UCF-101/frames_cropped/hdf5/train.txt"
+# 		batch_size: 128
+# 	}
+# }
 layer {
   bottom: "data"
   top: "conv1"
@@ -224,7 +233,7 @@ layer {
   param {
     lr_mult: 2
     decay_mult: 0
-  } 
+  }
   inner_product_param {
     num_output: 4096
   }
@@ -241,7 +250,7 @@ layer {
   name: "drop6"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.1
+    dropout_ratio: 0.7
   }
 }
 layer {
@@ -273,7 +282,7 @@ layer {
   name: "drop7"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.1
+    dropout_ratio: 0.7
   }
 }
 layer {
@@ -300,15 +309,15 @@ layer {
     }
   }
 }
-layer {
-  bottom: "prediction"
-  top: "prediction"
-  name: "dropPrediction"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.1
-  }
-}
+# layer {
+#   bottom: "prediction"
+#   top: "prediction"
+#   name: "dropPrediction"
+#   type: "Dropout"
+#   dropout_param {
+#     dropout_ratio: 0.1
+#   }
+# }
 layer {
   bottom: "prediction"
   bottom: "label"
