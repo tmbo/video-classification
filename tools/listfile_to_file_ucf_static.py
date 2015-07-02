@@ -17,7 +17,7 @@
 #
 ###
 
-from natsort import natsorted
+from natsort import natsort
 from random import shuffle, seed
 import os, sys, collections
 from math import ceil
@@ -68,7 +68,7 @@ def run(root_dir, list_file_path, n):
         continue
 
       # sort files
-      files = natsorted(files)
+      files = natsort(files)
 
       # all frames
       if (n == -1):
