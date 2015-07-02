@@ -1,7 +1,7 @@
 # System imports
 import sys, requests, subprocess
 from os import path
-from flask.ext.cors import CORS
+from flas                        k.ext.cors import CORS
 from flask import *
 from flask.json import jsonify
 from werkzeug import secure_filename
