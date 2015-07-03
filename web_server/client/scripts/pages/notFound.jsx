@@ -1,6 +1,7 @@
-import React from 'react';
+import React from "react";
+import Component from "../components/baseComponent.jsx";
 
-class NotFound extends React.Component {
+class NotFound extends Component {
 
   render() {
     return (

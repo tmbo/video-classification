@@ -1,6 +1,7 @@
 import React from "react";
+import Component from "../components/baseComponent.jsx";
 
-class Info extends React.Component {
+class Info extends Component {
 
   render() {
     return (

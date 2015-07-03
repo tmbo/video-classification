@@ -1,8 +1,9 @@
-import React from 'react';
+import React from "react";
+import Component from "../components/baseComponent.jsx";
 import { RouteHandler } from 'react-router';
 import Header from '../components/header.jsx'
 
-class App extends React.Component {
+class App extends Component {
 
   render() {
 

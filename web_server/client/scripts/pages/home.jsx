@@ -1,10 +1,12 @@
 import React from "react";
+import Component from "../components/baseComponent.jsx";
 import connectToStores from "alt/utils/connectToStores";
 import FileInput from "../components/fileInput.jsx"
 import ProgressBar from "../components/progressBar.jsx"
 import VideoStore from "../stores/videoStore.js"
+import VideoActions from "../actions/videoActions.js"
 
-class Home extends React.Component {
+class Home extends Component {
 
   static getStores() {
     return [VideoStore];
@@ -25,12 +27,14 @@ class Home extends React.Component {
       const payload = {
         video : file
       }
+      VideoActions.uploadVideo(payload)
     }
+
   }
 
   getProgressBar() {
     if (this.props.isUploading) {
-      uploadProgress = 50;
+      const uploadProgress = 50;
       return <ProgressBar progress={uploadProgress}/>;
     } else {
       return <span/>

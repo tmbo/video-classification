@@ -1,6 +1,7 @@
 import React from "react";
+import Component from "./baseComponent.jsx";
 
-class FileInput extends React.Component {
+class FileInput extends Component {
 
   constructor(props) {
     super(props);
@@ -41,6 +42,7 @@ class FileInput extends React.Component {
         </div>
         <div className="file-path-wrapper">
           <input
+            readOnly
             value={this.state.fileNames}
             className="file-path validate"
             type="text"

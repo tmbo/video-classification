@@ -1,6 +1,7 @@
 import React from "react";
+import Component from "./baseComponent.jsx";
 
-class Spinner extends React.Component {
+class Spinner extends Component {
 
   render() {
     return (

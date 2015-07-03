@@ -1,16 +1,17 @@
 import React from "react";
+import Component from "./baseComponent.jsx";
 
-class ProgressBar extends React.Component {
+class ProgressBar extends Component {
 
   render() {
 
-    styles = {
+    const styles = {
       width : this.props.progress + "%"
     }
 
     return (
-      <div class="progress">
-        <div class="determinate" style={styles}></div>
+      <div className="progress">
+        <div className="determinate" style={styles}></div>
       </div>
     );
   }

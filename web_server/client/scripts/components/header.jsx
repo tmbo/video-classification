@@ -1,8 +1,9 @@
 import React from "react";
+import Component from "./baseComponent.jsx";
 import { Link } from "react-router";
 import Logo from "../../images/apple-icon-72x72.png";
 
-class Header extends React.Component {
+class Header extends Component {
 
   render() {
     return (

@@ -18,7 +18,8 @@
     "materialize-css": "^0.96.1",
     "node-libs-browser": "^0.5.2",
     "react": "~0.13.3",
-    "react-router": "~0.13.3",
+    "react-class-helper": "^0.1.2",
+    "react-router": "^0.13.3",
     "style-loader": "^0.12.3",
     "webpack": "^1.9.12",
     "whatwg-fetch": "^0.9.0"
@@ -31,6 +32,6 @@
     "watch": "webpack --watch",
     "start": "webpack && python server.py",
     "server": "python server.py",
-    "postinstall" : "webpack --progress"
+    "postinstall": "webpack --progress"
   }
 }

@@ -8,9 +8,11 @@ class VideoStore {
 
   constructor() {
     this.bindActions(VideoActions);
+
+    this.isUploading = false;
   }
 
-  onUploadVideo() {
+  onUploadVideo(payload) {
       API.postVideo(payload)
       this.isUploading = true;
   }
