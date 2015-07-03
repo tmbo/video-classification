@@ -27,3 +27,8 @@ build*/
 # Web Server
 node_modules
 dist/
+videos/*.avi
+videos/*.mkv
+videos/*.mpeg
+videos/*.mpg
+videos/*.mp4
