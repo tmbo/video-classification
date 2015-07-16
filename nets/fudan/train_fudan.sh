@@ -51,7 +51,7 @@ trap 'cleanup "Training interrupted"; exit 1' INT
 
 #WEIGHTS=$CAFFE_ROOT/models/bvlc_reference_caffenet/bvlc_reference_caffenet.caffemodel
 #WEIGHTS=$CAFFE_ROOT/models/CNN_M_2048/VGG_CNN_M_2048.caffemodel
-WEIGHTS=$MP_HOME/nets/fudan/two_stream_temporal_sp1.caffemodel
+WEIGHTS=$MP_HOME/nets/fudan/experiments/20150716-125313_train/_iter_2500.caffemodel
 $CAFFE_ROOT/build/tools/caffe train \
     -solver $MP_HOME/nets/fudan/solver.prototxt \
     -weights $WEIGHTS 2> $TRAINING_LOG_NAME \
