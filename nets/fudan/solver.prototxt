@@ -1,8 +1,8 @@
 net: "net.prototxt"
 # Do test before training
-test_initialization: true
+test_initialization: false
 # Test every nth iteration
-test_interval: 2000
+test_interval: 2500
 # How many iterations per test
 test_iter: 2000
 
@@ -21,12 +21,12 @@ momentum: 0.9
 weight_decay: 0.00001
 
 # Display training loss every nth iteration
-display: 200
+display: 25
 # After how many iterations to stop
-max_iter: 400000
+max_iter: 20000
 
 # Snapshot every nth iteration in the specified directory
-snapshot: 10000
+snapshot: 5000
 snapshot_prefix: "./snapshots/"
 
 random_seed: 1701

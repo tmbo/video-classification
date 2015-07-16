@@ -9,7 +9,6 @@ layer {
     mirror: true
 	crop_size: 224
 	mean_value: 127
-#	mean_file: "/home/mpss2015m_1/video-classification/nets/fudan/ucf_sof10L_mean_sp1.binaryproto"
   }
   data_param {
 	backend: LEVELDB
@@ -31,15 +30,14 @@ layer {
   data_param {
     source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_16_per_video/test"
     batch_size: 16
-#	mean_file: "/home/mpss2015m_1/video-classification/nets/fudan/ucf_sof10L_mean_sp1.binaryproto"
 	backend: LEVELDB
   }
 }
 layer {
-  name: "conv1"
+  name: "flow_conv1"
   type: "Convolution"
   bottom: "flow_data"
-  top: "conv1"
+  top: "flow_conv1"
   convolution_param {
     num_output: 96
     kernel_size: 7
@@ -54,16 +52,16 @@ layer {
   }
 }
 layer {
-  name: "relu1"
+  name: "flow_relu1"
   type: "ReLU"
-  bottom: "conv1"
-  top: "conv1"
+  bottom: "flow_conv1"
+  top: "flow_conv1"
 }
 layer {
-  name: "norm1"
+  name: "flow_norm1"
   type: "LRN"
-  bottom: "conv1"
-  top: "norm1"
+  bottom: "flow_conv1"
+  top: "flow_norm1"
   lrn_param {
     local_size: 5
     alpha: 0.0001
@@ -71,10 +69,10 @@ layer {
   }
 }
 layer {
-  name: "pool1"
+  name: "flow_pool1"
   type: "Pooling"
-  bottom: "norm1"
-  top: "pool1"
+  bottom: "flow_norm1"
+  top: "flow_pool1"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -82,10 +80,10 @@ layer {
   }
 }
 layer {
-  name: "conv2"
+  name: "flow_conv2"
   type: "Convolution"
-  bottom: "pool1"
-  top: "conv2"
+  bottom: "flow_pool1"
+  top: "flow_conv2"
   convolution_param {
     num_output: 256
     kernel_size: 5
@@ -99,16 +97,16 @@ layer {
   }
 }
 layer {
-  name: "relu2"
+  name: "flow_relu2"
   type: "ReLU"
-  bottom: "conv2"
-  top: "conv2"
+  bottom: "flow_conv2"
+  top: "flow_conv2"
 }
 layer {
-  name: "pool2"
+  name: "flow_pool2"
   type: "Pooling"
-  bottom: "conv2"
-  top: "pool2"
+  bottom: "flow_conv2"
+  top: "flow_pool2"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -116,10 +114,10 @@ layer {
   }
 }
 layer {
-  name: "conv3"
+  name: "flow_conv3"
   type: "Convolution"
-  bottom: "pool2"
-  top: "conv3"
+  bottom: "flow_pool2"
+  top: "flow_conv3"
   convolution_param {
     num_output: 512
     pad: 1
@@ -133,16 +131,16 @@ layer {
   }
 }
 layer {
-  name: "relu3"
+  name: "flow_relu3"
   type: "ReLU"
-  bottom: "conv3"
-  top: "conv3"
+  bottom: "flow_conv3"
+  top: "flow_conv3"
 }
 layer {
-  name: "conv4"
+  name: "flow_conv4"
   type: "Convolution"
-  bottom: "conv3"
-  top: "conv4"
+  bottom: "flow_conv3"
+  top: "flow_conv4"
   convolution_param {
     num_output: 512
     pad: 1
@@ -157,16 +155,16 @@ layer {
   }
 }
 layer {
-  name: "relu4"
+  name: "flow_relu4"
   type: "ReLU"
-  bottom: "conv4"
-  top: "conv4"
+  bottom: "flow_conv4"
+  top: "flow_conv4"
 }
 layer {
-  name: "conv5"
+  name: "flow_conv5"
   type: "Convolution"
-  bottom: "conv4"
-  top: "conv5"
+  bottom: "flow_conv4"
+  top: "flow_conv5"
   convolution_param {
     num_output: 512
     pad: 1
@@ -181,16 +179,16 @@ layer {
   }
 }
 layer {
-  name: "relu5"
+  name: "flow_relu5"
   type: "ReLU"
-  bottom: "conv5"
-  top: "conv5"
+  bottom: "flow_conv5"
+  top: "flow_conv5"
 }
 layer {
-  name: "pool5"
+  name: "flow_pool5"
   type: "Pooling"
-  bottom: "conv5"
-  top: "pool5"
+  bottom: "flow_conv5"
+  top: "flow_pool5"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -198,73 +196,73 @@ layer {
   }
 }
 layer {
-  name: "fc6"
+  name: "flow_fc6"
   type: "InnerProduct"
-  bottom: "pool5"
-  top: "fc6"
+  bottom: "flow_pool5"
+  top: "flow_fc6"
   inner_product_param {
     num_output: 4096
   }
 }
 layer {
-  name: "relu6"
+  name: "flow_relu6"
   type: "ReLU"
-  bottom: "fc6"
-  top: "fc6"
+  bottom: "flow_fc6"
+  top: "flow_fc6"
 }
 layer {
-  name: "drop6"
+  name: "flow_drop6"
   type: "Dropout"
-  bottom: "fc6"
-  top: "fc6"
+  bottom: "flow_fc6"
+  top: "flow_fc6"
   dropout_param {
     dropout_ratio: 0.5
   }
 }
 layer {
-  name: "fc7"
+  name: "flow_fc7"
   type: "InnerProduct"
-  bottom: "fc6"
-  top: "fc7"
+  bottom: "flow_fc6"
+  top: "flow_fc7"
   inner_product_param {
     num_output: 2048
   }
 }
 layer {
-  name: "relu7"
+  name: "flow_relu7"
   type: "ReLU"
-  bottom: "fc7"
-  top: "fc7"
+  bottom: "flow_fc7"
+  top: "flow_fc7"
 }
 layer {
-  name: "drop7"
+  name: "flow_drop7"
   type: "Dropout"
-  bottom: "fc7"
-  top: "fc7"
+  bottom: "flow_fc7"
+  top: "flow_fc7"
   dropout_param {
     dropout_ratio: 0.5
   }
 }
 layer {
-  name: "fc8"
+  name: "flow_fc8"
   type: "InnerProduct"
-  bottom: "fc7"
-  top: "fc8"
+  bottom: "flow_fc7"
+  top: "flow_fc8"
   inner_product_param {
     num_output: 101
   }
 }
 layer {
-  name: "loss"
+  name: "flow_loss"
   type: "SoftmaxWithLoss"
-  bottom: "fc8"
+  bottom: "flow_fc8"
   bottom: "flow_label"
-  top: "loss"
+  top: "flow_loss"
 }
 layer {
-  name: "accuracy"
+  name: "flow_accuracy"
   type: "Accuracy"
-  bottom: "fc8"
+  bottom: "flow_fc8"
   bottom: "flow_label"
-  top: "accuracy"
+  top: "flow_accuracy"
 }
