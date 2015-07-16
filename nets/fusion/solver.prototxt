@@ -4,8 +4,7 @@ net: "net.prototxt"
 test_initialization: false
 test_interval: 1000
 # How many iterations per test
-test_iter: 200
-# test_iter: 1000
+test_iter: 1000
 # Base learning rate
 base_lr: 0.01
 
@@ -23,8 +22,8 @@ display: 100
 max_iter: 1000000
 
 # Snapshot every nth iteration in the specified directory
-#snapshot: 5000
-#snapshot_prefix: "../../snapshots/"
+snapshot: 5000
+snapshot_prefix: "snapshots/"
 
 random_seed: 1701
 # Display the loss averaged over the last average_loss iterations

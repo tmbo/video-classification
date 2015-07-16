@@ -18,8 +18,8 @@ layer {
     mean_value: 123
  }
   data_param {
-    backend: LMDB
-    source: "/extra/data_sets/UCF-101/fusion/lmdb/frames/"
+    backend: LEVELDB
+    source: "/extra/data_sets/UCF-101/levelDB/spatial/lstm/train/"
     batch_size: 16
   }
 }
@@ -37,8 +37,8 @@ layer {
     mean_value: 123
 }
   data_param {
-    backend: LMDB
-    source: "/extra/data_sets/UCF-101/fusion/lmdb/frames/"
+    backend: LEVELDB
+    source: "/extra/data_sets/UCF-101/levelDB/spatial/lstm/test"
     batch_size: 16
   }
 }
@@ -55,12 +55,12 @@ layer {
   transform_param {
     crop_size: 224
     mean_value: 127
-    mirror : 1
+    mirror : true
   }
   data_param {
-    source: "/extra/data_sets/UCF-101/fusion/lmdb/flow/"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/lstm/train"
     batch_size: 16
-    backend: LMDB
+    backend: LEVELDB
   }
   include {
     phase: TRAIN
@@ -77,11 +77,12 @@ layer {
   transform_param {
     crop_size: 224
     mean_value: 127
+    mirror: true
   }
   data_param {
-    source: "/extra/data_sets/UCF-101/fusion/lmdb/flow/"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/lstm/test"
     batch_size: 16
-    backend: LMDB
+    backend: LEVELDB
   }
 }
 
@@ -269,11 +270,11 @@ layer {
   name: "fc6"
   type: "InnerProduct"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
@@ -288,8 +289,40 @@ layer {
 }
 layer {
   bottom: "fc6"
-  top: "frames_fc6"
+  top: "fc6"
   name: "drop6"
+  type: "Dropout"
+  dropout_param {
+    dropout_ratio: 0.7
+  }
+}
+layer {
+  bottom: "fc6"
+  top: "fc7"
+  name: "fc7"
+  type: "InnerProduct"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2048
+  }
+}
+layer {
+  bottom: "fc7"
+  top: "fc7"
+  name: "relu7"
+  type: "ReLU"
+}
+layer {
+  bottom: "fc7"
+  top: "fc7"
+  name: "drop7"
   type: "Dropout"
   dropout_param {
     dropout_ratio: 0.7
@@ -301,10 +334,10 @@ layer {
 ###############
 
 layer {
-  bottom: "flow_data"
-  top: "flow_conv1"
   name: "flow_conv1"
   type: "Convolution"
+  bottom: "flow_data"
+  top: "flow_conv1"
   convolution_param {
     num_output: 96
     kernel_size: 7
@@ -318,28 +351,27 @@ layer {
   }
 }
 layer {
-  bottom: "flow_conv1"
-  top: "flow_conv1"
   name: "flow_relu1"
   type: "ReLU"
+  bottom: "flow_conv1"
+  top: "flow_conv1"
 }
 layer {
-  bottom: "flow_conv1"
-  top: "flow_norm1"
   name: "flow_norm1"
   type: "LRN"
+  bottom: "flow_conv1"
+  top: "flow_norm1"
   lrn_param {
     local_size: 5
-    alpha: 0.0005
+    alpha: 0.0001
     beta: 0.75
-    k: 2
   }
 }
 layer {
-  bottom: "flow_norm1"
-  top: "flow_pool1"
   name: "flow_pool1"
   type: "Pooling"
+  bottom: "flow_norm1"
+  top: "flow_pool1"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -347,13 +379,12 @@ layer {
   }
 }
 layer {
-  bottom: "flow_pool1"
-  top: "flow_conv2"
   name: "flow_conv2"
   type: "Convolution"
+  bottom: "flow_pool1"
+  top: "flow_conv2"
   convolution_param {
     num_output: 256
-    pad: 1
     kernel_size: 5
     stride: 2
   }
@@ -365,28 +396,16 @@ layer {
   }
 }
 layer {
-  bottom: "flow_conv2"
-  top: "flow_conv2"
   name: "flow_relu2"
   type: "ReLU"
-}
-layer {
   bottom: "flow_conv2"
-  top: "flow_norm2"
-  name: "flow_norm2"
-  type: "LRN"
-  lrn_param {
-    local_size: 5
-    alpha: 0.0005
-    beta: 0.75
-    k: 2
-  }
+  top: "flow_conv2"
 }
 layer {
-  bottom: "flow_norm2"
-  top: "flow_pool2"
   name: "flow_pool2"
   type: "Pooling"
+  bottom: "flow_conv2"
+  top: "flow_pool2"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -394,10 +413,10 @@ layer {
   }
 }
 layer {
-  bottom: "flow_pool2"
-  top: "flow_conv3"
   name: "flow_conv3"
   type: "Convolution"
+  bottom: "flow_pool2"
+  top: "flow_conv3"
   convolution_param {
     num_output: 512
     pad: 1
@@ -411,20 +430,21 @@ layer {
   }
 }
 layer {
-  bottom: "flow_conv3"
-  top: "flow_conv3"
   name: "flow_relu3"
   type: "ReLU"
+  bottom: "flow_conv3"
+  top: "flow_conv3"
 }
 layer {
-  bottom: "flow_conv3"
-  top: "flow_conv4"
   name: "flow_conv4"
   type: "Convolution"
+  bottom: "flow_conv3"
+  top: "flow_conv4"
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
+    group: 1
   }
   param {
     lr_mult: 0
@@ -434,20 +454,21 @@ layer {
   }
 }
 layer {
-  bottom: "flow_conv4"
-  top: "flow_conv4"
   name: "flow_relu4"
   type: "ReLU"
+  bottom: "flow_conv4"
+  top: "flow_conv4"
 }
 layer {
-  bottom: "flow_conv4"
-  top: "flow_conv5"
   name: "flow_conv5"
   type: "Convolution"
+  bottom: "flow_conv4"
+  top: "flow_conv5"
   convolution_param {
     num_output: 512
     pad: 1
     kernel_size: 3
+    group: 1
   }
   param {
     lr_mult: 0
@@ -457,16 +478,16 @@ layer {
   }
 }
 layer {
-  bottom: "flow_conv5"
-  top: "flow_conv5"
   name: "flow_relu5"
   type: "ReLU"
+  bottom: "flow_conv5"
+  top: "flow_conv5"
 }
 layer {
-  bottom: "flow_conv5"
-  top: "flow_pool5"
   name: "flow_pool5"
   type: "Pooling"
+  bottom: "flow_conv5"
+  top: "flow_pool5"
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -474,176 +495,36 @@ layer {
   }
 }
 layer {
-  bottom: "flow_pool5"
-  top: "flow_fc6"
   name: "flow_fc6"
   type: "InnerProduct"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
+  bottom: "flow_pool5"
+  top: "flow_fc6"
   inner_product_param {
     num_output: 4096
   }
 }
 layer {
-  bottom: "flow_fc6"
-  top: "flow_fc6"
   name: "flow_relu6"
   type: "ReLU"
-}
-layer {
   bottom: "flow_fc6"
   top: "flow_fc6"
+}
+layer {
   name: "flow_drop6"
   type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.7
-  }
-}
-
-###############
-# FUSION
-###############
-
-# FRAMES
-
-layer {
-  name: "frames_reshape"
-  type: "Reshape"
-  bottom: "frames_fc6"
-  top: "frames_reshape"
-  reshape_param {
-    shape {
-      dim: 1
-	  dim: 1
-	  dim: 16
-	  dim: 4096
-	}
-  }
-}
-layer {
-  name: "frames_pool3"
-  type: "Pooling"
-  bottom: "frames_reshape"
-  top: "frames_pool3"
-  pooling_param {
-    pool: AVE
-    kernel_h: 16
-	kernel_w: 1
-    stride: 1
-  }
-}
-layer {
-  name: "frames_fc7"
-  type: "InnerProduct"
-  bottom: "frames_pool3"
-  top: "frames_fc7"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 1
-    }
-  }
-}
-layer {
-  name: "frames_relu7"
-  type: "ReLU"
-  bottom: "frames_fc7"
-  top: "frames_fc7"
-}
-layer {
-  name: "frames_drop7"
-  type: "Dropout"
-  bottom: "frames_fc7"
-  top: "frames_drop7"
-  dropout_param {
-    dropout_ratio: 0.9
-  }
-}
-layer {
-  name: "frames_reshape2"
-  type: "Reshape"
-  bottom: "frames_drop7"
-  top: "frames_reshape2"
-  reshape_param {
-    shape {
-	  dim: 1
-	  dim: 1
-	  dim: 1
-	  dim: 4096
-	}
-  }
-}
-
-# FLOW
-
-layer {
-  name: "flow_reshape"
-  type: "Reshape"
   bottom: "flow_fc6"
-  top: "flow_reshape"
-  reshape_param {
-    shape {
-	  dim: 1
-	  dim: 1
-	  dim: 16
-	  dim: 4096
-	}
-  }
-}
-layer {
-  name: "flow_pool3"
-  type: "Pooling"
-  bottom: "flow_reshape"
-  top: "flow_pool3"
-  pooling_param {
-    pool: AVE
-    kernel_h: 16
-	kernel_w: 1
-    stride: 1
+  top: "flow_fc6"
+  dropout_param {
+    dropout_ratio: 0.5
   }
 }
 layer {
   name: "flow_fc7"
   type: "InnerProduct"
-  bottom: "flow_pool3"
+  bottom: "flow_fc6"
   top: "flow_fc7"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
   inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 1
-    }
+    num_output: 2048
   }
 }
 layer {
@@ -656,42 +537,48 @@ layer {
   name: "flow_drop7"
   type: "Dropout"
   bottom: "flow_fc7"
-  top: "flow_drop7"
+  top: "flow_fc7"
   dropout_param {
-    dropout_ratio: 0.9
+    dropout_ratio: 0.5
   }
 }
+
+###############
+# FUSION
+###############
+
+# FRAMES
+
 layer {
-  name: "flow_reshape2"
+  name: "fusion_reshape1"
   type: "Reshape"
-  bottom: "flow_drop7"
-  top: "flow_reshape2"
+  bottom: "fc7"
+  top: "fusion_reshape1"
   reshape_param {
     shape {
-	  dim: 1
-	  dim: 1
       dim: 1
-	  dim: 4096
-	}
-  }
-}
-
-# FUSION
-
-layer {
-  name: "concat"
-  bottom: "flow_reshape2"
-  bottom: "frames_reshape2"
-  top: "concat"
-  type: "Concat"
-  concat_param {
-    axis: 1
+      dim: 1
+      dim: 16
+      dim: 2048
+    }
   }
 }
 layer {
-  name: "fusion_fc1"
+  name: "fusion_pool1"
+  type: "Pooling"
+  bottom: "fusion_reshape1"
+  top: "fusion_pool1"
+  pooling_param {
+    pool: AVE
+    kernel_h: 16
+    kernel_w: 1
+    stride: 1
+  }
+}
+layer {
+  name: "fsuion_fc1"
   type: "InnerProduct"
-  bottom: "concat"
+  bottom: "fusion_pool1"
   top: "fusion_fc1"
   param {
     lr_mult: 1
@@ -702,7 +589,7 @@ layer {
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
+    num_output: 2048
     weight_filler {
       type: "gaussian"
       std: 0.005
@@ -723,16 +610,166 @@ layer {
   name: "fusion_drop1"
   type: "Dropout"
   bottom: "fusion_fc1"
-  top: "fusion_drop1"
+  top: "fusion_fc1"
   dropout_param {
     dropout_ratio: 0.9
   }
 }
 layer {
+  name: "fusion_reshape2"
+  type: "Reshape"
+  bottom: "fusion_fc1"
+  top: "fusion_frames"
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 2048
+    }
+  }
+}
+
+# FLOW
+
+layer {
+  name: "fusion_reshape3"
+  type: "Reshape"
+  bottom: "flow_fc7"
+  top: "fusion_reshape3"
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 16
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "fusion_pool2"
+  type: "Pooling"
+  bottom: "fusion_reshape3"
+  top: "fusion_pool2"
+  pooling_param {
+    pool: AVE
+    kernel_h: 16
+    kernel_w: 1
+    stride: 1
+  }
+}
+layer {
   name: "fusion_fc2"
   type: "InnerProduct"
-  bottom: "fusion_drop1"
+  bottom: "fusion_pool2"
   top: "fusion_fc2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
+  }
+}
+layer {
+  name: "fusion_relu2"
+  type: "ReLU"
+  bottom: "fusion_fc2"
+  top: "fusion_fc2"
+}
+layer {
+  name: "fusion_drop2"
+  type: "Dropout"
+  bottom: "fusion_fc2"
+  top: "fusion_fc2"
+  dropout_param {
+    dropout_ratio: 0.9
+  }
+}
+layer {
+  name: "fusion_reshape4"
+  type: "Reshape"
+  bottom: "fusion_fc2"
+  top: "fusion_flow"
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 2048
+    }
+  }
+}
+
+# FUSION
+
+layer {
+  name: "fusion_concat1"
+  bottom: "fusion_frames"
+  bottom: "fusion_flow"
+  top: "fusion_concat1"
+  type: "Concat"
+  concat_param {
+    axis: 1
+  }
+}
+layer {
+  name: "fusion_fc3"
+  type: "InnerProduct"
+  bottom: "fusion_concat1"
+  top: "fusion_fc3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 2048
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 1
+    }
+  }
+}
+layer {
+  name: "fusion_relu3"
+  type: "ReLU"
+  bottom: "fusion_fc3"
+  top: "fusion_fc3"
+}
+layer {
+  name: "fusion_drop3"
+  type: "Dropout"
+  bottom: "fusion_fc3"
+  top: "fusion_fc3"
+  dropout_param {
+    dropout_ratio: 0.9
+  }
+}
+layer {
+  name: "fusion_fc4"
+  type: "InnerProduct"
+  bottom: "fusion_fc3"
+  top: "fusion_fc4"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -764,11 +801,11 @@ layer {
   top: "label_reshape"
   reshape_param {
     shape {
-	  dim: 1
-	  dim: 1
-	  dim: 1
-	  dim: 16
-	}
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 16
+    }
   }
 }
 layer {
@@ -779,14 +816,14 @@ layer {
   pooling_param {
     pool: AVE
     kernel_h: 1
-	kernel_w: 16
+    kernel_w: 16
     stride: 1
   }
 }
 layer {
   name: "accuracy"
   type: "Accuracy"
-  bottom: "fusion_fc2"
+  bottom: "fusion_fc4"
   bottom: "fusion_label"
   top: "accuracy"
 }

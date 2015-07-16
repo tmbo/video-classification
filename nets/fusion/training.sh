@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 # Check if called with name
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 [experiment_name] [architecture]"
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 [experiment_name]"
 	echo "       experiment_name: Name of the subfolder in ./experiments/ for the current experiment."
-    echo "       architecture:    Subfolder in . that contains the network definition."
 	echo "Exiting."
 	exit 1
 fi
@@ -12,7 +11,6 @@ fi
 # Set Vars
 DATE=`date +%Y%m%d-%H%M%S`
 FOLDER_NAME="${DATE}_$1"
-ARCH="$2"
 TRAINING_LOG_NAME="uc101.tlog"
 
 echo "Saving experiment in experiments/$FOLDER_NAME"
@@ -43,7 +41,7 @@ function cleanup() {
 rm snapshots/* 2> /dev/null
 
 # Saving setup
-cp $ARCH/net.prototxt $ARCH/solver.prototxt training.sh experiments/$FOLDER_NAME
+cp net.prototxt solver.prototxt training.sh experiments/$FOLDER_NAME
 
 # Setting interrupt trap
 trap 'cleanup "Training interrupted"; exit 1' INT
@@ -51,8 +49,13 @@ trap 'cleanup "Training interrupted"; exit 1' INT
 # Calling caffe
 # export CAFFE_ROOT="$HOME/caffe-tmbo"
 
+$SPATIAL_WEIGHTS = $MP_HOME/nets/activity_recognition/experiments/20150701-133744_uncropped_10fps_full_dr7/_iter_70000.caffemodel
+$FLOW_WEIGHTS = $MP_HOME/nets/fudan/experiments/20150716-105607_train-with-flow-labels/_iter_5000.caffemodel
+
 $CAFFE_ROOT/build/tools/caffe train \
-    -solver $MP_HOME/nets/flow/experiments/$FOLDER_NAME/solver.prototxt 2> $TRAINING_LOG_NAME
+    -solver $MP_HOME/nets/fusion/solver.prototxt
+    -weights $SPATIAL_WEIGHTS,$FLOW_WEIGHTS 2> $TRAINING_LOG_NAME \
+    -gpu 0
 
 # Resetting interrupt handling
 trap - INT
