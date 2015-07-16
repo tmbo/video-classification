@@ -837,9 +837,16 @@ layer {
   }
 }
 layer {
-  name: "accuracy"
+  name: "fusion_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fusion_fc4"
+  bottom: "fusion_label"
+  top: "fusion_loss"
+}
+layer {
+  name: "fusion_accuracy"
   type: "Accuracy"
   bottom: "fusion_fc4"
   bottom: "fusion_label"
-  top: "accuracy"
+  top: "fusion_accuracy"
 }
