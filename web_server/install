@@ -1,7 +1,0 @@
-#!/bin/bash
-
-npm install
-
-npm install -g webpack
-
-for req in $(cat requirements.txt); do pip install $req; done
