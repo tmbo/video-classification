@@ -50,7 +50,7 @@ trap 'cleanup "Training interrupted"; exit 1' INT
 # export CAFFE_ROOT="$HOME/caffe-tmbo"
 
 SPATIAL_WEIGHTS=$MP_HOME/nets/activity_recognition/experiments/20150701-133744_uncropped_10fps_full_dr7/_iter_70000.caffemodel
-FLOW_WEIGHTS=$MP_HOME/nets/fudan/experiments/20150716-105607_train-with-flow-labels/_iter_5000.caffemodel
+FLOW_WEIGHTS=$MP_HOME/nets/fudan/experiments/20150716-125313_train/_iter_2500.caffemodel
 
 $CAFFE_ROOT/build/tools/caffe train \
     -solver $MP_HOME/nets/fusion/solver.prototxt \

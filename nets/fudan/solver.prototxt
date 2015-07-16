@@ -26,7 +26,7 @@ display: 25
 max_iter: 20000
 
 # Snapshot every nth iteration in the specified directory
-snapshot: 5000
+snapshot: 2500
 snapshot_prefix: "./snapshots/"
 
 random_seed: 1701
