@@ -1,48 +1,46 @@
 name: "flow_VGG_CNN_M_2048"
 layer {
-  name: "data"
+  name: "flow_data"
   type: "Data"
-  top: "data"
-  top: "label"
-  include { phase: TRAIN }
-  transform_param {
+  top: "flow_data"
+  top: "flow_label"
+  transform_param {                                                                                                                                                                  
     mirror: true
-    crop_size: 224
-    mean_value: 127
-    mean_value: 127
-    mean_value: 127
- }
+	crop_size: 224
+	mean_value: 127 
+  }
   data_param {
-    backend: LMDB
-    source: "/opt/data_sets/UCF-101/lmdbs/flow/train_random/"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_1/train"
     batch_size: 64
+	backend: LEVELDB
+  }
+  include {
+    phase: TRAIN
   }
 }
 layer {
-  name: "data"
+  name: "flow_data"
   type: "Data"
-  top: "data"
-  top: "label"
+  top: "flow_data"
+  top: "flow_label"
   include {
     phase: TEST
   }
-  transform_param {
+  transform_param {                                                                                                                                                                  
     mirror: true
-    crop_size: 224
-    mean_value: 127
-    mean_value: 127
-    mean_value: 127
-}
+	crop_size: 224
+	mean_value: 127 
+  }
   data_param {
-    backend: LMDB
-    source: "/opt/data_sets/UCF-101/lmdbs/flow/test_random/"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_1/test"
     batch_size: 16
+	backend: LEVELDB
   }
 }
 layer {
-  bottom: "data"
-  top: "conv1"
-  name: "conv1"
+  bottom: "flow_data"
+  top: "flow_conv1"
+  name: "flow_conv1"
   type: "Convolution"
   convolution_param {
     num_output: 96
@@ -57,15 +55,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv1"
-  top: "conv1"
-  name: "relu1"
+  bottom: "flow_conv1"
+  top: "flow_conv1"
+  name: "flow_relu1"
   type: "ReLU"
 }
 layer {
-  bottom: "conv1"
-  top: "norm1"
-  name: "norm1"
+  bottom: "flow_conv1"
+  top: "flow_norm1"
+  name: "flow_norm1"
   type: "LRN"
   lrn_param {
     local_size: 5
@@ -75,9 +73,9 @@ layer {
   }
 }
 layer {
-  bottom: "norm1"
-  top: "pool1"
-  name: "pool1"
+  bottom: "flow_norm1"
+  top: "flow_pool1"
+  name: "flow_pool1"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -86,9 +84,9 @@ layer {
   }
 }
 layer {
-  bottom: "pool1"
-  top: "conv2"
-  name: "conv2"
+  bottom: "flow_pool1"
+  top: "flow_conv2"
+  name: "flow_conv2"
   type: "Convolution"
   convolution_param {
     num_output: 256
@@ -104,15 +102,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv2"
-  top: "conv2"
-  name: "relu2"
+  bottom: "flow_conv2"
+  top: "flow_conv2"
+  name: "flow_relu2"
   type: "ReLU"
 }
 layer {
-  bottom: "conv2"
-  top: "norm2"
-  name: "norm2"
+  bottom: "flow_conv2"
+  top: "flow_norm2"
+  name: "flow_norm2"
   type: "LRN"
   lrn_param {
     local_size: 5
@@ -122,9 +120,9 @@ layer {
   }
 }
 layer {
-  bottom: "norm2"
-  top: "pool2"
-  name: "pool2"
+  bottom: "flow_norm2"
+  top: "flow_pool2"
+  name: "flow_pool2"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -133,9 +131,9 @@ layer {
   }
 }
 layer {
-  bottom: "pool2"
-  top: "conv3"
-  name: "conv3"
+  bottom: "flow_pool2"
+  top: "flow_conv3"
+  name: "flow_conv3"
   type: "Convolution"
   convolution_param {
     num_output: 512
@@ -150,38 +148,15 @@ layer {
   }
 }
 layer {
-  bottom: "conv3"
-  top: "conv3"
-  name: "relu3"
+  bottom: "flow_conv3"
+  top: "flow_conv3"
+  name: "flow_relu3"
   type: "ReLU"
 }
 layer {
-  bottom: "conv3"
-  top: "conv4"
-  name: "conv4"
-  type: "Convolution"
-  convolution_param {
-    num_output: 512
-    pad: 1
-    kernel_size: 3
-  }
-  param {
-    lr_mult: 0
-  }
-  param {
-    lr_mult: 0
-  }
-}
-layer {
-  bottom: "conv4"
-  top: "conv4"
-  name: "relu4"
-  type: "ReLU"
-}
-layer {
-  bottom: "conv4"
-  top: "conv5"
-  name: "conv5"
+  bottom: "flow_conv3"
+  top: "flow_conv4"
+  name: "flow_conv4"
   type: "Convolution"
   convolution_param {
     num_output: 512
@@ -196,15 +171,38 @@ layer {
   }
 }
 layer {
-  bottom: "conv5"
-  top: "conv5"
-  name: "relu5"
+  bottom: "flow_conv4"
+  top: "flow_conv4"
+  name: "flow_relu4"
   type: "ReLU"
 }
 layer {
-  bottom: "conv5"
-  top: "pool5"
-  name: "pool5"
+  bottom: "flow_conv4"
+  top: "flow_conv5"
+  name: "flow_conv5"
+  type: "Convolution"
+  convolution_param {
+    num_output: 512
+    pad: 1
+    kernel_size: 3
+  }
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 1
+  }
+}
+layer {
+  bottom: "flow_conv5"
+  top: "flow_conv5"
+  name: "flow_relu5"
+  type: "ReLU"
+}
+layer {
+  bottom: "flow_conv5"
+  top: "flow_pool5"
+  name: "flow_pool5"
   type: "Pooling"
   pooling_param {
     pool: MAX
@@ -213,9 +211,9 @@ layer {
   }
 }
 layer {
-  bottom: "pool5"
-  top: "fc6"
-  name: "fc6"
+  bottom: "flow_pool5"
+  top: "flow_fc6"
+  name: "flow_fc6"
   type: "InnerProduct"
   param {
     lr_mult: 1
@@ -230,24 +228,24 @@ layer {
   }
 }
 layer {
-  bottom: "fc6"
-  top: "fc6"
-  name: "relu6"
+  bottom: "flow_fc6"
+  top: "flow_fc6"
+  name: "flow_relu6"
   type: "ReLU"
 }
 layer {
-  bottom: "fc6"
-  top: "fc6"
-  name: "drop6"
+  bottom: "flow_fc6"
+  top: "flow_fc6"
+  name: "flow_drop6"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.1
+    dropout_ratio: 0.5
   }
 }
 layer {
-  bottom: "fc6"
-  top: "fc7"
-  name: "fc7"
+  bottom: "flow_fc6"
+  top: "flow_fc7"
+  name: "flow_fc7"
   type: "InnerProduct"
   param {
     lr_mult: 1
@@ -262,24 +260,24 @@ layer {
   }
 }
 layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "relu7"
+  bottom: "flow_fc7"
+  top: "flow_fc7"
+  name: "flow_relu7"
   type: "ReLU"
 }
 layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "drop7"
+  bottom: "flow_fc7"
+  top: "flow_fc7"
+  name: "flow_drop7"
   type: "Dropout"
   dropout_param {
-    dropout_ratio: 0.1
+    dropout_ratio: 0.5
   }
 }
 layer {
-  bottom: "fc7"
-  top: "prediction"
-  name: "prediction"
+  bottom: "flow_fc7"
+  top: "flow_prediction"
+  name: "flow_prediction"
   type: "InnerProduct"
   param {
     lr_mult: 1
@@ -301,25 +299,16 @@ layer {
   }
 }
 layer {
-  bottom: "prediction"
-  top: "prediction"
-  name: "dropPrediction"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.1
-  }
-}
-layer {
-  bottom: "prediction"
-  bottom: "label"
-  top: "prob"
-  name: "prob"
+  bottom: "flow_prediction"
+  bottom: "flow_label"
+  top: "flow_prob"
+  name: "flow_prob"
   type: "SoftmaxWithLoss"
 }
 layer {
-  name: "accuracy"
+  name: "flow_accuracy"
   type: "Accuracy"
-  bottom: "prediction"
-  bottom: "label"
+  bottom: "flow_prediction"
+  bottom: "flow_label"
   top: "accuracy"
 }
