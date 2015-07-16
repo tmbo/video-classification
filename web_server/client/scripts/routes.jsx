@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Router from 'react-router';
 var { Route, DefaultRoute, NotFoundRoute } = Router;
 

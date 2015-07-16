@@ -1,6 +1,7 @@
-import React from 'react';
+import React from "react";
+import Component from "../components/baseComponent.jsx";
 
-var NotFound = React.createClass({
+class NotFound extends Component {
 
   render() {
     return (
@@ -10,6 +11,6 @@ var NotFound = React.createClass({
     );
   }
 
-});
+};
 
-module.exports = NotFound;
+export default NotFound;

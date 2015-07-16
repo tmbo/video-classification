@@ -10,7 +10,7 @@
 ./run Basketball
 ./run BasketballDunk
 ./run BenchPress
-./run Biking
+#./run Biking
 ./run Billiards
 ./run BlowDryHair
 ./run BlowingCandles

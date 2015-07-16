@@ -1,44 +1,31 @@
 import React from "react";
-import GeneralMixin from "../mixins/generalMixin"
+import Component from "./baseComponent.jsx";
 
-var FileInput = React.createClass({
+class FileInput extends Component {
 
-  mixins : [GeneralMixin],
-
-  propTypes: {
-    placeholder : React.PropTypes.string,
-    fileFilter : React.PropTypes.string,
-  },
-
-  getDefaultProps() {
-    return {
-      placeholder: "",
-      fileFilter: ""
-    };
-  },
-
-  getInitialState() {
-    return {
-      fileNames : ""
-    }
-  },
+  constructor(props) {
+    super(props);
+    this.state = {fileNames : ""};
+  }
 
   handleChange(evt) {
     const files = this.getFiles();
     let fileNames = [];
+
     for (var i=0; i < files.length; i++) {
       fileNames.push(files[i].name);
     }
-    this.updateState({fileNames : {$set : fileNames.join(", ")}})
-  },
+
+    this.setState({fileNames : fileNames.join(", ")});
+  }
 
   handleClick(evt) {
     this.refs.fileInput.getDOMNode().click();
-  },
+  }
 
   getFiles() {
     return this.refs.fileInput.getDOMNode().files;
-  },
+  }
 
   render() {
 
@@ -51,15 +38,16 @@ var FileInput = React.createClass({
             name="video"
             ref="fileInput"
             accept={this.props.fileFilter}
-            onChange={this.handleChange} />
+            onChange={this.handleChange.bind(this)} />
         </div>
         <div className="file-path-wrapper">
           <input
+            readOnly
             value={this.state.fileNames}
             className="file-path validate"
             type="text"
             placeholder={this.props.placeholder}
-            onClick={this.handleClick}
+            onClick={this.handleClick.bind(this)}
             ref="filePath"
              />
         </div>
@@ -67,6 +55,16 @@ var FileInput = React.createClass({
     );
   }
 
-});
+};
+
+FileInput.propTypes = {
+  placeholder : React.PropTypes.string,
+  fileFilter : React.PropTypes.string,
+}
+
+FileInput.defaultProps = {
+  placeholder: "",
+  fileFilter: ""
+}
 
 module.exports = FileInput;

@@ -1,8 +1,9 @@
-import React from 'react';
+import React from "react";
+import Component from "../components/baseComponent.jsx";
 import { RouteHandler } from 'react-router';
 import Header from '../components/header.jsx'
 
-var App = React.createClass({
+class App extends Component {
 
   render() {
 
@@ -18,6 +19,6 @@ var App = React.createClass({
     );
   }
 
-});
+};
 
-module.exports = App;
+export default App;

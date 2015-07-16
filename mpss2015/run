@@ -9,5 +9,5 @@ fi
 class=$1
 gpu=0
 
-./build/ofextractcmd $UCF101_HOME/frames/$class $UCF101_HOME/flow/$class $gpu
+./build/ofextractcmd $UCF101_HOME/frames/$class $UCF101_HOME/flow_corrected/$class $gpu
 

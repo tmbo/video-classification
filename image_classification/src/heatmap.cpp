@@ -21,20 +21,21 @@ int main(int argc, char** argv) {
 
     // Initialize classifier
     std::cout << "Initialize classifier ..." << std::endl;
-    std::string preModel = "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/_iter_100000.caffemodel";
+    std::string preModel = "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/_iter_70000.caffemodel";
     std::string protoFile = "/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/deploy.prototxt";
 //    std::string preModel = "/home/mpss2015/video-classification/nets/activity_recognition/snapshots/conv4-0.01_after-0.1_lstm-1024-512/_iter_100000.caffemodel";
 //    std::string protoFile = "/home/mpss2015/video-classification/nets/activity_recognition/caffenet/deploy.prototxt";
-    cv::Size size(227, 227);
+    cv::Size size(224, 224);
     int channels = 3;
     bool isDebug = false;
 
     CaffeClassifier classifier(true, preModel, protoFile, size, channels, isDebug);
 
-    cv::Mat inputImage = cv::imread("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/8.jpg", CV_LOAD_IMAGE_COLOR);
+//    cv::Mat inputImage = cv::imread("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/c_050.jpg", CV_LOAD_IMAGE_COLOR);
+    cv::Mat inputImage = cv::imread("/home/knub/Repositories/video-classification/nets/activity_recognition/caffenet/bl_015.jpg", CV_LOAD_IMAGE_COLOR);
 
     cv::Mat heatMap;
-    classifier.predictHeatMap(inputImage, 18, "reshape-prediction", "data", heatMap);
+    classifier.predictHeatMap(inputImage, 38, "prediction", "data", heatMap);
 
     cv::Mat normalized;
     cv::normalize(heatMap, normalized, 0.0, 255.0, cv::NORM_MINMAX, CV_8UC1);

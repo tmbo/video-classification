@@ -55,11 +55,11 @@ namespace ic {
     void CaffeClassifier::predictHeatMap(cv::Mat& inputImage, int label, string predictionLayer, string dataLayer, cv::Mat& heatMap) {
         const int IMAGE_SIZE = 227;
         const int BATCH_SIZE = 64;
-        heatMap = cv::Mat(IMAGE_SIZE, IMAGE_SIZE, CV_32FC1, Scalar(23.0));
+        heatMap = cv::Mat(IMAGE_SIZE, IMAGE_SIZE, CV_32FC1, Scalar(26.932154));
 
-        const int STEP_SIZE = 13;
+        const int STEP_SIZE = 9;
         const int START_OFFSET = STEP_SIZE / 2;
-        const int FILLER_SIZE = 40;
+        const int FILLER_SIZE = 50;
 
         cv::Scalar mean =  cv::mean(inputImage);
 
@@ -140,9 +140,11 @@ namespace ic {
                 float* fs = featureBlob->mutable_cpu_data() + featureBlob->offset(j);
                 vector<float> featureVector(fs, fs + dimFeatures);
 //                std::vector<float>::iterator result = std::max_element(featureVector.begin(), featureVector.end());
-//                assert(result - featureVector.begin() - 1 == label);
-//                std::cout << featureVector.size() << std::endl;
-                float confidence = featureVector[label + 1];
+//                int predicted = result - featureVector.begin();
+//                std::cout << "Predicted: " << predicted << ", Actual: " << label << std::endl;
+//                assert(predicted == label);
+
+                float confidence = featureVector[label];
 
 
                 rectangle(heatMap,

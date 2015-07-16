@@ -35,12 +35,9 @@ def uploadVideo():
 
     file = request.files.getlist("video")[0]
 
-    print file.filename
-    print isAllowed(file.filename)
-
     if file and isAllowed(file.filename):
         filename = secure_filename(file.filename)
-        file.save(filename)
+        file.save(file.save(path.join(app.config["UPLOAD_FOLDER"], filename)))
         response = jsonify({"success" : filename})
 
     else:

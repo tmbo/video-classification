@@ -1,4 +1,5 @@
 import FetchUtils from "./fetchUtils";
+import VideoActions from "../actions/videoActions.js";
 
 const BASE_URL = "http://localhost:9000"; 
 
@@ -28,7 +29,7 @@ module.exports = window.api = {
     };
 
     return FetchUtils.fetchJson(url, options)
-      .then((data) => VideoActions.receiveVideo(data));
+      .then((data) => VideoActions.receivePrediction(data));
   },
 
 };
