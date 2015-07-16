@@ -6,7 +6,7 @@ test_interval: 1000
 # How many iterations per test
 test_iter: 1000
 # Base learning rate
-base_lr: 0.01
+base_lr: 0.001
 
 # Policy for changing the learning rate - multiply by gamma every stepsize iterations
 lr_policy: "step"
@@ -17,9 +17,9 @@ momentum: 0.9
 # weight_decay: 0.0
 
 # Display training loss every nth iteration
-display: 100
+display: 10
 # After how many iterations to stop
-max_iter: 1000000
+max_iter: 100000
 
 # Snapshot every nth iteration in the specified directory
 snapshot: 5000
