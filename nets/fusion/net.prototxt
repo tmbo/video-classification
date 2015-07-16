@@ -8,7 +8,7 @@ layer {
   name: "frames_data"
   type: "Data"
   top: "frames_data"
-  top: "frames_label"
+#  top: "frames_label"
   include { phase: TRAIN }
   transform_param {
     mirror: true
@@ -27,7 +27,7 @@ layer {
   name: "frames_data"
   type: "Data"
   top: "frames_data"
-  top: "frames_label"
+#  top: "frames_label"
   include { phase: TEST }
   transform_param {
     mirror: true
@@ -270,11 +270,11 @@ layer {
   name: "fc6"
   type: "InnerProduct"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -302,11 +302,11 @@ layer {
   name: "fc7"
   type: "InnerProduct"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -502,6 +502,14 @@ layer {
   inner_product_param {
     num_output: 4096
   }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
 }
 layer {
   name: "flow_relu6"
@@ -525,6 +533,14 @@ layer {
   top: "flow_fc7"
   inner_product_param {
     num_output: 2048
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
   }
 }
 layer {
@@ -576,7 +592,7 @@ layer {
   }
 }
 layer {
-  name: "fsuion_fc1"
+  name: "fusion_fc1"
   type: "InnerProduct"
   bottom: "fusion_pool1"
   top: "fusion_fc1"
@@ -612,7 +628,7 @@ layer {
   bottom: "fusion_fc1"
   top: "fusion_fc1"
   dropout_param {
-    dropout_ratio: 0.9
+    dropout_ratio: 0.5
   }
 }
 layer {
@@ -695,7 +711,7 @@ layer {
   bottom: "fusion_fc2"
   top: "fusion_fc2"
   dropout_param {
-    dropout_ratio: 0.9
+    dropout_ratio: 0.5
   }
 }
 layer {
@@ -762,7 +778,7 @@ layer {
   bottom: "fusion_fc3"
   top: "fusion_fc3"
   dropout_param {
-    dropout_ratio: 0.9
+    dropout_ratio: 0.5
   }
 }
 layer {
