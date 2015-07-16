@@ -22,6 +22,7 @@ import os, sys, collections, re
 
 FILENAME_EMPTY_FLOW = "empty_flow"
 DIRECTORY_RE = re.compile(r"((\w+/){2})([0-9]+)\.(jpg|png)$")
+WRONG_SIZES_DIRS = ["v_PommelHorse_g05_c01/", "v_PommelHorse_g05_c02/", "v_PommelHorse_g05_c03/", "v_PommelHorse_g05_c04/"]
 
 def get_flow_for_line(line, root_dir, stacked_frames_count):
   filename, label = line.split(" ")
@@ -45,7 +46,10 @@ def get_flow_for_line(line, root_dir, stacked_frames_count):
   for stack_number in stacks:
 
     if stack_number < 0 or stack_number > file_count:
-      filename_x = filename_y = FILENAME_EMPTY_FLOW
+      if sub_dir in WRONG_SIZES_DIRS:
+        filename_x = filename_y = FILENAME_EMPTY_FLOW + "_400x226"
+      else:
+        filename_x = filename_y = FILENAME_EMPTY_FLOW
       line_x = '{}/{}.jpg {}'.format(root_dir, filename_x, label)
       line_y = '{}/{}.jpg {}'.format(root_dir, filename_y, label)
     else:
