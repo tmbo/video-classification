@@ -11,7 +11,7 @@ fi
 # Set Vars
 DATE=`date +%Y%m%d-%H%M%S`
 FOLDER_NAME="${DATE}_$1"
-TRAINING_LOG_NAME="uc101.tlog"
+TRAINING_LOG_NAME="fusion.tlog"
 
 echo "Saving experiment in experiments/$FOLDER_NAME"
 mkdir experiments/$FOLDER_NAME
@@ -49,13 +49,13 @@ trap 'cleanup "Training interrupted"; exit 1' INT
 # Calling caffe
 # export CAFFE_ROOT="$HOME/caffe-tmbo"
 
-$SPATIAL_WEIGHTS = $MP_HOME/nets/activity_recognition/experiments/20150701-133744_uncropped_10fps_full_dr7/_iter_70000.caffemodel
-$FLOW_WEIGHTS = $MP_HOME/nets/fudan/experiments/20150716-105607_train-with-flow-labels/_iter_5000.caffemodel
+SPATIAL_WEIGHTS=$MP_HOME/nets/activity_recognition/experiments/20150701-133744_uncropped_10fps_full_dr7/_iter_70000.caffemodel
+FLOW_WEIGHTS=$MP_HOME/nets/fudan/experiments/20150716-105607_train-with-flow-labels/_iter_5000.caffemodel
 
 $CAFFE_ROOT/build/tools/caffe train \
-    -solver $MP_HOME/nets/fusion/solver.prototxt
-    -weights $SPATIAL_WEIGHTS,$FLOW_WEIGHTS 2> $TRAINING_LOG_NAME \
-    -gpu 0
+    -solver $MP_HOME/nets/fusion/solver.prototxt \
+    -gpu 1 \
+    -weights $SPATIAL_WEIGHTS,$FLOW_WEIGHTS 2> $TRAINING_LOG_NAME
 
 # Resetting interrupt handling
 trap - INT
