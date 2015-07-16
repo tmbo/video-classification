@@ -7,6 +7,7 @@
 *.caffemodel
 *.solverstate
 *.binaryproto
+**/experiments
 
 # Temporary files
 *.log
