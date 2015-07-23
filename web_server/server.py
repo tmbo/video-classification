@@ -19,6 +19,10 @@ static_assets_path = path.join(path.dirname(__file__), "dist")
 app = Flask(__name__, static_folder=static_assets_path)
 CORS(app)
 
+NETWORK_BATCH_SIZE = 16
+
+FLOW_STACK_SIZE=10
+
 
 LABEL_MAPPING = {}
 
@@ -47,6 +51,13 @@ def clear_folder(folder):
         except Exception, e:
             print e
 
+
+def select_indices(max_len, n):
+    l = range(0, max_len, max_len / (n-1))
+    assert len(l) == n, "created invalid frame selection"
+    return l
+
+
 # ----- Video -----------
 import caffe
 
@@ -55,6 +66,7 @@ def create_frames(video_file_name, frame_rate, output_folder):
     cmd = "ffmpeg -n -nostdin -i \"%s\" -r \"%d\" -qscale:v 2 \"%s/%%4d.jpg\"" % (video_file_name, frame_rate, output_folder)
     subprocess.call(cmd, shell=True)
     return output_folder
+
 
 def create_flows(frame_folder, output_folder):
     cmd = "%s %s %s 0" % (app.config["FLOW_CMD"], frame_folder, output_folder)
@@ -70,39 +82,59 @@ def load_frames(frame_list, w, h, transformer):
     data = np.zeros((len(frame_list), 3, w, h))
 
     for idx, frame in enumerate(frame_list):
-        data[idx, :, :, :] = transformer.preprocess('data', load_frame_data(frame))
+        data[idx, :, :, :] = transformer.preprocess('frames_data', load_frame_data(frame))
     
     return data
 
+def load_flows(selected_frames, all_flows_list, w, h, transformer):
+    assert len(all_flows_list) % 2 == 0, "Error: Number of flows need to be divisible by 2"
+    
+    y_start = len(all_flows_list) / 2
+    
+    def load_flow_stack(start_idx):
+        images = []
+        for flow_offset in range(0, FLOW_STACK_SIZE):
+            images.append(caffe.io.load_image(all_flows_list[start_idx + flow_offset], False))
+            images.append(caffe.io.load_image(all_flows_list[start_idx + flow_offset + y_start], False))
+        return np.dstack(images)
+    
+    data = np.zeros((len(selected_frames), FLOW_STACK_SIZE * 2, w, h))
+
+    for idx, frame_id in enumerate(selected_frames):
+        data[idx, :, :, :] = transformer.preprocess('flow_data', load_flow_stack(frame_id))
+
+    return data
 
 def frames_in_folder(folder):
     return map(lambda p: os.path.join(folder, p), os.listdir(folder))
 
-
-def predict_caffe(frame_files):
+                     
+def predict_caffe(all_frame_files, all_flow_files):
+    idxs = select_indices(len(all_frame_files), NETWORK_BATCH_SIZE)
+    frame_files = all_frame_files[idxs]
     net = caffe.Net(app.config["CAFFE_SPATIAL_PROTO"], app.config["CAFFE_SPATIAL_MODEL"], caffe.TEST)
-    batch_size = app.config["CAFFE_BATCH_LIMIT"]
 
     transformer = caffe.io.Transformer({'data': net.blobs['data'].data.shape})
-    transformer.set_transpose('data', (2, 0, 1))
-    transformer.set_raw_scale('data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
-    transformer.set_channel_swap('data', (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
-    transformer.set_mean('data', np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1))  # mean pixel
+    # data transformations
+    transformer.set_transpose('frames_data', (2, 0, 1))
+    transformer.set_raw_scale('frames_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
+    transformer.set_channel_swap('frames_data', (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
+    print "Spatial mean shape ", np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1).shape()
+    transformer.set_mean('frames_data', np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1))  # mean pixel
 
+    # flow transformations
+    transformer.set_mean('flow_data', np.ones((20, 1)) * 127)  # mean pixel
+    transformer.set_raw_scale('flow_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
+    
     caffe.set_mode_cpu()
     
-    results = np.zeros((len(frame_files), app.config["CAFFE_NUM_LABELS"]))
-    
-    for cidx, chunk in enumerate(slice_in_chunks(frame_files, batch_size)):
-        
-        data = load_frames(chunk, net.blobs['data'].data.shape[2], net.blobs['data'].data.shape[3], transformer)
-        
-        net.blobs['data'].reshape(*data.shape)
-    
-        out = net.forward_all(data=data)
-        print "Finished chunk %d of %d" % (cidx, math.ceil(len(frame_files) * 1.0 / batch_size))
-        results[cidx*batch_size: cidx*batch_size+len(chunk), :] = out['prob']
-    return results
+    frame_data = load_frames(frame_files, net.blobs['frames_data'].data.shape[2], net.blobs['frames_data'].data.shape[3], transformer)
+    flow_data = load_flows(idxs, all_flow_files, net.blobs['flow_data'].data.shape[2], net.blobs['flow_data'].data.shape[3], transformer)
+
+    # net.blobs['frames_data'].reshape(*frame_data.shape)
+
+    out = net.forward_all(frame_data=frame_data, flow_data=flow_data)
+    return out['prob'], out['flow_prob'], out['frame_prob']
 
 
 # ----- Routes ----------
