@@ -13,7 +13,7 @@ layer {
   data_param {
 	backend: LEVELDB
     source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_all/train"
-    batch_size: 64
+    batch_size: 96
   }
 }
 layer {
@@ -203,6 +203,12 @@ layer {
   inner_product_param {
     num_output: 4096
   }
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
+  }
 }
 layer {
   name: "flow_relu6"
@@ -216,7 +222,7 @@ layer {
   bottom: "flow_fc6"
   top: "flow_fc6"
   dropout_param {
-    dropout_ratio: 0.7
+    dropout_ratio: 0.8
   }
 }
 layer {
@@ -226,6 +232,12 @@ layer {
   top: "flow_fc7"
   inner_product_param {
     num_output: 2048
+  }
+  param {
+    lr_mult: 1
+  }
+  param {
+    lr_mult: 2
   }
 }
 layer {
@@ -240,7 +252,7 @@ layer {
   bottom: "flow_fc7"
   top: "flow_fc7"
   dropout_param {
-    dropout_ratio: 0.7
+    dropout_ratio: 0.8
   }
 }
 layer {

@@ -1,6 +1,6 @@
 net: "net.prototxt"
 # Do test before training
-test_initialization: false
+# test_initialization: false
 # Test every nth iteration
 test_interval: 2000
 # How many iterations per test
@@ -32,7 +32,7 @@ snapshot_prefix: "./snapshots/"
 random_seed: 1701
 # Display the loss averaged over the last average_loss iterations - this does not work for accuracy
 average_loss: 200
-#clip_gradients: 10
+clip_gradients: 10
 
 # GPU for the win!
 solver_mode: GPU
