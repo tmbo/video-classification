@@ -51,7 +51,7 @@ def clear_folder(folder):
                     shutil.rmtree(file_path)
             except Exception as e:
                 print e
-    except Exception as e:
+    except Exception:
         pass
         
 
@@ -165,7 +165,7 @@ def upload_video():
     def is_allowed(file_name):
         return len(filter(lambda ext: ext in file_name, ["avi", "mpg", "mpeg", "mkv", "webm", "mp4", "mov"])) > 0
 
-    video_file = request.files.getlist("video")[0]
+    video_file = "/Users/tombocklisch/Documents/Studium/Master Project/video-classification/web_server/assets/v_ApplyEyeMakeup_g01_c01.avi" # request.files.getlist("video")[0]
 
     if file and is_allowed(video_file.filename):
         file_name = secure_filename(video_file.filename)
@@ -203,10 +203,11 @@ def get_prediction(file_path):
     shutil.rmtree(temp_dir, ignore_errors=True)
     os.makedirs(temp_dir)
     create_frames(file_path, 25, temp_dir)
-    create_flows(temp_dir)
+    flow_dir = path.join(app.config["TEMP_FOLDER"], "flows", file_path)
+    create_flows(temp_dir, flow_dir)
 
     # predictions = external_script.predict(file_path)
-    predictions = predict_caffe(frames_in_folder(temp_dir))
+    predictions = predict_caffe(frames_in_folder(temp_dir), frames_in_folder(flow_dir))
     print "Shape of predicitons", predictions.shape, "Type", type(predictions)
     
     print "Max ", np.argmax(predictions, axis=1)
