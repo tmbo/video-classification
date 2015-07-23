@@ -12,7 +12,7 @@ layer {
   }
   data_param {
 	backend: LEVELDB
-    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_16_per_video/train"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_all/train"
     batch_size: 64
   }
 }
@@ -28,7 +28,7 @@ layer {
 	mean_value: 127
   }
   data_param {
-    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_16_per_video/test"
+    source: "/extra/data_sets/UCF-101/levelDB/flow/cnn_all/test"
     batch_size: 16
 	backend: LEVELDB
   }
@@ -216,7 +216,7 @@ layer {
   bottom: "flow_fc6"
   top: "flow_fc6"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layer {
@@ -240,7 +240,7 @@ layer {
   bottom: "flow_fc7"
   top: "flow_fc7"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.7
   }
 }
 layer {
