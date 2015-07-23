@@ -34,3 +34,5 @@ videos/*.mpeg
 videos/*.mpg
 videos/*.mp4
 temp
+files.json
+flask_extensions.pyc
