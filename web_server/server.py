@@ -205,6 +205,9 @@ def get_prediction(file_path):
 
 
 if __name__ == "__main__":
+    import json
+    data = json.load(file("files.json"))
+
     # Start the server
     app.config.update(
         DEBUG=True,
@@ -212,13 +215,13 @@ if __name__ == "__main__":
         CORS_HEADERS="Content-Type",
         UPLOAD_FOLDER="videos",
         TEMP_FOLDER="temp",
-        LABEL_MAPPING="/Users/tombocklisch/Documents/Studium/Master Project/models/label_mapping.txt",
-        FLOW_CMD="/Users/tombocklisch/Documents/Studium/Master Project/somefile",
+        LABEL_MAPPING=data["label_mapping"],
+        FLOW_CMD=data["flow_cmd"],
         CAFFE_BATCH_LIMIT=50,
         CAFFE_NUM_LABELS=101,
-        CAFFE_SPATIAL_PROTO="/Users/tombocklisch/Documents/Studium/Master Project/models/deploy.prototxt",
-        CAFFE_SPATIAL_MODEL="/Users/tombocklisch/Documents/Studium/Master Project/models/_iter_70000.caffemodel",
-        CAFFE_SPATIAL_MEAN="/Users/tombocklisch/Documents/Studium/Master Project/models/ilsvrc_2012_mean.npy"  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
+        CAFFE_SPATIAL_PROTO=data["spatial_proto"],
+        CAFFE_SPATIAL_MODEL=data["spatial_model"],
+        CAFFE_SPATIAL_MEAN=data["spatial_mean"]  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
     
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
