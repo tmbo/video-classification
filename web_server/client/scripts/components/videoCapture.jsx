@@ -1,6 +1,6 @@
 import React from "react";
 import Component from "./baseComponent.jsx";
-import RecordRTC from "recordRTC";
+import RecordRTC from "recordrtc";
 import VideoActions from "../actions/videoActions"
 
 class VideoCapture extends Component {
