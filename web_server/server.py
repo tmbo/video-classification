@@ -57,7 +57,7 @@ def clear_folder(folder):
 
 
 def select_indices(max_len, n):
-    l = range(0, max_len, max_len / (n-1))[:n]
+    l = range(0, max_len, (max_len-1) / (n-1))[:n]
     assert len(l) == n, "created invalid frame selection " + str(len(l))
     return l
 
