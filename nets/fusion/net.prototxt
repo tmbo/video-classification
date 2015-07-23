@@ -8,7 +8,7 @@ layer {
   name: "frames_data"
   type: "Data"
   top: "frames_data"
-#  top: "frames_label"
+  top: "frames_label"
   include { phase: TRAIN }
   transform_param {
     mirror: true
@@ -27,7 +27,7 @@ layer {
   name: "frames_data"
   type: "Data"
   top: "frames_data"
-#  top: "frames_label"
+  top: "frames_label"
   include { phase: TEST }
   transform_param {
     mirror: true
@@ -35,6 +35,7 @@ layer {
     mean_value: 104
     mean_value: 117
     mean_value: 123
+
 }
   data_param {
     backend: LEVELDB
@@ -51,7 +52,7 @@ layer {
   name: "flow_data"
   type: "Data"
   top: "flow_data"
-  top: "flow_label"
+#  top: "flow_label"
   transform_param {
     crop_size: 224
     mean_value: 127
@@ -70,7 +71,7 @@ layer {
   name: "flow_data"
   type: "Data"
   top: "flow_data"
-  top: "flow_label"
+#  top: "flow_label"
   include {
     phase: TEST
   }
@@ -296,38 +297,6 @@ layer {
     dropout_ratio: 0.7
   }
 }
-layer {
-  bottom: "fc6"
-  top: "fc7"
-  name: "fc7"
-  type: "InnerProduct"
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 2048
-  }
-}
-layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "relu7"
-  type: "ReLU"
-}
-layer {
-  bottom: "fc7"
-  top: "fc7"
-  name: "drop7"
-  type: "Dropout"
-  dropout_param {
-    dropout_ratio: 0.7
-  }
-}
 
 ###############
 # FLOW CNN
@@ -526,38 +495,6 @@ layer {
     dropout_ratio: 0.5
   }
 }
-layer {
-  name: "flow_fc7"
-  type: "InnerProduct"
-  bottom: "flow_fc6"
-  top: "flow_fc7"
-  inner_product_param {
-    num_output: 2048
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-  param {
-    lr_mult: 0
-    decay_mult: 0
-  }
-}
-layer {
-  name: "flow_relu7"
-  type: "ReLU"
-  bottom: "flow_fc7"
-  top: "flow_fc7"
-}
-layer {
-  name: "flow_drop7"
-  type: "Dropout"
-  bottom: "flow_fc7"
-  top: "flow_fc7"
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
 
 ###############
 # FUSION
@@ -568,17 +505,35 @@ layer {
 layer {
   name: "fusion_reshape1"
   type: "Reshape"
-  bottom: "fc7"
+  bottom: "fc6"
   top: "fusion_reshape1"
+  include { phase: TRAIN }
   reshape_param {
     shape {
       dim: 1
       dim: 1
       dim: 16
-      dim: 2048
+      dim: 4096
     }
   }
 }
+layer {
+  name: "fusion_reshape1"
+  type: "Reshape"
+  bottom: "fc6"
+  top: "fusion_reshape1"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 16
+      dim: 4096  
+
+	}
+  }
+}
+
 layer {
   name: "fusion_pool1"
   type: "Pooling"
@@ -588,13 +543,46 @@ layer {
     pool: AVE
     kernel_h: 16
     kernel_w: 1
-    stride: 1
+    stride_h: 16
+    stride_w: 1
+  }
+}
+
+layer {
+  name: "fusion_reshape5"
+  type: "Reshape"
+  bottom: "fusion_pool1"
+  top: "fusion_reshape5"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 4096
+    }
   }
 }
 layer {
+  name: "fusion_reshape5"
+  type: "Reshape"
+  bottom: "fusion_pool1"
+  top: "fusion_reshape5"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 4096
+    }
+  }
+}
+
+layer {
   name: "fusion_fc1"
   type: "InnerProduct"
-  bottom: "fusion_pool1"
+  bottom: "fusion_reshape5"
   top: "fusion_fc1"
   param {
     lr_mult: 1
@@ -631,11 +619,28 @@ layer {
     dropout_ratio: 0.5
   }
 }
+
 layer {
   name: "fusion_reshape2"
   type: "Reshape"
   bottom: "fusion_fc1"
   top: "fusion_frames"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "fusion_reshape2"
+  type: "Reshape"
+  bottom: "fusion_fc1"
+  top: "fusion_frames"
+  include { phase: TEST }
   reshape_param {
     shape {
       dim: 1
@@ -651,17 +656,34 @@ layer {
 layer {
   name: "fusion_reshape3"
   type: "Reshape"
-  bottom: "flow_fc7"
+  bottom: "flow_fc6"
   top: "fusion_reshape3"
+  include { phase: TRAIN }
   reshape_param {
     shape {
       dim: 1
       dim: 1
       dim: 16
-      dim: 2048
+      dim: 4096
     }
   }
 }
+layer {
+  name: "fusion_reshape3"
+  type: "Reshape"
+  bottom: "flow_fc6"
+  top: "fusion_reshape3"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 16
+      dim: 4096
+    }
+  }
+}
+
 layer {
   name: "fusion_pool2"
   type: "Pooling"
@@ -671,13 +693,44 @@ layer {
     pool: AVE
     kernel_h: 16
     kernel_w: 1
-    stride: 1
+    stride_h: 16
+	stride_w: 1
+  }
+}
+layer {
+  name: "fusion_reshape6"
+  type: "Reshape"
+  bottom: "fusion_pool2"
+  top: "fusion_reshape6"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 4096
+    }
+  }
+}
+layer {
+  name: "fusion_reshape6"
+  type: "Reshape"
+  bottom: "fusion_pool2"
+  top: "fusion_reshape6"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 4096
+    }
   }
 }
 layer {
   name: "fusion_fc2"
   type: "InnerProduct"
-  bottom: "fusion_pool2"
+  bottom: "fusion_reshape6"
   top: "fusion_fc2"
   param {
     lr_mult: 1
@@ -714,11 +767,28 @@ layer {
     dropout_ratio: 0.5
   }
 }
+
 layer {
   name: "fusion_reshape4"
   type: "Reshape"
   bottom: "fusion_fc2"
   top: "fusion_flow"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 2048
+    }
+  }
+}
+layer {
+  name: "fusion_reshape4"
+  type: "Reshape"
+  bottom: "fusion_fc2"
+  top: "fusion_flow"
+  include { phase: TEST }
   reshape_param {
     shape {
       dim: 1
@@ -738,7 +808,7 @@ layer {
   top: "fusion_concat1"
   type: "Concat"
   concat_param {
-    axis: 1
+    axis: 2
   }
 }
 layer {
@@ -811,10 +881,11 @@ layer {
 ###########
 
 layer {
-  name: "label_reshape"
+  name: "label_reshape1"
   type: "Reshape"
-  bottom: "flow_label"
-  top: "label_reshape"
+  bottom: "frames_label"
+  top: "label_reshape1"
+  include { phase: TRAIN }
   reshape_param {
     shape {
       dim: 1
@@ -825,7 +896,22 @@ layer {
   }
 }
 layer {
-  bottom: "label_reshape"
+  name: "label_reshape1"
+  type: "Reshape"
+  bottom: "frames_label"
+  top: "label_reshape1"
+  include { phase: TEST }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 16
+    }
+  }
+}
+layer {
+  bottom: "label_reshape1"
   top: "fusion_label"
   name: "fusion_label"
   type: "Pooling"
@@ -833,7 +919,23 @@ layer {
     pool: AVE
     kernel_h: 1
     kernel_w: 16
-    stride: 1
+    stride_h: 1
+	stride_w: 16
+  }
+}
+layer {
+  name: "label_reshape2"
+  type: "Reshape"
+  bottom: "fusion_label"
+  top: "fusion_label"
+  include { phase: TRAIN }
+  reshape_param {
+    shape {
+      dim: 1
+      dim: 1
+      dim: 1
+      dim: 1
+    }
   }
 }
 layer {
