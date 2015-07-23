@@ -1,0 +1,134 @@
+\documentclass[a4paper,12pt,headsepline,pagesize,bibtotoc,titlepage]{scrartcl}
+
+\usepackage{scrpage2}
+\pagestyle{useheadings}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage[T1]{fontenc}
+
+\usepackage{mathptmx}
+\usepackage[scaled=.90]{helvet}
+\usepackage{courier}
+
+\usepackage{amsmath,amsthm,amsfonts,graphicx,caption}
+
+\usepackage{hyperref}   % Clickable hyperlinks
+\usepackage{ae,aecompl} % Better fonts for the screen
+
+\headsep4mm
+
+\typearea[current]{current}
+
+\renewcommand{\figurename}{Fig.}
+\renewcommand{\captionlabelfont}{\bf}
+
+\title{
+	\includegraphics*[width=0.4\textwidth]{images/hpi_logo.png}\\
+	\vspace{24pt}
+	Deep Learning for Video Classification
+}
+
+\subtitle{
+	Master’s project\\
+	Internet Technologies and Systems\\
+	Summer semester 2015
+}
+\author{
+	Tanja Bergmann, Joseph Bethge, Tom Bocklisch, \\
+	Stefan Bunk, Tom Herold, Dominik Mueller \\ \\[12pt]
+	Supervisor:\\
+	Dr. Haojin Yang\\
+	Prof. Dr. Christoph Meinel
+}
+\date{\today}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\section{Related Work}
+\begin{itemize}
+	\item Explain the development in the last two years and their respective approaches
+	\item Explain, why some papers are hard to reproduce
+\end{itemize}
+
+\section{Data Preparation}
+
+\begin{itemize}
+	\item Experiences with LMDB, LevelDB, HDF5
+	\item convert\_imageset
+	\item convert\_imageset\_multi
+\end{itemize}
+
+\section{Video Classification in Caffe}
+\subsection{Changes to Caffe-tmbo}
+
+\begin{itemize}
+	\item New sequence data layer
+	\item Multi-layer script
+	\item More?
+\end{itemize}
+
+\subsection{Spatial}
+
+\begin{itemize}
+	\item
+		Different nets:
+		\begin{itemize}
+			\item Caffenet/CNN\_M (also tried, VGG 19 and 16, but too big)
+			\item With weights/without weights
+			\item Compare the nets with respect to memory, number of parameters, training time, performance
+		\end{itemize}
+	\item
+		Experiments:
+		\begin{itemize}
+			\item Different dropouts
+			\item Train from scratch vs train from weights
+			\item On different splits?
+			\item Fc6, Fc7, fc8
+			\item Different base data sets (only 16, all data)
+			\item Different flows?
+			\item Occlusion tests
+		\end{itemize}
+	\item
+		LSTM did not work out
+\end{itemize}
+
+
+\subsection{Flow}
+\subsection{Fusion}
+
+\section{Web Application}
+\begin{itemize}
+	\item How to start
+	\item What it does internally
+	\item Architecture
+\end{itemize}
+\section{Scripts and their Usage}
+\begin{itemize}
+	\item Convert scripts
+	\item Database creation, lmdb, leveldb, hdf5
+	\item Experiment setup
+\end{itemize}
+
+
+%\input{sections/02_related_work}
+%\input{sections/03_hard_cut}
+%\input{sections/04_soft_cut}
+%\input{sections/05_conclusion}
+
+
+\newpage
+\begin{thebibliography}{1}
+
+\bibitem{meinel2008}
+C.~Meinel.
+``Tele-Lab IT-Security: an Architecture for an online virtual IT Security Lab'',
+\emph{International Journal of Online Engineering (iJOE)},
+X, 2008.
+
+\end{thebibliography}
+
+\end{document}
