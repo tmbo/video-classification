@@ -255,7 +255,7 @@ if __name__ == "__main__":
         FLOW_CMD=data["flow_cmd"],
         CAFFE_BATCH_LIMIT=50,
         CAFFE_NUM_LABELS=101,
-        CAFFE_SPATIAL_PROTO=data["spatial_proto"],
+        CAFFE_SPATIAL_PROTO=data["proto"],
         CAFFE_SPATIAL_MODEL=data["spatial_model"],
         CAFFE_SPATIAL_MEAN=data["spatial_mean"]  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
