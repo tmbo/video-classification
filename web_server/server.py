@@ -57,22 +57,8 @@ def clear_folder(folder):
 
 
 def select_indices(max_len, n):
-    count = max_len / n
-    start = int(ceil((max_len - count * n) / 2.0))
-    l = range(start, max_len, count)
-    # TODO: Fix frame selection
-    print "###############################"
-    print "count"
-    print count
-    print "start"
-    print start
-    print "max_len"
-    print max_len
-    print "len(l)"
-    print len(l)
-    print "n"
-    print n
-    assert len(l) == n, "created invalid frame selection"
+    l = range(0, max_len, max_len / (n-1))[:n]
+    assert len(l) == n, "created invalid frame selection " + str(len(l))
     return l
 
 

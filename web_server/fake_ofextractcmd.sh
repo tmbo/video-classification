@@ -1,6 +1,6 @@
 #!/bin/bash
 
-precomputed_flow="/Users/tombocklisch/Documents/Studium/Master Project/video-classification/web_server/assets"
+precomputed_flow="assets"
 
 if [ $# -eq 0 ]
   then
@@ -19,7 +19,7 @@ for dir in `ls $source_root_dir`; do
   fulldir="$source_root_dir/$dir"
   if [[ -d $fulldir ]]; then
     basedir=`basename $fulldir`
-    cp $precomputed_flow/$basedir $optical_flow_root_dir -r -v
+    cp -rv "$precomputed_flow/$basedir" "$optical_flow_root_dir"
   fi
 done
 
