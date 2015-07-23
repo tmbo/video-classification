@@ -41,16 +41,19 @@ def slice_in_chunks(els, n):
 
 
 def clear_folder(folder):
-    for the_file in os.listdir(folder):
-        file_path = os.path.join(folder, the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path): 
-                shutil.rmtree(file_path)
-        except Exception, e:
-            print e
-
+    try:
+        for the_file in os.listdir(folder):
+            file_path = os.path.join(folder, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print e
+    except Exception as e:
+        pass
+        
 
 def select_indices(max_len, n):
     l = range(0, max_len, max_len / (n-1))
@@ -255,7 +258,6 @@ if __name__ == "__main__":
         CAFFE_SPATIAL_MODEL=data["spatial_model"],
         CAFFE_SPATIAL_MEAN=data["spatial_mean"]  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
-    
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
 
     load_label_mapping()
