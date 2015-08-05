@@ -47,77 +47,17 @@
 \tableofcontents
 \newpage
 
-\section{Introduction}
-\section{Related Work}
-\begin{itemize}
-	\item Explain the development in the last two years and their respective approaches
-	\item Explain, why some papers are hard to reproduce
-\end{itemize}
+\input{sections/01_introduction.tex}
 
-\section{Data Preparation}
+\input{sections/02_related.tex}
 
-\begin{itemize}
-	\item Experiences with LMDB, LevelDB, HDF5
-	\item convert\_imageset
-	\item convert\_imageset\_multi
-\end{itemize}
+\input{sections/03_data.tex}
 
-\section{Video Classification in Caffe}
-\subsection{Changes to Caffe-tmbo}
+\input{sections/04_classification.tex}
 
-\begin{itemize}
-	\item New sequence data layer
-	\item Multi-layer script
-	\item More?
-\end{itemize}
+\input{sections/05_web.tex}
 
-\subsection{Spatial}
-
-\begin{itemize}
-	\item
-		Different nets:
-		\begin{itemize}
-			\item Caffenet/CNN\_M (also tried, VGG 19 and 16, but too big)
-			\item With weights/without weights
-			\item Compare the nets with respect to memory, number of parameters, training time, performance
-		\end{itemize}
-	\item
-		Experiments:
-		\begin{itemize}
-			\item Different dropouts
-			\item Train from scratch vs train from weights
-			\item On different splits?
-			\item Fc6, Fc7, fc8
-			\item Different base data sets (only 16, all data)
-			\item Different flows?
-			\item Occlusion tests
-		\end{itemize}
-	\item
-		LSTM did not work out
-\end{itemize}
-
-
-\subsection{Flow}
-\subsection{Fusion}
-
-\section{Web Application}
-\begin{itemize}
-	\item How to start
-	\item What it does internally
-	\item Architecture
-\end{itemize}
-\section{Scripts and their Usage}
-\begin{itemize}
-	\item Convert scripts
-	\item Database creation, lmdb, leveldb, hdf5
-	\item Experiment setup
-\end{itemize}
-
-
-%\input{sections/02_related_work}
-%\input{sections/03_hard_cut}
-%\input{sections/04_soft_cut}
-%\input{sections/05_conclusion}
+\input{sections/06_scripts.tex}
 
 
 \newpage

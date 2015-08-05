@@ -1,0 +1,39 @@
+\section{Video Classification in Caffe}
+\label{sec:classificaton}
+
+\subsection{Changes to Caffe-tmbo}
+
+\begin{itemize}
+	\item New sequence data layer
+	\item Multi-layer script
+	\item More?
+\end{itemize}
+
+\subsection{Spatial}
+
+\begin{itemize}
+	\item
+		Different nets:
+		\begin{itemize}
+			\item Caffenet/CNN\_M (also tried, VGG 19 and 16, but too big)
+			\item With weights/without weights
+			\item Compare the nets with respect to memory, number of parameters, training time, performance
+		\end{itemize}
+	\item
+		Experiments:
+		\begin{itemize}
+			\item Different dropouts
+			\item Train from scratch vs train from weights
+			\item On different splits?
+			\item Fc6, Fc7, fc8
+			\item Different base data sets (only 16, all data)
+			\item Different flows?
+			\item Occlusion tests
+		\end{itemize}
+	\item
+		LSTM did not work out
+\end{itemize}
+
+
+\subsection{Flow}
+\subsection{Fusion}
