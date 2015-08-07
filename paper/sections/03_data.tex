@@ -1,0 +1,36 @@
+\section{Data Preparation}
+\label{sec:data}
+
+\subsection{Preprocessing}
+
+As mentioned in Section~\ref{sec:related}, there are many parameters in the data generation and preparation process.
+
+The following setup turned out to give the best results for us:
+\begin{itemize}
+	\item Frame extraction with 10fps
+	\item Do not crop videos ourselves, rather use Caffe's random cropping
+	\item Stack 20 frames. For each frame, take the next 10 frames and calculate flow with
+	\item Flow was calculated with broxoptflow TODO
+\end{itemize}
+
+TODO: Write about our experiences
+
+\subsection{Experiences with LMDB, LevelDB, HDF5}
+Caffe requires the input data to be in either a LMDB (TODO), HDF5, or LevelDB.
+
+We first tried the LMDB.
+The problem with LMDB was that it created large databases, because no compression is used.
+We then decided to use HDF5, which compresses the data with the TODO algorithm.
+However, the library we used .. TODO .. cannot be recommended.
+
+Finally we used LevelDB,
+
+TODO: Add some numbers about file sizes and creation time.
+\subsection{convert\_imageset}
+The script \texttt{convert\_imageset} is a script provided by Caffe.
+It creates either LMDBs or LevelDBs.
+This can be switched by changing the constant \texttt{backend} in the script file and recompiling.
+\subsection{convert\_imageset\_multi}
+The script \texttt{convert\_imageset\_multi} is a script written by us, based on \texttt{convert\_imageset}.
+It takes an additional parameter \texttt{STACK\_SIZE} at the end, which tells how many images from the list file to stack into one image.
+Internally, it uses the method \texttt{cv::merge} from OpenCV to stack the images before writing them to the database.
