@@ -1,6 +1,6 @@
 import _ from "lodash"
 import alt from '../alt';
-import VideoActions from '../actions/videoActions';
+import SyncActions from '../actions/syncActions';
 import API from "../lib/api"
 
 import VideoThumbnail1 from "../../images/examples/video1.jpg"
@@ -11,7 +11,7 @@ import VideoThumbnail3 from "../../images/examples/video3.jpg"
 class VideoStore {
 
   constructor() {
-    this.bindActions(VideoActions);
+    this.bindActions(SyncActions);
 
     this.isUploading = false;
     this.isInvalidFile = false;

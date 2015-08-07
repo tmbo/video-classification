@@ -1,14 +1,16 @@
 import alt from "../alt";
 
-class VideoActions {
+class SyncActions {
   constructor() {
     this.generateActions(
-      "receivePrediction",
+      "receiveVideoPrediction",
+      "receiveImagePrediction",
       "receiveUploadError",
       "uploadVideo",
+      "uploadImage",
       "useExample"
     )
   }
 }
 
-export default alt.createActions(VideoActions)
+export default alt.createActions(SyncActions)

@@ -1,12 +1,12 @@
 import _ from "lodash"
 import alt from "../alt";
-import VideoActions from "../actions/videoActions";
+import SyncActions from "../actions/syncActions";
 import RouterActions from "../actions/routerActions";
 
 class ResultStore {
 
   constructor() {
-    this.bindActions(VideoActions);
+    this.bindActions(SyncActions);
 
     this.video = null;
     this.frames = null;

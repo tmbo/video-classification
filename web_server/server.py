@@ -13,7 +13,7 @@ import math
 
 # Local predicition modules
 # find modules in parent_folder/predictions
-# sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'prediction')) 
+# sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'prediction'))
 
 static_assets_path = path.join(path.dirname(__file__), "dist")
 app = Flask(__name__, static_folder=static_assets_path)
@@ -33,8 +33,8 @@ def load_label_mapping():
         for line in f:
             splitted = line.split(" ")
             LABEL_MAPPING[int(splitted[1])] = splitted[0]
-        
-        
+
+
 def slice_in_chunks(els, n):
     for i in range(0, len(els), n):
         yield els[i:i+n]
@@ -53,7 +53,7 @@ def clear_folder(folder):
                 print e
     except Exception:
         pass
-        
+
 
 def select_indices(max_len, n):
     l = range(0, max_len, max_len / (n-1))
@@ -86,21 +86,21 @@ def load_frames(frame_list, w, h, transformer):
 
     for idx, frame in enumerate(frame_list):
         data[idx, :, :, :] = transformer.preprocess('frames_data', load_frame_data(frame))
-    
+
     return data
 
 def load_flows(selected_frames, all_flows_list, w, h, transformer):
     assert len(all_flows_list) % 2 == 0, "Error: Number of flows need to be divisible by 2"
-    
+
     y_start = len(all_flows_list) / 2
-    
+
     def load_flow_stack(start_idx):
         images = []
         for flow_offset in range(0, FLOW_STACK_SIZE):
             images.append(caffe.io.load_image(all_flows_list[start_idx + flow_offset], False))
             images.append(caffe.io.load_image(all_flows_list[start_idx + flow_offset + y_start], False))
         return np.dstack(images)
-    
+
     data = np.zeros((len(selected_frames), FLOW_STACK_SIZE * 2, w, h))
 
     for idx, frame_id in enumerate(selected_frames):
@@ -111,7 +111,7 @@ def load_flows(selected_frames, all_flows_list, w, h, transformer):
 def frames_in_folder(folder):
     return map(lambda p: os.path.join(folder, p), os.listdir(folder))
 
-                     
+
 def predict_caffe(all_frame_files, all_flow_files):
     idxs = select_indices(len(all_frame_files), NETWORK_BATCH_SIZE)
     frame_files = all_frame_files[idxs]
@@ -128,9 +128,9 @@ def predict_caffe(all_frame_files, all_flow_files):
     # flow transformations
     transformer.set_mean('flow_data', np.ones((20, 1)) * 127)  # mean pixel
     transformer.set_raw_scale('flow_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
-    
+
     caffe.set_mode_cpu()
-    
+
     frame_data = load_frames(frame_files, net.blobs['frames_data'].data.shape[2], net.blobs['frames_data'].data.shape[3], transformer)
     flow_data = load_flows(idxs, all_flow_files, net.blobs['flow_data'].data.shape[2], net.blobs['flow_data'].data.shape[3], transformer)
 
@@ -160,7 +160,12 @@ def send_video(video_path):
     return send_file_partial(path.join(app.config["UPLOAD_FOLDER"], video_path))
 
 
-@app.route("/api/upload", methods=["POST"])
+@app.route("/api/upload_image", methods=["POST"])
+def upload_image():
+    return bad_request("Invalid file")
+
+
+@app.route("/api/upload_video", methods=["POST"])
 def upload_video():
     def is_allowed(file_name):
         return len(filter(lambda ext: ext in file_name, ["avi", "mpg", "mpeg", "mkv", "webm", "mp4", "mov"])) > 0
@@ -209,7 +214,7 @@ def get_prediction(file_path):
     # predictions = external_script.predict(file_path)
     predictions = predict_caffe(frames_in_folder(temp_dir), frames_in_folder(flow_dir))
     print "Shape of predicitons", predictions.shape, "Type", type(predictions)
-    
+
     print "Max ", np.argmax(predictions, axis=1)
 
     file_path += "?cachebuster=%s" % time.time()

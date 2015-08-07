@@ -36,3 +36,5 @@ videos/*.mp4
 temp
 files.json
 flask_extensions.pyc
+
+*.pyc

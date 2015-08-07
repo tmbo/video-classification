@@ -1,7 +1,7 @@
 import React from "react";
 import Component from "./baseComponent.jsx";
 import RecordRTC from "recordrtc";
-import VideoActions from "../actions/videoActions"
+import SyncActions from "../actions/syncActions"
 
 class VideoCapture extends Component {
 
@@ -57,7 +57,7 @@ class VideoCapture extends Component {
         this.refs.daVideo.getDOMNode().src = videoURL;
 
         const recordedBlob = this.recordRTC.getBlob();
-        VideoActions.uploadVideo(recordedBlob);
+        SyncActions.uploadVideo(recordedBlob);
 
         // Stop video stream?
         this.mediaStream.stop();
