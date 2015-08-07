@@ -15,7 +15,7 @@ class ImageStore {
   onUploadImage(imageFile) {
 
     const payload = {
-      video : imageFile
+      image : imageFile
     };
 
     API.postImage(payload)

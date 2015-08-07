@@ -8,12 +8,12 @@ import Result from '../pages/result.jsx';
 import NotFound from '../pages/notFound.jsx';
 
 var routes = (
-  <Route name="app" path="/" handler={ App }>
-    <Route name="result" handler={ Result } />
-    <Route name="home" handler={ Home } />
-    <DefaultRoute handler={ Home } />
-    <NotFoundRoute handler={ NotFound } />
-  </Route>
+    <Route name="app" path="/" handler={ App }>
+      <Route name="result" handler={ Result } />
+      <Route name="home" handler={ Home } />
+      <DefaultRoute handler={ Home } />
+      <NotFoundRoute handler={ NotFound } />
+    </Route>
 );
 
 module.exports = routes;

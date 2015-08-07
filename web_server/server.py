@@ -155,7 +155,7 @@ def predict_caffe(all_frame_files, all_flow_files):
     # net.blobs['frames_data'].reshape(*frame_data.shape)
 
     out = net.forward_all(frames_data=frame_data, flow_data=flow_data)
-    return out['prob'], out['frame_prob'], out['flow_prob']
+    return out['prob'], out['frames_prob'], out['flow_prob']
 
 
 # ----- Routes ----------
@@ -180,7 +180,21 @@ def send_video(video_path):
 
 @app.route("/api/upload_image", methods=["POST"])
 def upload_image():
-    return bad_request("Invalid file")
+    def is_allowed(file_name):
+        return len(filter(lambda ext: ext in file_name, ["jpg", "jpeg", "bmp", "tiff", "png", "gif"])) > 0
+
+    image_file = request.files.getlist("image")[0]
+
+    if file and is_allowed(image_file.filename):
+        file_name = secure_filename(image_file.filename)
+        file_path = path.join(app.config["UPLOAD_FOLDER"], file_name)
+        image_file.save(file_path)
+
+        response = jsonify(get_image_prediction(file_path))
+    else:
+        response = bad_request("Invalid file")
+
+    return response
 
 
 @app.route("/api/upload_video", methods=["POST"])
@@ -188,7 +202,7 @@ def upload_video():
     def is_allowed(file_name):
         return len(filter(lambda ext: ext in file_name, ["avi", "mpg", "mpeg", "mkv", "webm", "mp4", "mov"])) > 0
 
-    video_file = "/Users/tombocklisch/Documents/Studium/Master Project/video-classification/web_server/assets/v_ApplyEyeMakeup_g01_c01.avi" # request.files.getlist("video")[0]
+    video_file = request.files.getlist("video")[0]
 
     if file and is_allowed(video_file.filename):
         file_name = secure_filename(video_file.filename)
@@ -221,7 +235,13 @@ def bad_request(reason):
 
 
 # -------- Prediction & Features --------
+
+# Predicition for a video file including video preprocessing
 def get_prediction(file_path):
+
+    global NETWORK_BATCH_SIZE
+    NETWORK_BATCH_SIZE = 16
+
     temp_dir = path.join(app.config["TEMP_FOLDER"], "frames", file_path)
     shutil.rmtree(temp_dir, ignore_errors=True)
     os.makedirs(temp_dir)
@@ -236,21 +256,46 @@ def get_prediction(file_path):
     # Decide which prediction to display in the line plot
 #    predictions = flow_predictions
     print "Shape of predictions", predictions.shape, "Type", type(predictions)
-
     print "Max ", np.argmax(predictions, axis=1)
-
-    file_path += "?cachebuster=%s" % time.time()
-    result = {
-        "video": {
-            "url": "%s" % file_path,
-            "framerate": 15
-        },
-        "frames": []
-    }
     print "predictions"
     print predictions
 
-    for idx, row in enumerate(predictions):
+    clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
+    clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
+
+    result = bundle_response(file_path, frame_predictions)
+    print result
+    return result
+
+# Prediciton for a single image
+def get_image_prediction(file_path):
+
+    global NETWORK_BATCH_SIZE
+    NETWORK_BATCH_SIZE = 2
+
+    predictions, frame_predictions, flow_predictions = predict_caffe([file_path, file_path], [])
+
+    # Decide which prediction to display in the line plot
+#    predictions = flow_predictions
+    print "Shape of predictions", predictions.shape, "Type", type(predictions)
+    print "Max ", np.argmax(predictions, axis=1)
+    print "predictions"
+    print predictions
+
+    return bundle_response(file_path, frame_predictions)
+
+
+def bundle_response(media_file_path, frame_predictions):
+
+    media_file_path += "?cachebuster=%s" % time.time()
+    result = {
+        "media": {
+            "url": "%s" % media_file_path,
+        },
+        "frames": []
+    }
+
+    for idx, row in enumerate(frame_predictions):
         predictions_per_label = []
 
         five_best = np.argpartition(row, -5)[-5:]
@@ -266,10 +311,6 @@ def get_prediction(file_path):
 
         result["frames"].append(new_frame)
 
-    clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
-    clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
-
-    print result
     return result
 
 
@@ -289,11 +330,12 @@ if __name__ == "__main__":
         CAFFE_BATCH_LIMIT=50,
         CAFFE_NUM_LABELS=101,
         CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
-        CAFFE_SPATIAL_MODEL=",".join([
-            str(data["spatial_model"]),
-            str(data["flow_model"]),
-            str(data["fusion_model"])
-        ]),
+        CAFFE_SPATIAL_MODEL=str(data["spatial_model"]),
+        # CAFFE_SPATIAL_MODEL=",".join([
+        #     str(data["spatial_model"]),
+        #     str(data["flow_model"]),
+        #     str(data["fusion_model"])
+        # ]),
         CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))

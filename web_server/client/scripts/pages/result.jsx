@@ -75,21 +75,56 @@ class Result extends Component {
     }
   }
 
+  isVideoPrediction() {
+    return this.props.query.type == "video";
+  }
+
+  getPerFramePredictionPanel() {
+
+    if (!this.isVideoPrediction()) return null;
+
+    return (
+      <div className="row">
+        <div className="col s12">
+          <div className="card-panel">
+            <h3 className="card-title">Top 5 Predicted Labels per Frame</h3>
+            <LineChart data={this.getLineChartData()} onDataClick={this.onDataClicked.bind(this)} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  getMediaContainer() {
+
+    if (this.isVideoPrediction()) {
+      return (
+        <video
+          ref="video"
+          src={this.props.video.url}
+          className="responsive-video valign"
+          onMouseEnter={this.onVideoHover.bind(this)}
+          onMouseLeave={this.onVideoHover.bind(this)}
+          loop
+          />
+      );
+
+    } else {
+      return <img src={this.props.image.url} />;
+    }
+  }
+
   render() {
+
+    const framePredictionPanel = this.getPerFramePredictionPanel();
+    const mediaContainer = this.getMediaContainer();
 
     return (
       <div className="result-page">
         <div className="row">
           <div className="col s12 m6">
             <div className="card-panel teal video-panel valign-wrapper">
-              <video
-                ref="video"
-                src={this.props.video.url}
-                className="responsive-video valign"
-                onMouseEnter={this.onVideoHover.bind(this)}
-                onMouseLeave={this.onVideoHover.bind(this)}
-                loop
-                />
+              {mediaContainer}
             </div>
           </div>
           <div className="col s12 m6">
@@ -98,14 +133,7 @@ class Result extends Component {
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col s12">
-            <div className="card-panel">
-              <h3 className="card-title">Top 5 Predicted Labels per Frame</h3>
-              <LineChart data={this.getLineChartData()} onDataClick={this.onDataClicked.bind(this)} />
-            </div>
-          </div>
-        </div>
+        {framePredictionPanel}
       </div>
     );
   }

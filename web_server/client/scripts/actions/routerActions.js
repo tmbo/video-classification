@@ -3,9 +3,9 @@ import Router from "../lib/router";
 
 class RouterActions {
 
-  transition(nextPage) {
+  transition(nextPage, options) {
 
-    Router.transitionTo("result", {stepUrl: nextPage});
+    Router.transitionTo("result", {stepUrl: nextPage}, options);
 
   }
 }

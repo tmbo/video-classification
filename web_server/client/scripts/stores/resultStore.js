@@ -9,14 +9,23 @@ class ResultStore {
     this.bindActions(SyncActions);
 
     this.video = null;
+    this.image = null;
     this.frames = null;
   }
 
-  onReceivePrediction(response) {
-    this.video = response.video;
+  onReceiveVideoPrediction(response) {
+    this.video = response.media;
     this.frames = response.frames;
 
-    RouterActions.transition("result")
+    RouterActions.transition("result", {type : "video"})
+
+  }
+
+  onReceiveImagePrediction(response) {
+    this.image = response.media;
+    this.frames = response.frames;
+
+    RouterActions.transition("result", {type : "image"})
 
   }
 
