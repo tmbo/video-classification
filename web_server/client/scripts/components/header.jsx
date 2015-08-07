@@ -17,7 +17,7 @@ class Header extends Component {
   }
 
   getResultLink() {
-    if (this.props.video)
+    if (this.props.video || this.props.image)
       return (
         <li>
           <Link to="result">

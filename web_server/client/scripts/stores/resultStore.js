@@ -15,6 +15,7 @@ class ResultStore {
 
   onReceiveVideoPrediction(response) {
     this.video = response.media;
+    this.image = null;
     this.frames = response.frames;
 
     RouterActions.transition("result", {type : "video"})
@@ -23,6 +24,7 @@ class ResultStore {
 
   onReceiveImagePrediction(response) {
     this.image = response.media;
+    this.video = null;
     this.frames = response.frames;
 
     RouterActions.transition("result", {type : "image"})

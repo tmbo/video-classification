@@ -110,7 +110,7 @@ class Result extends Component {
       );
 
     } else {
-      return <img src={this.props.image.url} />;
+      return <img src={this.props.image.url} className="responsive-img"/>;
     }
   }
 
