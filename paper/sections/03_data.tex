@@ -1,21 +1,44 @@
 \section{Data Preparation}
 \label{sec:data}
 
-\subsection{Preprocessing}
-
 As mentioned in Section~\ref{sec:related}, there are many parameters in the data generation and preparation process.
-
-The following setup turned out to give the best results for us:
+In general we first extract the frame images from a video, and from these the optical flow images, which show movement in the video.
+After the data generation the preprocessed data has to be converted into a suitable data file for the Caffe framework.
+The final setup turned out to give the best results for us was the following:
 \begin{itemize}
-	\item Frame extraction with 10fps
+	\item Frame extraction with 10 frames per second (TODO: is this correct? copy into subsection below)
 	\item Do not crop videos ourselves, rather use Caffe's random cropping
-	\item Stack 20 frames. For each frame, take the next 10 frames and calculate flow with
-	\item Flow was calculated with broxoptflow TODO
+	\item Stack 20 frames. For each frame, take the next 10 optical flow frames
+	\item Optical flow was calculated with broxoptflow \cite{brox2004high}
 \end{itemize}
+In the following section we will discuss the different ways and data formats available for each step in detail.
 
-TODO: Write about our experiences
+\subsection{Frame extraction}
+We extracted the frame data from the videos with the FFmpeg\footnote{\url{http://www.ffmpeg.org/}} tool into JPEG files.
+A challenge was finding the correct frame rate for the frame extraction.
+High frame rates, such as 30 frames per second, often extracted two frame images from the same unchanged video frame.
+Lower frame rates, for example 5 frames per second, do not have these identical frame images.
+However they create less overall training data and less details, especially for optical flow extraction.
+A variable frame rate which is different for each video means there would likely be different results of analysis, depending on the frame rate a video was recorded with.
+This is why we decided to use a fixed frame rate of X (TODO) frames per second.
+This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
-\subsection{Experiences with LMDB, LevelDB, HDF5}
+\subsection{Optical flow extraction}
+TODO: Figure
+Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
+They are calculated between each pair of consecutive frame images.
+
+There are multiple ways to extract the optical flow but previous researchers have often decided for the algorithm presented by Brox et al
+\cite{brox2004high}.
+
+
+
+\subsection{Frame stacking}
+TODO: 20, 10, optical flow forward/backward, which ones did we try?
+
+
+\subsection{Data format for caffe}
+% Experiences with LMDB, LevelDB, HDF5
 Caffe requires the input data to be in either a LMDB (TODO), HDF5, or LevelDB.
 
 We first tried the LMDB.
@@ -26,10 +49,12 @@ However, the library we used .. TODO .. cannot be recommended.
 Finally we used LevelDB,
 
 TODO: Add some numbers about file sizes and creation time.
+
 \subsection{convert\_imageset}
 The script \texttt{convert\_imageset} is a script provided by Caffe.
 It creates either LMDBs or LevelDBs.
 This can be switched by changing the constant \texttt{backend} in the script file and recompiling.
+
 \subsection{convert\_imageset\_multi}
 The script \texttt{convert\_imageset\_multi} is a script written by us, based on \texttt{convert\_imageset}.
 It takes an additional parameter \texttt{STACK\_SIZE} at the end, which tells how many images from the list file to stack into one image.

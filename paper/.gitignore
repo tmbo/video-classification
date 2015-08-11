@@ -1,8 +1,14 @@
 *.aux
-*.out
+*.bbl
+*.blg
+*.dvi
+*.fdb_latexmk
 *.gz
-*.toc
 *.log
+*.out
 *.pdf
+*.synctex
+*.synctex.gz
+*.toc
 
 .output
