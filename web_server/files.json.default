@@ -1,9 +1,8 @@
 {
-  "label_mapping": "/Users/tombocklisch/Documents/Studium/Master Project/models/label_mapping.txt",
-  "flow_cmd": "/Users/tombocklisch/Documents/Studium/Master Project/somefile",
-  "spatial_proto": "/Users/tombocklisch/Documents/Studium/Master Project/models/deploy.prototxt",
-  "spatial_model": "/Users/tombocklisch/Documents/Studium/Master Project/models/_iter_70000.caffemodel",
-  "spatial_mean": "/Users/tombocklisch/Documents/Studium/Master Project/models/ilsvrc_2012_mean.npy",
-  "flow_model": "/models/_iter_70000.caffemodel",
-  "fusion_model": "/models/_iter_70000.caffemodel"
+  "label_mapping": "[ABSOLUTE_PATH]/models/label_mapping.txt",
+  "spatial_proto": "[ABSOLUTE_PATH]/models/deploy.prototxt",
+  "spatial_model": "[ABSOLUTE_PATH]/models/spatial.caffemodel",
+  "spatial_mean": "[ABSOLUTE_PATH]/models/spatial_mean.npy",
+  "flow_model": "[ABSOLUTE_PATH]/models/flow.caffemodel",
+  "fusion_model": "[ABSOLUTE_PATH]/models/fusion.caffemodel"
 }
