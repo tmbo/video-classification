@@ -3,6 +3,8 @@ import subprocess
 import time
 from os import path
 import shutil
+from natsort import natsorted
+import cv2
 
 from math import ceil
 import numpy as np
@@ -72,13 +74,30 @@ def create_frames(video_file_name, frame_rate, output_folder):
     subprocess.call(cmd, shell=True)
     return output_folder
 
-
 def create_flows(frame_folder, output_folder):
-    curr_path = os.path.dirname(os.path.abspath(__file__))
-    in_path = os.path.join(curr_path, os.path.dirname(frame_folder))
-    out_path = os.path.join(curr_path, os.path.dirname(output_folder))
-    cmd = "%s %s %s 0" % (app.config["FLOW_CMD"], in_path, out_path)
-    subprocess.call(cmd, shell=True)
+    in_path = os.path.abspath(frame_folder)
+    out_path = os.path.abspath(output_folder)
+    # cmd = "%s %s %s 0" % (app.config["FLOW_CMD"], in_path, out_path)
+    # subprocess.call(cmd, shell=True)
+
+    files = natsorted(os.listdir(in_path))
+    files = [os.path.join(in_path, file) for file in files]
+
+    for i in range(1, len(files)):
+        previous = cv2.imread(files[i-1])
+        previous_gray = cv2.cvtColor(previous, cv2.COLOR_BGR2GRAY)
+
+        current = cv2.imread(files[i])
+        current_gray = cv2.cvtColor(current, cv2.COLOR_BGR2GRAY)
+
+        flow = cv2.calcOpticalFlowFarneback(previous_gray, current_gray, 0.5, 3, 15, 3, 5, 1.2, 0)
+
+        flow_x = cv2.convertScaleAbs(flow[..., 0], None, 128 / 64, 128)
+        flow_y = cv2.convertScaleAbs(flow[..., 1], None, 128 / 64, 128)
+
+        cv2.imwrite(os.path.join(out_path, "X%03d.jpg" % (i -1)), flow_x)
+        cv2.imwrite(os.path.join(out_path, "Y%03d.jpg" % (i -1)), flow_y)
+
     return output_folder
 
 
@@ -260,8 +279,8 @@ def get_prediction(file_path):
     print "predictions"
     print predictions
 
-    clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
-    clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
+    # clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
+    # clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
 
     result = bundle_response(file_path, frame_predictions)
     print result
@@ -326,7 +345,6 @@ if __name__ == "__main__":
         UPLOAD_FOLDER="videos",
         TEMP_FOLDER="temp",
         LABEL_MAPPING=str(data["label_mapping"]),
-        FLOW_CMD=str(data["flow_cmd"]),
         CAFFE_BATCH_LIMIT=50,
         CAFFE_NUM_LABELS=101,
         CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
