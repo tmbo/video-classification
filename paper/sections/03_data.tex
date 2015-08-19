@@ -4,14 +4,26 @@
 As mentioned in Section~\ref{sec:related}, there are many parameters in the data generation and preparation process.
 In general we first extract the frame images from a video, and from these the optical flow images, which show movement in the video.
 After the data generation the preprocessed data has to be converted into a suitable data file for the Caffe framework.
-The final setup turned out to give the best results for us was the following:
+The best results were achieved using the following setup:
 \begin{itemize}
-	\item Frame extraction with 10 frames per second (TODO: is this correct? copy into subsection below)
+	\item Frame extraction with 10 frames per second (\todo[inline]{is this correct?} copy into subsection below)
 	\item Do not crop videos ourselves, rather use Caffe's random cropping
 	\item Stack 20 frames. For each frame, take the next 10 optical flow frames
-	\item Optical flow was calculated with broxoptflow \cite{brox2004high}
+	\item Optical flow was calculated with OpenCV's broxoptflow \cite{brox2004high}
 \end{itemize}
 In the following section we will discuss the different ways and data formats available for each step in detail.
+
+\subsection{Dataset}
+For our research purposes we relied on UFC101\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community. UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories. 
+The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action. The videos from the same group may share some common features, such as similar background, similar viewpoint, etc. 
+The action categories can be divided into five types: 1) Human-Object Interaction 2) Body-Motion Only 3) Human-Human Interaction 4) Playing Musical Instruments 5) Sports. \newline
+The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and 320 x 240 respectively. On average the clips have a length of 7 seconds. For comparable results the dataset's authors published a fixed train / test split. Our label set is made up of 101 actions.\newline
+
+
+UCF101 is composed of unconstrained videos downloaded
+from YouTube which feature challenges such as poor lighting,
+cluttered background and severe camera motion.
+
 
 \subsection{Frame extraction}
 We extracted the frame data from the videos with the FFmpeg\footnote{\url{http://www.ffmpeg.org/}} tool into JPEG files.
@@ -24,17 +36,17 @@ This is why we decided to use a fixed frame rate of X (TODO) frames per second.
 This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
-TODO: Figure
+\todo{Figure}
 Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
 They are calculated between each pair of consecutive frame images.
 
-There are multiple ways to extract the optical flow but previous researchers have often decided for the algorithm presented by Brox et al
+There are multiple ways to extract the optical flow but previous researchers \todo{reference} have often decided for the algorithm presented by Brox et al
 \cite{brox2004high}.
 
 
 
 \subsection{Frame stacking}
-TODO: 20, 10, optical flow forward/backward, which ones did we try?
+\todo[inline]{20, 10, optical flow forward/backward, which ones did we try?}
 
 
 \subsection{Data format for caffe}
@@ -48,7 +60,7 @@ However, the library we used .. TODO .. cannot be recommended.
 
 Finally we used LevelDB,
 
-TODO: Add some numbers about file sizes and creation time.
+\todo[inline]{Add some numbers about file sizes and creation time.}
 
 \subsection{convert\_imageset}
 The script \texttt{convert\_imageset} is a script provided by Caffe.
