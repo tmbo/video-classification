@@ -9,21 +9,28 @@ The best results were achieved using the following setup:
 	\item Frame extraction with 10 frames per second (\todo[inline]{is this correct?} copy into subsection below)
 	\item Do not crop videos ourselves, rather use Caffe's random cropping
 	\item Stack 20 frames. For each frame, take the next 10 optical flow frames
-	\item Optical flow was calculated with OpenCV's broxoptflow \cite{brox2004high}
+	\item Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
 \end{itemize}
 In the following section we will discuss the different ways and data formats available for each step in detail.
 
 \subsection{Dataset}
-For our research purposes we relied on UFC101\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community. UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories. 
-The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action. The videos from the same group may share some common features, such as similar background, similar viewpoint, etc. 
-The action categories can be divided into five types: 1) Human-Object Interaction 2) Body-Motion Only 3) Human-Human Interaction 4) Playing Musical Instruments 5) Sports. \newline
-The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and 320 x 240 respectively. On average the clips have a length of 7 seconds. For comparable results the dataset's authors published a fixed train / test split. Our label set is made up of 101 actions.\newline
+For our research purposes we relied on UFC101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
+UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories.
+The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action.
+The videos from the same group may share some common features, such as similar background, similar viewpoint, etc.
+The action categories can be divided into five types:
+\begin{enumerate}
+\item Human-Object Interaction
+\item Body-Motion Only
+\item Human-Human Interaction
+\item Playing Musical Instruments
+\item Sports
+\end{enumerate}
+The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and 320 x 240 respectively.
+On average the clips have a length of 7 seconds. For comparable results the dataset's authors published a fixed train / test split.
+Our label set is made up of 101 actions.
 
-
-UCF101 is composed of unconstrained videos downloaded
-from YouTube which feature challenges such as poor lighting,
-cluttered background and severe camera motion.
-
+%UCF101 is composed of unconstrained videos downloaded from YouTube which feature challenges such as poor lighting, cluttered background and severe camera motion.
 
 \subsection{Frame extraction}
 We extracted the frame data from the videos with the FFmpeg\footnote{\url{http://www.ffmpeg.org/}} tool into JPEG files.
