@@ -36,4 +36,30 @@
 
 
 \subsection{Flow}
+
+
 \subsection{Fusion}
+As first approach we rebuild the fusion architecture presented by TODO.
+
+We took the CNN nets for spatial and flow presented above and build a fusion architecture on top of them.
+Both CNNs were cut off after the \textit{fc6}-layer having an output of 16 x 4096.
+The input to the CNNs were 16 frames per video.
+So the output of the \textit{fc6}-layer of the spatial and flow net correspond to a prediction for each of those frames.
+To fuse those predictions, the first step is to merge the 16 prediction of one video into one prediction for the whole video.
+Therefore, we take the average prediction for both spatial and flow.
+A fully-connected layer is then trained with those predictions before we concatenate the predictions of spatial and flow.
+In the end two fully-connected layer are trained on the merged predictions.
+The output is defined by an accuracy layer.
+The whole architecture is shown in Figure~\ref{fig:fusion_architecture}\todo{improve figure}.
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[scale=.7]{images/fusion_architecture.eps}
+	\caption{Architecture of the fusion net: The predictions per frame of one video from the spatial and flow net are merged into one prediction per video each. Those predictions are then merged and trained via two fully connected layers.}
+	\label{fig:fusion_architecture}
+\end{figure}
+
+
+
+
+
+
