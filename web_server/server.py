@@ -131,7 +131,7 @@ def frames_in_folder(folder):
 def predict_caffe(all_frame_files, all_flow_files):
     idxs = select_indices(len(all_frame_files), NETWORK_BATCH_SIZE)
     frame_files = [ all_frame_files[idx] for idx in idxs ]
-    net = caffe.Net(str(app.config["CAFFE_SPATIAL_PROTO"]), str(app.config["CAFFE_SPATIAL_MODEL"]), caffe.TEST)
+    net = caffe.Net(str(app.config["CAFFE_FUSION_PROTO"]), str(app.config["CAFFE_FUSION_MODEL"]), caffe.TEST)
 
     transformer = caffe.io.Transformer({'frames_data': net.blobs['frames_data'].data.shape})
     # data transformations
@@ -209,7 +209,7 @@ def upload_video():
         file_path = path.join(app.config["UPLOAD_FOLDER"], file_name)
         video_file.save(file_path)
 
-        response = jsonify(get_prediction(file_path))
+	response = jsonify(get_video_prediction(file_path))
     else:
         response = bad_request("Invalid file")
 
@@ -221,7 +221,7 @@ def use_example(example_id):
     if example_id <= 3:
         filename = "video%s.webm" % example_id
         file_path = path.join(app.config["UPLOAD_FOLDER"], "examples", filename)
-        response = jsonify(get_prediction(file_path))
+	response = jsonify(get_video_prediction(file_path))
     else:
         response = bad_request("Invalid Example")
 
@@ -237,7 +237,7 @@ def bad_request(reason):
 # -------- Prediction & Features --------
 
 # Predicition for a video file including video preprocessing
-def get_prediction(file_path):
+def get_video_prediction(file_path):
 
     global NETWORK_BATCH_SIZE
     NETWORK_BATCH_SIZE = 16
@@ -251,19 +251,18 @@ def get_prediction(file_path):
     create_flows(temp_dir, flow_dir)
 
     # predictions = external_script.predict(file_path)
-    predictions, frame_predictions, flow_predictions = predict_caffe(frames_in_folder(temp_dir), frames_in_folder(flow_dir))
+    fusion_predictions, frame_predictions, flow_predictions = predict_caffe(frames_in_folder(temp_dir), frames_in_folder(flow_dir))
 
     # Decide which prediction to display in the line plot
 #    predictions = flow_predictions
-    print "Shape of predictions", predictions.shape, "Type", type(predictions)
-    print "Max ", np.argmax(predictions, axis=1)
-    print "predictions"
-    print predictions
+    print "Shape of predictions", fusion_predictions.shape, "Type", type(fusion_predictions)
+    print "Max ", np.argmax(fusion_predictions, axis=1)
+    print "predictions", fusion_predictions
 
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
     clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
 
-    result = bundle_response(file_path, frame_predictions)
+    result = bundle_response(file_path, fusion_predictions, frame_predictions)
     print result
     return result
 
@@ -273,35 +272,42 @@ def get_image_prediction(file_path):
     global NETWORK_BATCH_SIZE
     NETWORK_BATCH_SIZE = 2
 
-    predictions, frame_predictions, flow_predictions = predict_caffe([file_path, file_path], [])
+    fusion_predictions, frame_predictions, flow_predictions = predict_caffe([file_path, file_path], [])
 
-    # Decide which prediction to display in the line plot
-#    predictions = flow_predictions
-    print "Shape of predictions", predictions.shape, "Type", type(predictions)
-    print "Max ", np.argmax(predictions, axis=1)
-    print "predictions"
-    print predictions
+    print "Shape of predictions", fusion_predictions.shape, "Type", type(fusion_predictions)
+    print "Max ", np.argmax(fusion_predictions, axis=1)
+    print "predictions", fusion_predictions
 
-    return bundle_response(file_path, frame_predictions)
+    return bundle_response(file_path, fusion_predictions)
 
 
-def bundle_response(media_file_path, frame_predictions):
+def bundle_response(media_file_path, fusion_predictions, frame_predictions):
+
+    def n_largest(np_array, n):
+	return np.argpartition(np_array, -n)[-n:]
 
     media_file_path += "?cachebuster=%s" % time.time()
     result = {
         "media": {
             "url": "%s" % media_file_path,
         },
+	"fusion_predictions": [],
         "frames": []
     }
 
+    # Overall fusion prediction top 5
+    five_best_indices = n_largest(fusion_predictions[0], 5)
+    for i in np.sort(five_best_indices):
+	result["fusion_predictions"].append({"label": LABEL_MAPPING[i], "prob": fusion_predictions[0, i].item()})
+
+    # Per frame spatial prediticon top 5
     for idx, row in enumerate(frame_predictions):
         predictions_per_label = []
 
-        five_best = np.argpartition(row, -5)[-5:]
-        print "five_best"
-        print five_best
-        for i in five_best:
+	five_best_indices = n_largest(row, 5)
+	print "five_best", five_best_indices
+
+	for i in five_best_indices:
             predictions_per_label.append({"label": LABEL_MAPPING[i], "prob": row[i].item()})
 
         new_frame = {
@@ -312,6 +318,7 @@ def bundle_response(media_file_path, frame_predictions):
         result["frames"].append(new_frame)
 
     return result
+
 
 
 if __name__ == "__main__":
@@ -331,11 +338,12 @@ if __name__ == "__main__":
         CAFFE_NUM_LABELS=101,
         CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
         CAFFE_SPATIAL_MODEL=str(data["spatial_model"]),
-        # CAFFE_SPATIAL_MODEL=",".join([
-        #     str(data["spatial_model"]),
-        #     str(data["flow_model"]),
-        #     str(data["fusion_model"])
-        # ]),
+	CAFFE_FUSION_PROTO=str(data["fusion_proto"]),
+	CAFFE_FUSION_MODEL=",".join([
+	    str(data["spatial_model"]),
+	    str(data["flow_model"]),
+	    str(data["fusion_model"])
+	]),
         CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
