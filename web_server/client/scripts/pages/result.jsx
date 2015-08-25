@@ -27,18 +27,15 @@ class Result extends Component {
 
   getBarChartData() {
 
-    const groupedPredictions = ResultStore.getGroupedPredictions();
-    const columns = _.chain(groupedPredictions)
-      .map((value, key) => {
-        const average = _.sum(value) / value.length;
-        return [key, average];
-      })
-      .sortBy(column => column[1])
-      .reverse()
-      .slice(0, 5)
+    const fusionPredictions = ResultStore.getFusionPredictions();
+    const columns = _.chain(fusionPredictions)
+      .sortByOrder((pred) => pred.prob, ["desc"])
+      .transform((result, obj) => {
+        result.push([obj.label, obj.prob])
+      }, [])
       .value();
 
-    const colors = _.mapValues(groupedPredictions, (value, key) => ColorStore.getColorForLabel(key))
+    const colors = _.pluck(fusionPredictions, "label").map((value) => ColorStore.getColorForLabel(value));
 
     return {
       columns : columns,

@@ -36,7 +36,8 @@ class VideoUpload extends Component {
   handleClickExample(videoID, evt) {
 
     evt.preventDefault();
-    SyncActions.useExample(videoID);
+    if (!this.props.isUploading)
+      SyncActions.useExample(videoID);
 
   }
 

@@ -57,7 +57,7 @@ class VideoStore {
     this.isUploading = true;
   }
 
-  onReceivePrediction() {
+  onReceiveVideoPrediction() {
     this.isUploading = false;
     this.isInvalidFile = false;
   }

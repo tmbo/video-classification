@@ -11,12 +11,14 @@ class ResultStore {
     this.video = null;
     this.image = null;
     this.frames = null;
+    this.fusionPredictions = null;
   }
 
   onReceiveVideoPrediction(response) {
     this.video = response.media;
     this.image = null;
     this.frames = response.frames;
+    this.fusionPredictions = response.fusion_predictions;
 
     RouterActions.transition("result", {type : "video"})
 
@@ -26,12 +28,17 @@ class ResultStore {
     this.image = response.media;
     this.video = null;
     this.frames = response.frames;
+    this.fusionPredictions = response.fusion_predictions;
 
     RouterActions.transition("result", {type : "image"})
 
   }
 
-  static getPredictions() {
+  static getFusionPredictions() {
+    return this.getState().fusionPredictions;
+  }
+
+  static getFramesPredictions() {
     const frames = this.getState().frames;
     if (frames) {
       return _.flatten(_.pluck(frames, "predictions"));
@@ -41,7 +48,7 @@ class ResultStore {
   }
 
   static getGroupedPredictions() {
-    const predictions = this.getPredictions();
+    const predictions = this.getFramesPredictions();
     if (predictions) {
       const labels = _.unique(_.pluck(predictions, "label"));
 
