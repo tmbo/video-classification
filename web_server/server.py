@@ -22,8 +22,7 @@ CORS(app)
 
 NETWORK_BATCH_SIZE = 16
 
-FLOW_STACK_SIZE=10
-
+FLOW_STACK_SIZE = 10
 
 LABEL_MAPPING = {}
 
@@ -38,7 +37,7 @@ def load_label_mapping():
 
 def slice_in_chunks(els, n):
     for i in range(0, len(els), n):
-        yield els[i:i+n]
+        yield els[i:i + n]
 
 
 def clear_folder(folder):
@@ -57,10 +56,9 @@ def clear_folder(folder):
 
 
 def select_indices(max_len, n):
-    l = range(0, max_len, (max_len-1) / (n-1))[:n]
+    l = range(0, max_len, (max_len - 1) / (n - 1))[:n]
     assert len(l) == n, "created invalid frame selection " + str(len(l))
     return l
-
 
 # ----- Video -----------
 import caffe
@@ -68,7 +66,8 @@ import caffe
 
 def create_frames(video_file_name, frame_rate, output_folder):
     # TODO: CROP BETTER
-    cmd = "ffmpeg -n -nostdin -i \"%s\" -r \"%d\" -qscale:v 2 -filter:v \"crop=224:224:0:0\" \"%s/%%3d.jpg\"" % (video_file_name, frame_rate, output_folder)
+    cmd = "ffmpeg -n -nostdin -i \"%s\" -r \"%d\" -qscale:v 2 -filter:v \"crop=224:224:0:0\" \"%s/%%3d.jpg\"" % (
+        video_file_name, frame_rate, output_folder)
     subprocess.call(cmd, shell=True)
     return output_folder
 
@@ -94,7 +93,9 @@ def load_frames(frame_list, w, h, transformer):
 
     return data
 
-def load_flows(selected_frames, all_flows_list, w, h):#, transformer): --- we removed the transformer for the flow and do it manually
+
+def load_flows(selected_frames, all_flows_list, w,
+               h):  # , transformer): --- we removed the transformer for the flow and do it manually
     assert len(all_flows_list) % 2 == 0, "Error: Number of flows need to be divisible by 2"
 
     y_start = len(all_flows_list) / 2
@@ -118,11 +119,12 @@ def load_flows(selected_frames, all_flows_list, w, h):#, transformer): --- we re
 
     for idx, frame_id in enumerate(selected_frames):
         data[idx, :, :, :] = load_flow_stack(frame_id)
-        #transformer.preprocess('flow_data', load_flow_stack(frame_id))
+        # transformer.preprocess('flow_data', load_flow_stack(frame_id))
 
     data *= 255
     data -= 127.0
     return data
+
 
 def frames_in_folder(folder):
     return map(lambda p: os.path.join(folder, p), os.listdir(folder))
@@ -130,27 +132,32 @@ def frames_in_folder(folder):
 
 def predict_caffe(all_frame_files, all_flow_files):
     idxs = select_indices(len(all_frame_files), NETWORK_BATCH_SIZE)
-    frame_files = [ all_frame_files[idx] for idx in idxs ]
+    frame_files = [all_frame_files[idx] for idx in idxs]
     net = caffe.Net(str(app.config["CAFFE_FUSION_PROTO"]), str(app.config["CAFFE_FUSION_MODEL"]), caffe.TEST)
 
     transformer = caffe.io.Transformer({'frames_data': net.blobs['frames_data'].data.shape})
     # data transformations
     transformer.set_transpose('frames_data', (2, 0, 1))
-    transformer.set_raw_scale('frames_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
-    transformer.set_channel_swap('frames_data', (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
-#    print "Spatial mean shape ", np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1).shape()
+    transformer.set_raw_scale('frames_data',
+                              255)  # the reference model operates on images in [0,255] range instead of [0,1]
+    transformer.set_channel_swap('frames_data',
+                                 (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
+    #    print "Spatial mean shape ", np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1).shape()
     transformer.set_mean('frames_data', np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1))  # mean pixel
 
-#    flow_transformer = caffe.io.Transformer({'flow_data': net.blobs['flow_data'].data.shape})
+    #    flow_transformer = caffe.io.Transformer({'flow_data': net.blobs['flow_data'].data.shape})
     # flow transformations
-#    size = (20,)
-#    flow_transformer.set_mean('flow_data', np.ones(size) * 0.5)#np.ones(size) * 127)  # mean pixel
-#    flow_transformer.set_raw_scale('flow_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
+    #    size = (20,)
+    #    flow_transformer.set_mean('flow_data', np.ones(size) * 0.5)#np.ones(size) * 127)  # mean pixel
+    #    flow_transformer.set_raw_scale('flow_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
 
     caffe.set_mode_cpu()
 
-    frame_data = load_frames(frame_files, net.blobs['frames_data'].data.shape[2], net.blobs['frames_data'].data.shape[3], transformer)
-    flow_data = load_flows(idxs, all_flow_files, net.blobs['flow_data'].data.shape[2], net.blobs['flow_data'].data.shape[3])#, flow_transformer) # we removed the flow transformer
+    frame_data = load_frames(frame_files, net.blobs['frames_data'].data.shape[2],
+                             net.blobs['frames_data'].data.shape[3], transformer)
+    flow_data = load_flows(idxs, all_flow_files, net.blobs['flow_data'].data.shape[2],
+                           net.blobs['flow_data'].data.shape[
+                               3])  # , flow_transformer) # we removed the flow transformer
 
     # net.blobs['frames_data'].reshape(*frame_data.shape)
 
@@ -209,7 +216,7 @@ def upload_video():
         file_path = path.join(app.config["UPLOAD_FOLDER"], file_name)
         video_file.save(file_path)
 
-	response = jsonify(get_video_prediction(file_path))
+        response = jsonify(get_video_prediction(file_path))
     else:
         response = bad_request("Invalid file")
 
@@ -221,7 +228,7 @@ def use_example(example_id):
     if example_id <= 3:
         filename = "video%s.webm" % example_id
         file_path = path.join(app.config["UPLOAD_FOLDER"], "examples", filename)
-	response = jsonify(get_video_prediction(file_path))
+        response = jsonify(get_video_prediction(file_path))
     else:
         response = bad_request("Invalid Example")
 
@@ -238,7 +245,6 @@ def bad_request(reason):
 
 # Predicition for a video file including video preprocessing
 def get_video_prediction(file_path):
-
     global NETWORK_BATCH_SIZE
     NETWORK_BATCH_SIZE = 16
 
@@ -251,10 +257,11 @@ def get_video_prediction(file_path):
     create_flows(temp_dir, flow_dir)
 
     # predictions = external_script.predict(file_path)
-    fusion_predictions, frame_predictions, flow_predictions = predict_caffe(frames_in_folder(temp_dir), frames_in_folder(flow_dir))
+    fusion_predictions, frame_predictions, flow_predictions = predict_caffe(frames_in_folder(temp_dir),
+                                                                            frames_in_folder(flow_dir))
 
     # Decide which prediction to display in the line plot
-#    predictions = flow_predictions
+    #    predictions = flow_predictions
     print "Shape of predictions", fusion_predictions.shape, "Type", type(fusion_predictions)
     print "Max ", np.argmax(fusion_predictions, axis=1)
     print "predictions", fusion_predictions
@@ -266,9 +273,9 @@ def get_video_prediction(file_path):
     print result
     return result
 
+
 # Prediciton for a single image
 def get_image_prediction(file_path):
-
     global NETWORK_BATCH_SIZE
     NETWORK_BATCH_SIZE = 2
 
@@ -282,32 +289,31 @@ def get_image_prediction(file_path):
 
 
 def bundle_response(media_file_path, fusion_predictions, frame_predictions):
-
     def n_largest(np_array, n):
-	return np.argpartition(np_array, -n)[-n:]
+        return np.argpartition(np_array, -n)[-n:]
 
     media_file_path += "?cachebuster=%s" % time.time()
     result = {
         "media": {
             "url": "%s" % media_file_path,
         },
-	"fusion_predictions": [],
+        "fusion_predictions": [],
         "frames": []
     }
 
     # Overall fusion prediction top 5
     five_best_indices = n_largest(fusion_predictions[0], 5)
     for i in np.sort(five_best_indices):
-	result["fusion_predictions"].append({"label": LABEL_MAPPING[i], "prob": fusion_predictions[0, i].item()})
+        result["fusion_predictions"].append({"label": LABEL_MAPPING[i], "prob": fusion_predictions[0, i].item()})
 
     # Per frame spatial prediticon top 5
     for idx, row in enumerate(frame_predictions):
         predictions_per_label = []
 
-	five_best_indices = n_largest(row, 5)
-	print "five_best", five_best_indices
+        five_best_indices = n_largest(row, 5)
+        print "five_best", five_best_indices
 
-	for i in five_best_indices:
+        for i in five_best_indices:
             predictions_per_label.append({"label": LABEL_MAPPING[i], "prob": row[i].item()})
 
         new_frame = {
@@ -320,9 +326,9 @@ def bundle_response(media_file_path, fusion_predictions, frame_predictions):
     return result
 
 
-
 if __name__ == "__main__":
     import json
+
     data = json.load(file("files.json"))
 
     # Start the server
@@ -338,13 +344,14 @@ if __name__ == "__main__":
         CAFFE_NUM_LABELS=101,
         CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
         CAFFE_SPATIAL_MODEL=str(data["spatial_model"]),
-	CAFFE_FUSION_PROTO=str(data["fusion_proto"]),
-	CAFFE_FUSION_MODEL=",".join([
-	    str(data["spatial_model"]),
-	    str(data["flow_model"]),
-	    str(data["fusion_model"])
-	]),
-        CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])  #"/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
+        CAFFE_FUSION_PROTO=str(data["fusion_proto"]),
+        CAFFE_FUSION_MODEL=",".join([
+            str(data["spatial_model"]),
+            str(data["flow_model"]),
+            str(data["fusion_model"])
+        ]),
+        CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])
+        # "/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
     clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
