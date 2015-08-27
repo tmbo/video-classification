@@ -35,7 +35,10 @@ class Result extends Component {
       }, [])
       .value();
 
-    const colors = _.pluck(fusionPredictions, "label").map((value) => ColorStore.getColorForLabel(value));
+    const colors = _.chain(fusionPredictions)
+      .pluck("label")
+      .transform((result, value) => result[value] = ColorStore.getColorForLabel(value))
+      .value();
 
     return {
       columns : columns,

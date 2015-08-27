@@ -353,7 +353,6 @@ if __name__ == "__main__":
             str(data["fusion_model"])
         ]),
         CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])
-        # "/home/mpss2015/caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy"
     )
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
     clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
