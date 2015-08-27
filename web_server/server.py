@@ -2,7 +2,7 @@
 import subprocess
 import time
 from os import path
-import shutil
+import shutil, pipes
 
 from math import ceil
 import numpy as np
@@ -68,7 +68,7 @@ def create_frames(video_file_name, frame_rate, output_folder):
     # TODO: CROP BETTER
     cmd = "ffmpeg -n -nostdin -i \"%s\" -r \"%d\" -qscale:v 2 -filter:v \"crop=224:224:0:0\" \"%s/%%3d.jpg\"" % (
         video_file_name, frame_rate, output_folder)
-    subprocess.call(cmd, shell=True)
+    subprocess.check_call(cmd, shell=True)
     return output_folder
 
 
@@ -76,8 +76,9 @@ def create_flows(frame_folder, output_folder):
     curr_path = os.path.dirname(os.path.abspath(__file__))
     in_path = os.path.join(curr_path, os.path.dirname(frame_folder))
     out_path = os.path.join(curr_path, os.path.dirname(output_folder))
-    cmd = "%s %s %s 0" % (app.config["FLOW_CMD"], in_path, out_path)
-    subprocess.call(cmd, shell=True)
+
+    cmd = "%s %s %s 0" % (pipes.quote(app.config["FLOW_CMD"]), pipes.quote(in_path), pipes.quote(out_path))
+    subprocess.check_call(cmd, shell=True)
     return output_folder
 
 
@@ -345,6 +346,7 @@ if __name__ == "__main__":
         CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
         CAFFE_SPATIAL_MODEL=str(data["spatial_model"]),
         CAFFE_FUSION_PROTO=str(data["fusion_proto"]),
+        # CAFFE_FUSION_MODEL=str(data["fusion_model"]),
         CAFFE_FUSION_MODEL=",".join([
             str(data["spatial_model"]),
             str(data["flow_model"]),

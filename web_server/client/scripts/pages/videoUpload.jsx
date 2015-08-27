@@ -7,7 +7,7 @@ import Component from "../components/baseComponent.jsx";
 import FileInput from "../components/fileInput.jsx";
 import Spinner from "../components/spinner.jsx";
 import ImageCard from "../components/imageCard.jsx";
-import VideoCapture from "../components/videoCapture.jsx";
+//import VideoCapture from "../components/videoCapture.jsx";
 
 import VideoStore from "../stores/videoStore.js";
 import SyncActions from "../actions/syncActions.js";
