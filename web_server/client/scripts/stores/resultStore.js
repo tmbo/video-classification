@@ -18,6 +18,7 @@ class ResultStore {
     this.video = response.media;
     this.image = null;
     this.frames = response.frames;
+    this.flows = response.flows;
     this.fusionPredictions = response.fusion_predictions;
 
     RouterActions.transition("result", {type : "video"})
@@ -47,8 +48,26 @@ class ResultStore {
     }
   }
 
-  static getGroupedPredictions() {
+  static getFlowPredictions() {
+    const flows = this.getState().flows;
+    if (flows) {
+      return _.flatten(_.pluck(flows, "predictions"));
+    } else {
+      return null;
+    }
+  }
+
+  static getGroupedFramePredictions() {
     const predictions = this.getFramesPredictions();
+    return this.getGroupedPredictions(predictions);
+  }
+
+  static getGroupedFlowPredictions() {
+    const predictions = this.getFlowPredictions();
+    return this.getGroupedPredictions(predictions);
+  }
+
+  static getGroupedPredictions(predictions) {
     if (predictions) {
       const labels = _.unique(_.pluck(predictions, "label"));
 

@@ -47,10 +47,9 @@ class Result extends Component {
 
   }
 
-  getLineChartData() {
+  getLineChartData(groupedPredictions) {
 
     const frameNumbers = ["frameNumber"].concat(ResultStore.getFrameNumbers());
-    const groupedPredictions = ResultStore.getGroupedPredictions();
 
     let columns = _.map(groupedPredictions, (value, key) => [key].concat(value));
     columns.push(frameNumbers);
@@ -83,12 +82,36 @@ class Result extends Component {
 
     if (!this.isVideoPrediction()) return null;
 
+    const groupedPredictions = ResultStore.getGroupedFramePredictions();
+    const lineChartData = this.getLineChartData(groupedPredictions);
+
     return (
       <div className="row">
         <div className="col s12">
           <div className="card-panel">
-            <h3 className="card-title">Top 5 Predicted Labels per Frame</h3>
-            <LineChart data={this.getLineChartData()} onDataClick={this.onDataClicked.bind(this)} />
+            <h3 className="card-title">Top 5 Predicted Labels per Frame (Spatial)</h3>
+            <LineChart data={lineChartData} onDataClick={this.onDataClicked.bind(this)} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  getPerFlowPredictionPanel() {
+
+    if (!this.isVideoPrediction()) return null;
+
+    const groupedPredictions = ResultStore.getGroupedFlowPredictions();
+    const lineChartData = this.getLineChartData(groupedPredictions);
+
+    debugger
+
+    return (
+      <div className="row">
+        <div className="col s12">
+          <div className="card-panel">
+            <h3 className="card-title">Top 5 Predicted Labels per Frame (Flow)</h3>
+            <LineChart data={lineChartData} onDataClick={this.onDataClicked.bind(this)} />
           </div>
         </div>
       </div>
@@ -117,6 +140,7 @@ class Result extends Component {
   render() {
 
     const framePredictionPanel = this.getPerFramePredictionPanel();
+    const flowPredictionPanel = this.getPerFlowPredictionPanel();
     const mediaContainer = this.getMediaContainer();
 
     return (
@@ -134,6 +158,7 @@ class Result extends Component {
           </div>
         </div>
         {framePredictionPanel}
+        {flowPredictionPanel}
       </div>
     );
   }

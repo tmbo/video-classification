@@ -270,7 +270,7 @@ def get_video_prediction(file_path):
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
     clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
 
-    result = bundle_response(file_path, fusion_predictions, frame_predictions)
+    result = bundle_response(file_path, fusion_predictions, frame_predictions, flow_predictions)
     print result
     return result
 
@@ -289,9 +289,28 @@ def get_image_prediction(file_path):
     return bundle_response(file_path, fusion_predictions)
 
 
-def bundle_response(media_file_path, fusion_predictions, frame_predictions):
+def bundle_response(media_file_path, fusion_predictions, frame_predictions, flow_predictions):
     def n_largest(np_array, n):
         return np.argpartition(np_array, -n)[-n:]
+
+    def top5_predictions(predictions):
+        top5 = []
+        for idx, row in enumerate(predictions):
+            predictions_per_label = []
+
+            five_best_indices = n_largest(row, 5)
+            print "five_best", five_best_indices
+
+            for i in five_best_indices:
+                predictions_per_label.append({"label": LABEL_MAPPING[i], "prob": row[i].item()})
+
+            new_frame = {
+                "frameNumber": idx,
+                "predictions": predictions_per_label
+            }
+
+            top5.append(new_frame)
+        return top5
 
     media_file_path += "?cachebuster=%s" % time.time()
     result = {
@@ -299,7 +318,8 @@ def bundle_response(media_file_path, fusion_predictions, frame_predictions):
             "url": "%s" % media_file_path,
         },
         "fusion_predictions": [],
-        "frames": []
+        "frames": [],
+        "flows": []
     }
 
     # Overall fusion prediction top 5
@@ -307,22 +327,11 @@ def bundle_response(media_file_path, fusion_predictions, frame_predictions):
     for i in np.sort(five_best_indices):
         result["fusion_predictions"].append({"label": LABEL_MAPPING[i], "prob": fusion_predictions[0, i].item()})
 
-    # Per frame spatial prediticon top 5
-    for idx, row in enumerate(frame_predictions):
-        predictions_per_label = []
+    # Per frame spatial prediction top 5
+    result["frames"] = top5_predictions(frame_predictions)
 
-        five_best_indices = n_largest(row, 5)
-        print "five_best", five_best_indices
-
-        for i in five_best_indices:
-            predictions_per_label.append({"label": LABEL_MAPPING[i], "prob": row[i].item()})
-
-        new_frame = {
-            "frameNumber": idx,
-            "predictions": predictions_per_label
-        }
-
-        result["frames"].append(new_frame)
+    # Per frame flow prediction top 5
+    result["flows"] = top5_predictions(flow_predictions)
 
     return result
 

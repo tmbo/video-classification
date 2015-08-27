@@ -17,15 +17,20 @@ class Header extends Component {
   }
 
   getResultLink() {
-    if (this.props.video || this.props.image)
+
+    if (this.props.video || this.props.image) {
+
+      const mediaType = this.props.video ? "video" : "image"
+
       return (
         <li>
-          <Link to="result">
+          <Link to="result" query={{type: mediaType}}>
             <i className="material-icons left">dashboard</i>
             Result
           </Link>
         </li>
       );
+    }
   }
 
   render() {
