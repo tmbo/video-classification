@@ -39,45 +39,45 @@ class ResultStore {
     return this.getState().fusionPredictions;
   }
 
-  static getFramesPredictions() {
-    const frames = this.getState().frames;
-    if (frames) {
-      return _.flatten(_.pluck(frames, "predictions"));
-    } else {
-      return null;
-    }
-  }
 
-  static getFlowPredictions() {
-    const flows = this.getState().flows;
-    if (flows) {
-      return _.flatten(_.pluck(flows, "predictions"));
-    } else {
-      return null;
-    }
-  }
 
   static getGroupedFramePredictions() {
-    const predictions = this.getFramesPredictions();
+    const predictions = this.getState().frames;
     return this.getGroupedPredictions(predictions);
   }
 
   static getGroupedFlowPredictions() {
-    const predictions = this.getFlowPredictions();
+    const predictions = this.getState().flows;
     return this.getGroupedPredictions(predictions);
   }
 
-  static getGroupedPredictions(predictions) {
-    if (predictions) {
-      const labels = _.unique(_.pluck(predictions, "label"));
+  static getGroupedPredictions(probs_per_frame) {
+
+    if (probs_per_frame) {
+      const labels = _.chain(probs_per_frame)
+        .pluck("predictions")
+        .flatten()
+        .pluck("label")
+        .unique()
+        .value();
 
       return _.transform(labels, (result, label) => {
 
-        result[label] =
-          _.chain(predictions)
-           .filter(pred => pred.label == label)
-           .pluck("prob")
-           .value()
+        let per_frame = _.range(0, 16)
+        for (let i in per_frame) {
+
+          per_frame[i] = _.chain(probs_per_frame)
+            .filter(frame => frame.frameNumber == i)
+            .pluck("predictions")
+            .flatten()
+            .filter(pred => pred.label == label)
+            .pluck("prob")
+            .first()
+            .value() || 0
+        }
+
+        result[label] = per_frame
+
       }, {})
     } else {
       return null;
