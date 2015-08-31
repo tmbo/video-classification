@@ -1,5 +1,5 @@
 PDFVIEWER=evince
-OUTPUT_FILE=MPSS2015
+OUTPUT_FILE=paper
 
 show: build
 	$(PDFVIEWER) $(OUTPUT_FILE).pdf &
@@ -15,7 +15,7 @@ build:
 	@mv .output/$(OUTPUT_FILE).pdf .
 
 bibtex:
-	@cd .output && bibtex paper && cd ..
+	@cp paper.bib .output/ && cd .output && bibtex paper && cd ..
 
 clean:
 	rm .output/*.aux .output/*.log
