@@ -26,9 +26,18 @@ The action categories can be divided into five types:
 \item Playing Musical Instruments
 \item Sports
 \end{enumerate}
-The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and 320 x 240 respectively.
-On average the clips have a length of 7 seconds. For comparable results the dataset's authors published a fixed train / test split.
-Our label set is made up of 101 actions.
+The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and \texttt{320 x 240} respectively.
+There are also a few videos in the \emph{Pommelhorse} category, which seem to have a different resolution of \texttt{400 x }\todo{??}.
+We dealt with these by rescaling them to \texttt{320 x 240}.\todo{We did?}
+On average the clips have a length of 7 seconds.
+
+For comparable results the dataset's authors published three fixed train/test splits.
+We worked on the first split, i.e. the first thirds were used for training, and the last one was used for testing.
+When working with UC101 it is important to follow these splits, because the training instances are often sampled and cut from a longer video sequence.
+Concretely, this means that when generating the dataset, there usually was a long sequence of one activity.
+This long sequence was then cut, to create more than one training sample from this sequence.
+It is important to keep the samples from one original sequence in the same dataset.
+Otherwise, the test performance is estimated to high.
 
 %UCF101 is composed of unconstrained videos downloaded from YouTube which feature challenges such as poor lighting, cluttered background and severe camera motion.
 
@@ -60,12 +69,18 @@ There are multiple ways to extract the optical flow but previous researchers \to
 % Experiences with LMDB, LevelDB, HDF5
 Caffe requires the input data to be in either a LMDB (TODO), HDF5, or LevelDB.
 
-We first tried the LMDB.
+In our initial tests, we used LMDB, as this is usually used in the Caffe examples, and seems to be the recommended option.
+
 The problem with LMDB was that it created large databases, because no compression is used.
 We then decided to use HDF5, which compresses the data with the TODO algorithm.
 However, the library we used .. TODO .. cannot be recommended.
 
 Finally we used LevelDB,
+
+%Table:
+%Creation Time
+%Database Size
+
 
 \todo[inline]{Add some numbers about file sizes and creation time.}
 
