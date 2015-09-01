@@ -2,57 +2,64 @@
 \section{Data Preparation}
 \label{sec:data}
 
-As mentioned in Section~\ref{sec:related}, there are many parameters in the data generation and preparation process.
-In general we first extract the frame images from a video, and from these the optical flow images, which show movement in the video.
-After the data generation the preprocessed data has to be converted into a suitable data file for the Caffe framework.
-The best results were achieved using the following setup:
-\begin{itemize}
-	\item Frame extraction with 10 frames per second (\todo[inline]{is this correct?} copy into subsection below)
-	\item Do not crop videos ourselves, rather use Caffe's random cropping
-	\item Stack 20 frames. For each frame, take the next 10 optical flow frames
-	\item Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
-\end{itemize}
+As mentioned in Section~\ref{sec:related}, there are many parameters and design decisions in the data generation and preparation process, which influence the final performance.
+This section discuss all these parameters in detail.
+In general we first extract the frame images from a video, and then calculate optical flow images based on two adjacent frames.
+This captures the movement between those two frames.
+After the data generation, the preprocessed data has to be converted into a suitable data file for the Caffe framework.
 In the following section we will discuss the different ways and data formats available for each step in detail.
 
+% which split to use
+% how to extract frames
+% how to calculate optical flow
+% frame stacking
+% how to present the data to caffe (cropping)
+% caffe file format
+
 \subsection{Dataset}
-For our research purposes we relied on UCF101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
+For our research purposes we relied on the UCF101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
 UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories.
 The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action.
 The videos from the same group may share some common features, such as similar background, similar viewpoint, etc.
 The action categories can be divided into five types:
 \begin{enumerate*}
-\item Human-Object Interaction
-\item Body-Motion Only
-\item Human-Human Interaction
-\item Playing Musical Instruments
-\item Sports.
+	\item Human-Object Interaction
+	\item Body-Motion Only
+	\item Human-Human Interaction
+	\item Playing Musical Instruments
+	\item Sports.
 \end{enumerate*}
-The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and \texttt{320 x 240} respectively.
-There are also a few videos in the \emph{Pommelhorse} category, which seem to have a different resolution of \texttt{400 x }\todo{??}.
-We dealt with these by rescaling them to \texttt{320 x 240}.\todo{We did?}
+The dataset contains of 13320 clips with a fixed frame rate and a resolution of \texttt{320 x 240} respectively.
+There are a few videos in the \emph{PommelHorse} category, which have a different resolution of \texttt{400 x 226}.
+We dealt with these by rescaling them to \texttt{320 x 240}.
 On average the clips have a length of 7 seconds.
 
 For comparable results the dataset's authors published three fixed train/test splits.
-We worked on the first split, i.e. trainlist01.txt and testlist01.txt\footnote{\url{http://crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip}}. % the first thirds were used for training, and the last one was used for testing.
+We worked on the first split, i.e. \texttt{trainlist01.txt} and \texttt{testlist01.txt}\footnote{See \url{http://crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip} for the splits.}.
 When working with UC101 it is important to follow these splits, because the training instances are often sampled and cut from a longer video sequence.
 Concretely, this means that when generating the dataset, there usually was a long sequence of one activity.
-This long sequence was then cut, to create more than one training sample from this sequence.
+This long sequence was then cut to create more than one training sample from this sequence.
 It is important to keep the samples from one original sequence in the same dataset.
 Otherwise, the test performance is estimated to high.
 
 %UCF101 is composed of unconstrained videos downloaded from YouTube which feature challenges such as poor lighting, cluttered background and severe camera motion.
-
 \subsection{Frame extraction}
-We extracted the frame data from the videos with the FFmpeg\footnote{\url{http://www.ffmpeg.org/}} tool into JPEG files.
+The first preprocessing step needs to convert the given \texttt{*.avi} video files into single-frame pictures.
+We extracted the frame data from the videos with the \emph{FFmpeg}\footnote{\url{http://www.ffmpeg.org/}} tool.
+See Section~\ref{subsec:frame_extraction} for the concrete parameters.
+As output, we chose JPEG files.
 A challenge was finding the correct frame rate for the frame extraction.
-High frame rates, such as 30 frames per second, often extracted two frame images from the same unchanged video frame.
-Lower frame rates, for example 5 frames per second, do not have these identical frame images.
+High frame rates, such as 30 frames per second, often led to two adjacent frames being exactly identical.
+This is a problem for the optical flow extraction, because the optical flow will be empty then.
+Especially for classes, where a lot of movement and characteristic optical flow is expected (such as \emph{Archery} or \emph{Juggling Balls}), this turned out problematic.
+The problem of identical images does not exist for lower frame rates, for example 5 frames per second.
 However they create less overall training data and less details, especially for optical flow extraction.
-A variable frame rate which is different for each video means there would likely be different results of analysis, depending on the frame rate a video was recorded with.
-This is why we decided to use a fixed frame rate of \todo{Frame rate} frames per second.
+A variable frame rate extraction is not feasible, as the optical flow must be comparable between different video types, i.e. the time between two frames must be identical.
+This is why we decided to use a fixed frame rate of 15 \todo{Frame rate} frames per second.
 This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
+\item Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
 \todo{Figure}
 Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
 They are calculated between each pair of consecutive frame images.
@@ -60,8 +67,9 @@ They are calculated between each pair of consecutive frame images.
 There are multiple ways to extract the optical flow but previous researchers \todo{reference} have often decided for the algorithm presented by Brox et al \cite{brox2004high}.
 
 
-\subsection{Frame stacking}
+\subsection{Optical flow frame stacking}
 \todo[inline]{20, 10, optical flow forward/backward, which ones did we try?}
+\item Stack 20 frames. For each frame, take the next 10 optical flow frames
 
 
 \subsection{Data format for caffe}
@@ -80,15 +88,36 @@ Finally we used LevelDB,
 %Creation Time
 %Database Size
 
-
 \todo[inline]{Add some numbers about file sizes and creation time.}
 
-\subsection{convert\_imageset}
+\subsection{Image cropping}
+Most nets prefer 224x224. E.g. caffenet, alexnet.
+How to crop
+Different approaches.
+Use caffe
+Do it yourself.
+Do not crop videos ourselves, rather use Caffe's random cropping
+
+\subsection{Selecting frames for the LSTM}
+
+
+\subsection{Relevant scripts}
+
+\subsubsection{convert\_imageset}
 The script \texttt{convert\_imageset} is a script provided by Caffe.
 It creates either LMDBs or LevelDBs.
 This can be switched by changing the constant \texttt{backend} in the script file and recompiling.
 
-\subsection{convert\_imageset\_multi}
+\subsubsection{convert\_imageset\_multi}
 The script \texttt{convert\_imageset\_multi} is a script written by us, based on \texttt{convert\_imageset}.
 It takes an additional parameter \texttt{STACK\_SIZE} at the end, which tells how many images from the list file to stack into one image.
 Internally, it uses the method \texttt{cv::merge} from OpenCV to stack the images before writing them to the database.
+
+\subsubsection{frame\_extraction.sh}
+\label{subsec:frame_extraction}
+
+The script under \texttt{tools/frame\_extraction.sh} is responsible for extracting the files using \emph{FFmpeg}.
+It's used like the following: \texttt{./frame\_extraction.sh /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10}.
+The parameters passed to \emph{FFmpeg} are as follows: \todo{Joseph}.
+
+
