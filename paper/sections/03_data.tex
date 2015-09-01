@@ -9,13 +9,6 @@ This captures the movement between those two frames.
 After the data generation, the preprocessed data has to be converted into a suitable data file for the Caffe framework.
 In the following section we will discuss the different ways and data formats available for each step in detail.
 
-% which split to use
-% how to extract frames
-% how to calculate optical flow
-% frame stacking
-% how to present the data to caffe (cropping)
-% caffe file format
-
 \subsection{Dataset}
 For our research purposes we relied on the UCF101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
 UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories.
@@ -55,51 +48,70 @@ Especially for classes, where a lot of movement and characteristic optical flow 
 The problem of identical images does not exist for lower frame rates, for example 5 frames per second.
 However they create less overall training data and less details, especially for optical flow extraction.
 A variable frame rate extraction is not feasible, as the optical flow must be comparable between different video types, i.e. the time between two frames must be identical.
-This is why we decided to use a fixed frame rate of 15 \todo{Frame rate} frames per second.
+This is why we decided to use a fixed frame rate of 15 frames per second.
+% COMMENT: The data on the server is definitely 15 frames per second. There are twice as much frames in the frames_30fps/ subfolders than in the frames/ subfolders.
 This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
-Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
+To capture the movement in a video sequence, the optical flow is computed.
+Optical flow is always based on two immediately consecutive frames.
+We are using the optical flow algorithm from Brox et al~\cite{brox2004high}, because it is used by many other groups and because it can be computed on the GPU, leading to faster flow extraction.
+It also readily implemented in openCV using the method \texttt{TODO}.
+Optical flow can be computed in both directions, therefore there are two optical flow images for each pair of consecutive frames.
+Therefore, for $N$ frames, there are $\frac{N - 1}{2}$ optical flows.
+
 \todo{Figure}
-Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
-They are calculated between each pair of consecutive frame images.
-
-There are multiple ways to extract the optical flow but previous researchers \todo{reference} have often decided for the algorithm presented by Brox et al \cite{brox2004high}.
-
 
 \subsection{Optical flow frame stacking}
-\todo[inline]{20, 10, optical flow forward/backward, which ones did we try?}
-Stack 20 frames. For each frame, take the next 10 optical flow frames
-
+A single optical flow image does not contain as much information as the RGB picture of the same frame.
+Therefore, several optical flow images are stacked, just as the color channels \emph{R}, \emph{G}, and \emph{B} are stacked in a standard image.
+For each frame, we stack the optical flows for the next 10 frames, leading to a stack size of 20 in total.
+We also experimented with adding the flows of the 10 previous frames as well, leading to a stack size of 40.
+However, this did not improve the results.
+Please note, that when we say that we take the optical flows for the next 10 frames, we do not mean that we compute the flow from the \nth{1} frame to the \nth{10} frame.
+Rather, we add the optical flows from the \nth{1} to the \nth{2} frame, from the \nth{2} to the \nth{3} frame, and so on.
 
 \subsection{Data format for caffe}
 % Experiences with LMDB, LevelDB, HDF5
-Caffe requires the input data to be in either a LMDB (TODO), HDF5, or LevelDB.
-
+Caffe requires the input data to be in either a LMDB, HDF5, or LevelDB.
 In our initial tests, we used LMDB, as this is usually used in the Caffe examples, and seems to be the recommended option.
-
 The problem with LMDB was that it created large databases, because no compression is used.
-We then decided to use HDF5, which compresses the data with the TODO algorithm.
-However, the library we used .. TODO .. cannot be recommended.
+This led to disk space issues.
 
-Finally we used LevelDB,
+We then decided to use HDF5, which compresses the data.
+However, the library we used, h5py\footnote{See \url{http://www.h5py.org/}.} cannot be recommended, because we had big issues with memory leaks.
+The library was consuming so much RAM and swap space, that the machine had to be killed sometimes.
+Also, the Caffe documentation says, that HDF5 should only be used ``when efficiency is not critical''.
 
-%Table:
-%Creation Time
-%Database Size
+Finally we used LevelDB, a database developed by Google for fast read performance.
+Compression is done using Google's Snappy\footnote{See \url{http://google.github.io/snappy/}.} library, which offers both performance and good compression.
+We therefore recommend LevelDB.
 
-\todo[inline]{Add some numbers about file sizes and creation time.}
+% Table:
+% Creation Time
+% Database Size
 
 \subsection{Image cropping}
-Most nets prefer 224x224. E.g. caffenet, alexnet.
-How to crop
-Different approaches.
-Use caffe
-Do it yourself.
-Do not crop videos ourselves, rather use Caffe's random cropping
+As said before, most images have a resolution of \texttt{320 x 240}.
+On the other hand, most convolutional network architectures require a squared input resolution.
+The \emph{Caffenet} requires data to be in \texttt{227 x 227}, the \emph{CNN\_M} network requires a resolution of \texttt{224 x 224}.
+The best approach to transform the image from the original resolution to the required resolution is cropping.
+Caffe already comes with a built-in method for randomly cropping images.
+When setting the \texttt{crop\_size} parameter in the net definition, the input image is cropped randomly every time the image is read for training or testing.
+Also, mirroring can be used to increase the training size further with the same approach.
+
+Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a crop from each corner and from the center of the image.
+We also tried this, but did not use it in our final setting, because of two reasons.
+First, it massively increases the training set size, making the data harder to handle and requiring more disk space.
+Second, the random cropping in Caffe is at least as effective as doing crops manually.
 
 \subsection{Selecting frames for the LSTM}
-
+For the LSTMs, we need another set of databases (spatial and flow), which contain only a fixed number of frames per video.
+This is because the LSTM implementation by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
+We decided to use 16 frames per video.
+We select these 16 frames by omitting the first and last five frames, and the equally distributing the selected frames among the remaining frames.
+We skipped some frames at the beginning and end, because the are fade-in/fade-out effects in some of the videos.
+\todo{Reference the script, which selects the frames}.
 
 \subsection{Relevant scripts}
 
