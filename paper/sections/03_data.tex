@@ -15,25 +15,25 @@ The best results were achieved using the following setup:
 In the following section we will discuss the different ways and data formats available for each step in detail.
 
 \subsection{Dataset}
-For our research purposes we relied on UFC101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
+For our research purposes we relied on UCF101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
 UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories.
 The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action.
 The videos from the same group may share some common features, such as similar background, similar viewpoint, etc.
 The action categories can be divided into five types:
-\begin{enumerate}
+\begin{enumerate*}
 \item Human-Object Interaction
 \item Body-Motion Only
 \item Human-Human Interaction
 \item Playing Musical Instruments
-\item Sports
-\end{enumerate}
+\item Sports.
+\end{enumerate*}
 The dataset contains 13320 clips with a fixed frame rate and resolution of 25 FPS and \texttt{320 x 240} respectively.
 There are also a few videos in the \emph{Pommelhorse} category, which seem to have a different resolution of \texttt{400 x }\todo{??}.
 We dealt with these by rescaling them to \texttt{320 x 240}.\todo{We did?}
 On average the clips have a length of 7 seconds.
 
 For comparable results the dataset's authors published three fixed train/test splits.
-We worked on the first split, i.e. the first thirds were used for training, and the last one was used for testing.
+We worked on the first split, i.e. trainlist01.txt and testlist01.txt\footnote{\url{http://crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip}}. % the first thirds were used for training, and the last one was used for testing.
 When working with UC101 it is important to follow these splits, because the training instances are often sampled and cut from a longer video sequence.
 Concretely, this means that when generating the dataset, there usually was a long sequence of one activity.
 This long sequence was then cut, to create more than one training sample from this sequence.
@@ -49,7 +49,7 @@ High frame rates, such as 30 frames per second, often extracted two frame images
 Lower frame rates, for example 5 frames per second, do not have these identical frame images.
 However they create less overall training data and less details, especially for optical flow extraction.
 A variable frame rate which is different for each video means there would likely be different results of analysis, depending on the frame rate a video was recorded with.
-This is why we decided to use a fixed frame rate of X (TODO) frames per second.
+This is why we decided to use a fixed frame rate of \todo{Frame rate} frames per second.
 This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
@@ -57,9 +57,7 @@ This minimized the occurrence of two identical frames after each other while sti
 Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
 They are calculated between each pair of consecutive frame images.
 
-There are multiple ways to extract the optical flow but previous researchers \todo{reference} have often decided for the algorithm presented by Brox et al
-\cite{brox2004high}.
-
+There are multiple ways to extract the optical flow but previous researchers \todo{reference} have often decided for the algorithm presented by Brox et al \cite{brox2004high}.
 
 
 \subsection{Frame stacking}

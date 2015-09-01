@@ -16,7 +16,7 @@
 	\item
 		Different nets:
 		\begin{itemize}
-			\item Caffenet/CNN\_M (also tried, VGG 19 and 16, but too big)
+			\item Caffenet/CNN\_M (also tried, VGG 19, but too big)
 			\item With weights/without weights
 			\item Compare the nets with respect to memory, number of parameters, training time, performance
 		\end{itemize}
@@ -43,7 +43,7 @@
 As first approach we rebuild the fusion architecture presented by TODO.
 
 We took the CNN nets for spatial and flow presented above and build a fusion architecture on top of them.
-Both CNNs were cut off after the \textit{fc6}-layer having an output of 16 x 4096.
+Both CNNs were cut off after the \textit{fc6}-layer having an output of 16 x 4096.\todo{Der eigentlich output von fc6 ist ja erstmal 1 x 4096}
 The input to the CNNs were 16 frames per video.
 So the output of the \textit{fc6}-layer of the spatial and flow net correspond to a prediction for each of those frames.
 To fuse those predictions, the first step is to merge the 16 prediction of one video into one prediction for the whole video.

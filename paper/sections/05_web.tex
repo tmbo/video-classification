@@ -20,12 +20,12 @@ For easy verification a click on the graphical nodes synchronizes the preview vi
 \subsection{Architecture / Implementation}
 The system contains of two almost independent parts:
 (\textit{1}) A modern single-page web app.
-The frontend utilizes the modular \textit{React}\footnote{https://facebook.github.io/react/} UI-framework and follows the \textit{Flux} \footnote{https://facebook.github.io/flux/} unidirectional data flow pattern.
+The frontend utilizes the modular \textit{React}\footnote{\url{https://facebook.github.io/react/}} UI-framework and follows the \textit{Flux} \footnote{\url{https://facebook.github.io/flux/}} unidirectional data flow pattern.
 Frontend routing, templating and interaction handling provides a rich and seamless experience.
 In order to utilize the latest Javascript ES6 language-level features and retain backward compatibility with older browsers the frontend part has to be transpiled into a single file.
-The scriptable module bundler \textit{Webpack} \footnote{https://webpack.github.io/} takes care of that.
+The scriptable module bundler \textit{Webpack} \footnote{\url{https://webpack.github.io/}} takes care of that.
 
-\textit{(2)} The server part is implemented in the Flask framework \footnote{http://flask.pocoo.org/} for Python.
+\textit{(2)} The server part is implemented in the Flask framework \footnote{\url{http://flask.pocoo.org/}} for Python.
 Besides providing an easy to modify web framework our choice for Python makes it easy to include Caffe through the PyCaffe bindings.
 User videos are locally preproccessed using the same FFmpeg and OpenCV pipeline as outlined previously in section \ref{sec:data}.
 After initially serving the web app to a client, all communication is then through a REST interface.
