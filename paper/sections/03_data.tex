@@ -59,7 +59,7 @@ This is why we decided to use a fixed frame rate of 15 \todo{Frame rate} frames 
 This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
-\item Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
+Optical flow was calculated with OpenCV's broxoptflow~\cite{brox2004high}
 \todo{Figure}
 Using the motions to deduce meaning out of a video with a convolutional neural network can be done with optical flow images.
 They are calculated between each pair of consecutive frame images.
@@ -69,7 +69,7 @@ There are multiple ways to extract the optical flow but previous researchers \to
 
 \subsection{Optical flow frame stacking}
 \todo[inline]{20, 10, optical flow forward/backward, which ones did we try?}
-\item Stack 20 frames. For each frame, take the next 10 optical flow frames
+Stack 20 frames. For each frame, take the next 10 optical flow frames
 
 
 \subsection{Data format for caffe}
