@@ -11,7 +11,7 @@ base_lr: 0.01
 # Policy for changing the learning rate - multiply by gamma every stepsize iterations
 lr_policy: "step"
 gamma: 0.1
-stepsize: 20000
+stepsize: 80000
 momentum: 0.9
 # Regularization parameter for the weights
 # weight_decay: 0.0
@@ -19,7 +19,7 @@ momentum: 0.9
 # Display training loss every nth iteration
 display: 100
 # After how many iterations to stop
-max_iter: 100000
+max_iter: 400000
 
 # Snapshot every nth iteration in the specified directory
 snapshot: 5000

@@ -172,10 +172,12 @@ layer {
     group: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 1
+	decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
+	decay_mult: 0
   }
 }
 layer {
@@ -205,9 +207,11 @@ layer {
   }
   param {
     lr_mult: 1
+	decay_mult: 1
   }
   param {
     lr_mult: 2
+	decay_mult: 0
   }
 }
 layer {
@@ -235,9 +239,11 @@ layer {
   }
   param {
     lr_mult: 1
+	decay_mult: 1
   }
   param {
     lr_mult: 2
+	decay_mult: 0
   }
 }
 layer {
@@ -252,7 +258,7 @@ layer {
   bottom: "flow_fc7"
   top: "flow_fc7"
   dropout_param {
-    dropout_ratio: 0.8
+    dropout_ratio: 0.7
   }
 }
 layer {
