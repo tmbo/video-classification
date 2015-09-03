@@ -163,7 +163,7 @@ def predict_caffe(all_frame_files, all_flow_files):
     # net.blobs['frames_data'].reshape(*frame_data.shape)
 
     out = net.forward_all(frames_data=frame_data, flow_data=flow_data)
-    return out['prob'], out['frames_prob'], out['flow_prob']
+    return out['prob'], out['frame_prob'], out['flow_prob']
 
 
 # ----- Routes ----------
@@ -352,7 +352,6 @@ if __name__ == "__main__":
         FLOW_CMD=str(data["flow_cmd"]),
         CAFFE_BATCH_LIMIT=50,
         CAFFE_NUM_LABELS=101,
-        CAFFE_SPATIAL_PROTO=str(data["spatial_proto"]),
         CAFFE_SPATIAL_MODEL=str(data["spatial_model"]),
         CAFFE_FUSION_PROTO=str(data["fusion_proto"]),
         # CAFFE_FUSION_MODEL=str(data["fusion_model"]),
@@ -372,4 +371,4 @@ if __name__ == "__main__":
     subprocess.Popen("webpack")
 
     # Start the Flask app
-    app.run(port=9000, threaded=True)
+    app.run(port=9000, threaded=True, host="0.0.0.0")

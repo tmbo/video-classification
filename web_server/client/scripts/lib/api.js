@@ -1,12 +1,10 @@
 import FetchUtils from "./fetchUtils";
 import SyncActions from "../actions/syncActions.js";
 
-const BASE_URL = "http://localhost:9000"; 
-
 const API = {
 
   postVideo: function(content) {
-    const url = `${BASE_URL}/api/upload_video`;
+    const url = "/api/upload_video";
     const options = {
       method: "POST",
       body: content,
@@ -21,14 +19,14 @@ const API = {
   },
 
   getPredictionForExample(exampleId) {
-    const url = `${BASE_URL}/api/example/${exampleId}`;
+    const url = `/api/example/${exampleId}`;
 
     return FetchUtils.fetchJson(url)
       .then((data) => SyncActions.receiveVideoPrediction(data));
   },
 
   postImage: function(content) {
-    const url = `${BASE_URL}/api/upload_image`;
+    const url = "/api/upload_image";
     const options = {
       method: "POST",
       body: content,
