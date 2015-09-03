@@ -131,10 +131,10 @@ def frames_in_folder(folder):
     return map(lambda p: os.path.join(folder, p), os.listdir(folder))
 
 
-def predict_caffe(all_frame_files, all_flow_files):
+def predict_caffe_video(all_frame_files, all_flow_files):
     idxs = select_indices(len(all_frame_files), NETWORK_BATCH_SIZE)
     frame_files = [all_frame_files[idx] for idx in idxs]
-    net = caffe.Net(str(app.config["CAFFE_FUSION_PROTO"]), str(app.config["CAFFE_FUSION_MODEL"]), caffe.TEST)
+    net = caffe.Net(app.config["CAFFE_FUSION_PROTO"], app.config["CAFFE_FUSION_MODEL"], caffe.TEST)
 
     transformer = caffe.io.Transformer({'frames_data': net.blobs['frames_data'].data.shape})
     # data transformations
@@ -146,12 +146,6 @@ def predict_caffe(all_frame_files, all_flow_files):
     #    print "Spatial mean shape ", np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1).shape()
     transformer.set_mean('frames_data', np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1))  # mean pixel
 
-    #    flow_transformer = caffe.io.Transformer({'flow_data': net.blobs['flow_data'].data.shape})
-    # flow transformations
-    #    size = (20,)
-    #    flow_transformer.set_mean('flow_data', np.ones(size) * 0.5)#np.ones(size) * 127)  # mean pixel
-    #    flow_transformer.set_raw_scale('flow_data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
-
     caffe.set_mode_cpu()
 
     frame_data = load_frames(frame_files, net.blobs['frames_data'].data.shape[2],
@@ -160,11 +154,37 @@ def predict_caffe(all_frame_files, all_flow_files):
                            net.blobs['flow_data'].data.shape[
                                3])  # , flow_transformer) # we removed the flow transformer
 
-    # net.blobs['frames_data'].reshape(*frame_data.shape)
 
     out = net.forward_all(frames_data=frame_data, flow_data=flow_data)
     return out['prob'], out['frame_prob'], out['flow_prob']
 
+
+def predict_caffe_image(image_file):
+
+    print image_file
+    net = caffe.Net(app.config["CAFFE_IMAGE_PROTO"], app.config["CAFFE_IMAGE_MODEL"], caffe.TEST)
+
+    print "##################"
+
+    print net.blobs['image_data'].data.shape
+
+    transformer = caffe.io.Transformer({'image_data': net.blobs['image_data'].data.shape})
+    # data transformations
+    transformer.set_transpose('image_data', (2, 0, 1))
+    transformer.set_raw_scale('image_data',
+                              255)  # the reference model operates on images in [0,255] range instead of [0,1]
+    transformer.set_channel_swap('image_data',
+                                 (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
+    transformer.set_mean('image_data', np.load(app.config["CAFFE_SPATIAL_MEAN"]).mean(1).mean(1))  # mean pixel
+
+    # data = np.zeros(3, net.blobs['image_data'].data.shape[2], net.blobs['image_data'].data.shape[3])
+    data = np.zeros_like(net.blobs['image_data'].data)
+    data[0, :, :, :] = transformer.preprocess('image_data', load_frame_data(image_file))
+
+    caffe.set_mode_cpu()
+
+    out = net.forward_all(image_data=data)
+    return out['prob']
 
 # ----- Routes ----------
 @app.route("/", defaults={"fall_through": ""})
@@ -258,7 +278,7 @@ def get_video_prediction(file_path):
     create_flows(temp_dir, flow_dir)
 
     # predictions = external_script.predict(file_path)
-    fusion_predictions, frame_predictions, flow_predictions = predict_caffe(frames_in_folder(temp_dir),
+    fusion_predictions, frame_predictions, flow_predictions = predict_caffe_video(frames_in_folder(temp_dir),
                                                                             frames_in_folder(flow_dir))
 
     # Decide which prediction to display in the line plot
@@ -280,13 +300,13 @@ def get_image_prediction(file_path):
     global NETWORK_BATCH_SIZE
     NETWORK_BATCH_SIZE = 2
 
-    fusion_predictions, frame_predictions, flow_predictions = predict_caffe([file_path, file_path], [])
+    prediction = predict_caffe_image(file_path)
 
-    print "Shape of predictions", fusion_predictions.shape, "Type", type(fusion_predictions)
-    print "Max ", np.argmax(fusion_predictions, axis=1)
-    print "predictions", fusion_predictions
+    print "Shape of predictions", prediction.shape
+    print "Max ", np.argmax(prediction, axis=1)
+    print "predictions", prediction
 
-    return bundle_response(file_path, fusion_predictions)
+    return bundle_response(file_path, prediction, [], [])
 
 
 def bundle_response(media_file_path, fusion_predictions, frame_predictions, flow_predictions):
@@ -360,7 +380,10 @@ if __name__ == "__main__":
             str(data["flow_model"]),
             str(data["fusion_model"])
         ]),
-        CAFFE_SPATIAL_MEAN=str(data["spatial_mean"])
+        CAFFE_SPATIAL_MEAN=str(data["spatial_mean"]),
+        CAFFE_IMAGE_MODEL=str(data["image_model"]),
+        CAFFE_IMAGE_PROTO=str(data["image_proto"])
+
     )
     clear_folder(path.join(app.config["TEMP_FOLDER"], "frames"))
     clear_folder(path.join(app.config["TEMP_FOLDER"], "flows"))
