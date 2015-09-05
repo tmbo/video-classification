@@ -1,8 +1,14 @@
 {
-  "label_mapping": "[ABSOLUTE_PATH]/models/label_mapping.txt",
-  "spatial_proto": "[ABSOLUTE_PATH]/models/deploy.prototxt",
-  "spatial_model": "[ABSOLUTE_PATH]/models/spatial.caffemodel",
-  "spatial_mean": "[ABSOLUTE_PATH]/models/spatial_mean.npy",
-  "flow_model": "[ABSOLUTE_PATH]/models/flow.caffemodel",
-  "fusion_model": "[ABSOLUTE_PATH]/models/fusion.caffemodel"
+  "VIDEO_LABEL_MAPPING": "ABSOLUTE_PATH/models/label_mapping.txt",
+  "IMAGE_LABEL_MAPPING": "ABSOLUTE_PATH/models/image_classification/synset_words.txt",
+  "FLOW_CMD" : "ABSOLUTE_PATH/web_server/fake_ofextractcmd.sh",
+  "TEMP_FOLDER" : "ABSOLUTE_PATH/web_server/tmp",
+  "UPLOAD_FOLDER" : "ABSOLUTE_PATH/web_server/videos",
+  "CAFFE_SPATIAL_MODEL": "ABSOLUTE_PATH/models/spatial.caffemodel",
+  "CAFFE_SPATIAL_MEAN": "ABSOLUTE_PATH/models/spatial_mean.npy",
+  "CAFFE_FLOW_MODEL": "ABSOLUTE_PATH/models/flow.caffemodel",
+  "CAFFE_FUSION_PROTO": "ABSOLUTE_PATH/models/deploy.prototxt",
+  "CAFFE_FUSION_MODEL": "ABSOLUTE_PATH/models/fusion.caffemodel",
+  "CAFFE_IMAGE_MODEL": "ABSOLUTE_PATH/models/image_classification/VGG_ILSVRC_19_layers.caffemodel",
+  "CAFFE_IMAGE_PROTO": "ABSOLUTE_PATH/models/image_classification/deploy_image.prototxt"
 }
