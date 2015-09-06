@@ -2,13 +2,28 @@
 \section{Video Classification in Caffe}
 \label{sec:classification}
 
-TODO: Describe general architecture
+...\todo{general introduction}
+
+The architecture of our artificial neural network was build on the work of ...\todo{reference}.
+It is a three-stream architecture (Figure~\ref{fig:architecture}).
+The first stream is processing the single frames of a video, further called \emph{spatial}.
+This stream is responsible for recognizing objects in frames.
+The second stream memorizes motion of certain actions.
+This stream handles flow images and is therefore called \emph{flow}.
+Both streams consists of a convolutional neural network (CNN) followed by a LSTM.
+To merge the predictions of both streams a third stream is introduced by ...\todo{reference}.
+This stream, called \emph{fusion}, takes the output of the CNN and merge the predictions.
+The output of all three streams is then combined in the end to get a final prediction.
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[scale=.7]{images/architecture.eps}
 	\caption{General Architecture TODO}
 	\label{fig:architecture}
 \end{figure}
+
+The individual neural networks used in this architecture differ from the work of ...\todo{reference}.
+During our research we tried out different neural networks for the two streams, which will be presented in this section.
+Also the parameters, which were used for the training, and the results will be shown.
 
 \subsection{Changes to Caffe-tmbo}
 
