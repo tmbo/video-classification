@@ -2,18 +2,22 @@
 \section{Video Classification in Caffe}
 \label{sec:classification}
 
-...\todo{general introduction}
+For building our artificial neural network we used the framework Caffe\footnote{\url{http://caffe.berkeleyvision.org/}}.
+Caffe is a deep learning framework offering several implementations of layers.
+Besides, Caffe is GitHub project and can be adapted and extended for special use cases.
+We used with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com/BVLC/caffe/pull/2033}}, which offers an implementation for long-short-term memory (LSTM).
 
-The architecture of our artificial neural network was build on the work of ...\todo{reference}.
-It is a three-stream architecture (Figure~\ref{fig:architecture}).
-The first stream is processing the single frames of a video, further called \emph{spatial}.
-This stream is responsible for recognizing objects in frames.
-The second stream memorizes motion of certain actions.
-This stream handles flow images and is therefore called \emph{flow}.
-Both streams consists of a convolutional neural network (CNN) followed by a LSTM.
-To merge the predictions of both streams a third stream is introduced by ...\todo{reference}.
-This stream, called \emph{fusion}, takes the output of the CNN and merge the predictions.
-The output of all three streams is then combined in the end to get a final prediction.
+The architecture of our artificial neural network was build on the work of TODO.
+This architecture consists of three parts and can be found in Figure~\ref{fig:architecture}.
+The first part is processing the single frames of a video, further called \emph{spatial}.
+It is responsible for recognizing objects and structures in frames.
+The second part memorizes motion of actions.
+It handles flow images and is therefore called \emph{flow}.
+Both parts consists of a convolutional neural network (CNN) followed by a long-short-term memory (LSTM).
+To merge the predictions of both parts, \emph{spatial} and \emph{flow}, a third part is introduced.
+This part, called \emph{fusion}, takes the output of both CNNs, \emph{spatial} and \emph{flow}, and merge the predictions.
+To get a final overall prediction the three results are combined in the end.
+
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[scale=.7]{images/architecture.eps}
@@ -21,17 +25,51 @@ The output of all three streams is then combined in the end to get a final predi
 	\label{fig:architecture}
 \end{figure}
 
-The individual neural networks used in this architecture differ from the work of ...\todo{reference}.
-During our research we tried out different neural networks for the two streams, which will be presented in this section.
+The individual neural networks we used in this architecture differ from the work of TODO.
+Also we adapt the architecture by removing the LSTMs, only having a CNN for the \emph{spatial} and \emph{flow} part.
+This is because our results using LSTMs were no that good as using only CNNs.\todo{Correct?}
+During our research we tried out different neural networks, which will be presented in this section.
 Also the parameters, which were used for the training, and the results will be shown.
 
-\subsection{Changes to Caffe-tmbo}
+\subsection{Changes to Caffe}
 
-\begin{itemize}
-	\item New sequence data layer
-	\item Multi-layer script
-	\item More?
-\end{itemize}
+Working with a neural network consisting of LSTMs requires to use two different inputs:
+On the one hand the raw pixel values and on the other hand a tagging sequence.
+The tagging sequence tells the LSTM, where a new training example starts, as we process more than one training sequence per batch.
+A tagging sequence consist of 0's and 1's.
+A 1 indicates the beginning of a new sequence.
+For generating this tagging sequence we wrote a new layer of type \emph{DummyData}.
+An example can be found in Listing~\ref{lst:seq-layer}.
+The layer has the two parameters:
+The first parameter is the shape.
+The first dimension of the shape is the length of a sequence, the second dimension is the number of sequences fitting into one batch.
+The second parameter ...\todo{???}
+
+\begin{lstlisting}[language=sh, caption=Sequence Layer, label=lst:seq-layer]
+layer {
+	name: "sequence"
+	type: "DummyData"
+	top: "sequence"
+	dummy_data_param {
+		shape {
+			dim: 16
+			dim: 4
+		}
+		data_filler {
+			type: "sequence"
+			value: 16
+		}
+	}
+}
+\end{lstlisting}
+
+A second adaption we made to Caffe was the implementation of the script \emph{convert\_imageset\_multi}, which was already introduced in Section~\ref{sec:data}.
+
+% \begin{itemize}
+% 	\item New sequence data layer
+% 	\item Multi-layer script
+% 	\item More?
+% \end{itemize}
 
 \subsection{Spatial}
 \label{subsec:spatial}
@@ -62,6 +100,7 @@ Also the parameters, which were used for the training, and the results will be s
 
 \subsection{Flow}
 \label{subsec:flow}
+
 
 
 \subsection{Fusion}
