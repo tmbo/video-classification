@@ -109,9 +109,9 @@ A second adaption we made to Caffe was the implementation of the script \emph{co
 To combine the results from \emph{spatial} and \emph{flow} we use a third fusion network.
 We tried out different approaches which are presented in the following.
 
-\subsection{SVM}
+\subsubsection{SVM}
 
-\subsection{Early Fusion}
+\subsubsection{Early Fusion}
 Our \emph{early fusion} architecture was build on the fusion architecture presented by TODO.
 We took the CNN\_Ms for \emph{spatial} and \emph{flow} presented above and build a fusion architecture on top of them.
 We selected 16 frames per video as described in Section~\ref{sec:data} and pass them on to the CNNs for \emph{spatial} and \emph{flow}.
@@ -132,10 +132,10 @@ The whole architecture is shown in Figure~\ref{fig:early_fusion}.
 
 TODO: results and parameter we tried
 
-\subsection{Middle Fusion}
+\subsubsection{Middle Fusion}
 
 
-\subsection{Late Fusion}
+\subsubsection{Late Fusion}
 
 
 \begin{figure}[!htb]
