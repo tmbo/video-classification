@@ -239,7 +239,8 @@ def bundle_response(media_file_path, fusion_predictions, frame_predictions, flow
     media_file_path += "?cachebuster=%s" % time.time()
     result = {
         "media": {
-            "url": "%s" % media_file_path,
+            "url": "/%s" % media_file_path,
+            "type": "video"
         },
         "fusion_predictions": [],
         "frames": [],

@@ -8,6 +8,7 @@ from video_blueprint import n_largest, bad_request, load_frame_data
 import json
 import caffe
 import linecache
+import cv2
 
 CONFIG = json.load(file("files.json"))
 
@@ -61,8 +62,13 @@ def predict_caffe(file_path):
 
     caffe.set_mode_cpu()
 
+    img = cv2.imread(file_path)
+    img = cv2.resize(img, (224, 224))
+    img = np.transpose(img)
+
     data = np.zeros_like(net.blobs['image_data'].data)
-    data[0, :, :, :] = transformer.preprocess("image_data", load_frame_data(file_path))
+    #data[0, :, :, :] = transformer.preprocess("image_data", img)
+    data[0, :, :, :] = img
 
     out = net.forward_all(image_data=data)
     return out['prob']
@@ -73,16 +79,20 @@ def bundle_response(media_file_path, predicitions):
     media_file_path += "?cachebuster=%s" % time.time()
     result = {
         "media": {
-            "url": "%s" % media_file_path,
+            "url": "/%s" % media_file_path,
+            "type": "image"
         },
         "fusion_predictions": [],
         "frames": None,
         "flows": None
     }
 
-    label_mapping = linecache(CONFIG["IMAGE_LABEL_MAPPING"])
-
     # Overall fusion prediction top 5
     five_best_indices = n_largest(predicitions[0], 5)
     for i in np.sort(five_best_indices):
-        result["fusion_predictions"].append({"label": label_mapping.getline(i), "prob": predicitions[0, i].item()})
+        result["fusion_predictions"].append({
+            "label": linecache.getline(CONFIG["IMAGE_LABEL_MAPPING"], i),
+            "prob": predicitions[0, i].item()
+        })
+
+    return result
