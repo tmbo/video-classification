@@ -104,8 +104,6 @@ class Result extends Component {
     const groupedPredictions = ResultStore.getGroupedFlowPredictions();
     const lineChartData = this.getLineChartData(groupedPredictions);
 
-    debugger
-
     return (
       <div className="row">
         <div className="col s12">

@@ -1,0 +1,7 @@
+from frontend_blueprint import frontend_blueprint
+from image_blueprint import image_blueprint
+from video_blueprint import video_blueprint
+
+image_blueprint = image_blueprint
+video_blueprint = video_blueprint
+frontend_blueprint = frontend_blueprint

@@ -5,6 +5,7 @@ name: "activity_recognition_oxfordnet"
 ###############
 
 input: "image_data"
+input_dim: 1
 input_dim: 3
 input_dim: 224
 input_dim: 224
@@ -398,7 +399,6 @@ layer {
 }
 layer {
   bottom: "fc8"
-  bottom: "label"
   top: "prob"
   name: "prob"
   type: "Softmax"
