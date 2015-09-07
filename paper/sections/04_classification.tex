@@ -80,7 +80,7 @@ A second adaption we made to Caffe was the implementation of the script \emph{co
 For running experiments with different parameter settings, we build a script, which helps with keeping track of different experiments.
 It can be found in the \texttt{nets/*} subfolders under the name \texttt{train.sh}.
 It is started like \texttt{train.sh dropout0.7fps30}, where the parameter indicates the name of the experiment.
-This automatically creates a folder \texttt{experiments/20150907-100235_dropout0.7fps30}, where the first numbers indicate the date and time of the experiment.
+This automatically creates a folder \texttt{experiments/20150907-100235\_dropout0.7fps30}, where the first numbers indicate the date and time of the experiment.
 Before starting the experiment in Caffe, the script automatically copies the net and solver definitions to this folder.
 After the training has finished or has been aborted, it copies the logs and the latest snapshots to the same folder.
 It also automatically parses the logs and creates charts, which plot the iteration number against training loss, learning rate and test accuracy.
