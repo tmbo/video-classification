@@ -35,15 +35,20 @@ Also the parameters, which were used for the training, and the results will be s
 
 Working with a neural network consisting of LSTMs requires to use two different inputs:
 On the one hand the raw pixel values and on the other hand a tagging sequence.
-The tagging sequence tells the LSTM, where a new training example starts, as we process more than one training sequence per batch.
+The tagging sequence tells the LSTM, where a new training example starts.
+This is important, as there is more than one training sequence per batch.
 A tagging sequence consist of 0's and 1's.
 A 1 indicates the beginning of a new sequence.
-For generating this tagging sequence we wrote a new layer of type \emph{DummyData}.
-An example can be found in Listing~\ref{lst:seq-layer}.
+For generating this tagging sequence we wrote a new data-generation strategy for the \emph{DummyData} layer.
+This layer can be used for generating artifical data: Existing implementations generate constant, uniformly distributed, gaussian distributed data etc.
+An example of the dummy data layer can be found in Listing~\ref{lst:seq-layer}.
 The layer has the two parameters:
-The first parameter is the shape.
-The first dimension of the shape is the length of a sequence, the second dimension is the number of sequences fitting into one batch.
-The second parameter ...\todo{???}
+The first parameter is the \texttt{shape}.
+The shape parameter tells the output shape of the tagging blob, i.e. \texttt{16 x 4} in the example.
+The second parameter \texttt{data\_filler} tells the concrete parameters for the dummy data.
+In our case, we specify the tagging sequence data generation type.
+The parameter \texttt{value} specifies the length of a sequence.
+In the example, this means that there is 1 one, and then 15 following zeroes.
 
 \begin{lstlisting}[language=sh, caption=Sequence Layer, label=lst:seq-layer]
 layer {
@@ -70,6 +75,16 @@ A second adaption we made to Caffe was the implementation of the script \emph{co
 % 	\item Multi-layer script
 % 	\item More?
 % \end{itemize}
+
+\subsection{Experiment infrastructure}
+For running experiments with different parameter settings, we build a script, which helps with keeping track of different experiments.
+It can be found in the \texttt{nets/*} subfolders under the name \texttt{train.sh}.
+It is started like \texttt{train.sh dropout0.7fps30}, where the parameter indicates the name of the experiment.
+This automatically creates a folder \texttt{experiments/20150907-100235_dropout0.7fps30}, where the first numbers indicate the date and time of the experiment.
+Before starting the experiment in Caffe, the script automatically copies the net and solver definitions to this folder.
+After the training has finished or has been aborted, it copies the logs and the latest snapshots to the same folder.
+It also automatically parses the logs and creates charts, which plot the iteration number against training loss, learning rate and test accuracy.
+We used this script for all of our experiments and think it is of great value.
 
 \subsection{Spatial}
 \label{subsec:spatial}
