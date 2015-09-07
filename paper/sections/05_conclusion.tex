@@ -2,4 +2,13 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sed nunc leo. Nam ac leo venenatis est commodo vehicula. Nulla justo nisl, venenatis id tincidunt id, porta ut felis. Cras eu justo ac nisi ornare commodo placerat at risus. Suspendisse ut urna tellus. Cras ut erat tempus justo aliquam laoreet. Praesent est neque, interdum quis convallis et, gravida sed arcu. Mauris bibendum, dui at ullamcorper luctus, arcu dolor laoreet nisi, ut facilisis dui enim a nisl. Sed odio risus, pulvinar suscipit feugiat pharetra, varius non est. Morbi pellentesque libero eu odio pulvinar semper. Praesent cursus adipiscing metus nec fermentum. Nullam malesuada euismod mi nec tincidunt. Nulla eget auctor velit. Mauris quam odio, blandit sit amet pharetra non, lobortis sed risus. Aliquam nec orci vel dolor suscipit tristique. Etiam quam eros, commodo at iaculis at, molestie eu metus. Maecenas viverra dui non magna suscipit sodales commodo justo iaculis.
+In this project, we tried to reproduce the latest results in the video classification research area.
+The first challenge was in the data preprocessing and preprepation task.
+As regenerating the data takes several hours, these decisions are important and must be made with care.
+We received our best results when extracting with 15 frames per second, using 10-times stacked optical flows, using random frame cropping, and using 16 frames per video for the fusion part.
+Our final prediction accuracy was \todo{Accuracy}.
+However, we cannot rule out, that generating with more frames per second can yield better performance.
+Also some of these decisions, such as the frame stack size and the number of frames per video, were based on resource limitations.
+
+For the architecture, we based our nets on the well known Caffenet and VGG nets, which are well established in the literature.
+The VGG net with \todo{layers, size etc.} ..
