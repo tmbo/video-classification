@@ -2,21 +2,20 @@
 \section{Video Classification in Caffe}
 \label{sec:classification}
 
-For building our artificial neural network we used the framework Caffe\footnote{\url{http://caffe.berkeleyvision.org/}}.
-Caffe is a deep learning framework offering several implementations of layers.
-Besides, Caffe is GitHub project and can be adapted and extended for special use cases.
-We used with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com/BVLC/caffe/pull/2033}}, which offers an implementation for long-short-term memory (LSTM).
+For building our artificial neural network we used the  Caffe\footnote{\url{http://caffe.berkeleyvision.org/}} framework.
+Caffe is a deep learning framework offering several implementations of common layers.
+The source code for Caffe is hosted on GitHub available to be adapted and extended for special use cases.
+We worked with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com/BVLC/caffe/pull/2033}}, which offers an implementation for long-short-term memory (LSTM) networks.
 
-The architecture of our artificial neural network was build on the work of TODO.
-This architecture consists of three parts and can be found in Figure~\ref{fig:architecture}.
-The first part is processing the single frames of a video, further called \emph{spatial}.
-It is responsible for recognizing objects and structures in frames.
-The second part memorizes motion of actions.
-It handles flow images and is therefore called \emph{flow}.
+Wu at al \cite{wu2015modeling} proposed a hybrid deep learning for video classification resulting in a complex artificial neural network architecture.
+It comprises of three components, as shown in Figure~\ref{fig:architecture}: the \emph{spatial}, \emph{flow} and \emph{fusion} nets respectively.
+
+The \emph{spatial} part is processing the single frames of a video in order to to recognize objects and structures in frames.
+The \emph{flow} part memorizes motion of actions by learning the optical flow images.
 Both parts consists of a convolutional neural network (CNN) followed by a long-short-term memory (LSTM).
 To merge the predictions of both parts, \emph{spatial} and \emph{flow}, a third part is introduced.
-This part, called \emph{fusion}, takes the output of both CNNs, \emph{spatial} and \emph{flow}, and merge the predictions.
-To get a final overall prediction the three results are combined in the end.
+This part, called \emph{fusion}, takes the output of both CNNs and merges their predictions.
+Hence the final overall prediction is a combination of the three results.
 
 \begin{figure}[!htb]
 	\centering
@@ -25,30 +24,31 @@ To get a final overall prediction the three results are combined in the end.
 	\label{fig:architecture}
 \end{figure}
 
-The individual neural networks we used in this architecture differ from the work of TODO.
-Also we adapt the architecture by removing the LSTMs, only having a CNN for the \emph{spatial} and \emph{flow} part.
-This is because our results using LSTMs were no that good as using only CNNs.\todo{Correct?}
+Our initial test indicated that the use of LSTMs did not improve our prediction results.\todo{Correct?} 
+Therefore we eliminated the LSTM parts for our network structure, leaving us more in line with two-stream approach of Simonyan et al\cite{simonyan2014two}.
+The simplified approach retains a separate CNN for each of the three components.
+
 During our research we tried out different neural networks, which will be presented in this section.
-Also the parameters, which were used for the training, and the results will be shown.
+In this section we will summarize the results and hyperparameters, which were used for the training.
 
-\subsection{Changes to Caffe}
+\subsection{Modifications to Caffe}
 
-Working with a neural network consisting of LSTMs requires to use two different inputs:
-On the one hand the raw pixel values and on the other hand a tagging sequence.
+Working with a neural network consisting of LSTMs requires two different inputs:
+On the one hand the raw pixel values and on the other hand a binary tagging sequence.
 The tagging sequence tells the LSTM, where a new training example starts.
 This is important, as there is more than one training sequence per batch.
 A tagging sequence consist of 0's and 1's.
 A 1 indicates the beginning of a new sequence.
 For generating this tagging sequence we wrote a new data-generation strategy for the \emph{DummyData} layer.
-This layer can be used for generating artifical data: Existing implementations generate constant, uniformly distributed, gaussian distributed data etc.
+This layer is meant to generate artificial data: Existing implementations generate constant values, uniformly distributed and gaussian distributed data etc.
+\newline
 An example of the dummy data layer can be found in Listing~\ref{lst:seq-layer}.
 The layer has the two parameters:
-The first parameter is the \texttt{shape}.
-The shape parameter tells the output shape of the tagging blob, i.e. \texttt{16 x 4} in the example.
-The second parameter \texttt{data\_filler} tells the concrete parameters for the dummy data.
+The \texttt{shape} parameter defines the output shape of the tagging blob, i.e. \texttt{16 x 4} in the example.
+The second parameter \texttt{data\_filler} sets the concrete parameters for the dummy data.
 In our case, we specify the tagging sequence data generation type.
 The parameter \texttt{value} specifies the length of a sequence.
-In the example, this means that there is 1 one, and then 15 following zeroes.
+In the example, this means that there is single one, followed by 15 zeroes.
 
 \begin{lstlisting}[language=sh, caption=Sequence Layer, label=lst:seq-layer]
 layer {
@@ -68,7 +68,8 @@ layer {
 }
 \end{lstlisting}
 
-A second adaption we made to Caffe was the implementation of the script \emph{convert\_imageset\_multi}, which was already introduced in Section~\ref{sec:data}.
+
+In order to create stacked optical flow data we made a second modification to Caffe. As mentioned in section \ref{subsec:convert_imageset_multi}, we added a utility script bundle a list of images into a database of stacked images.
 
 % \begin{itemize}
 % 	\item New sequence data layer
@@ -121,15 +122,17 @@ We used this script for all of our experiments and think it is of great value.
 \subsection{Fusion}
 \label{subsec:fusion}
 
-To combine the results from \emph{spatial} and \emph{flow} we use a third fusion network.
-We tried out different approaches which are presented in the following.
+To combine the respective results from \emph{spatial} and \emph{flow} we need a third component.
+For the fusion part we can use an additional machine learning algorithm to further generalize our prediction results. To establish a baseline with applied a support vector machine (SVM) for the fusion. We followed up by using neutral networks for the fusion. In the following section we will present and evaluate different network configurations.
 
-\subsubsection{SVM}
-
-\todo{Joseph}
+\subsubsection{Support Vector Machine}
+The establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output. 
+its own.
+\todo[inline]{Joseph}
+This approach resulted in fusion accuracy of 75\%, barely better than the \emph{flow} network on 
 
 \subsubsection{Early Fusion}
-Our \emph{early fusion} architecture was build on the fusion architecture presented by TODO.
+Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.
 We took the CNN\_Ms for \emph{spatial} and \emph{flow} presented above and build a fusion architecture on top of them.
 We selected 16 frames per video as described in Section~\ref{sec:data} and pass them on to the CNNs for \emph{spatial} and \emph{flow}.
 The CNNs were cut off after the \textit{fc6}-layer having an output of 1 x 4096 per frame.
@@ -147,7 +150,7 @@ The whole architecture is shown in Figure~\ref{fig:early_fusion}.
 	\label{fig:early_fusion}
 \end{figure}
 
-TODO: results and parameter we tried
+\todo[inline]{TODO: results and parameter we tried}
 
 \subsubsection{Middle Fusion}
 

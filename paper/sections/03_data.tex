@@ -135,7 +135,7 @@ By skipping some frames at the beginning and end, we avoided the fade-in/fade-ou
 \item sce\_frames.sh
 \end{itemize}
 
-\subsubsection{caffe/tool/convert\_imageset}
+\subsubsection{caffe/tools/convert\_imageset}
 The script \texttt{convert\_imageset} is a script provided by Caffe and bundles individual images into either a LMDB or LevelDB.
 The database type can be switched with the \texttt{backend} parameter.
 
@@ -148,6 +148,7 @@ caffe/tools/convert_imageset -backend Leveldb imageroot filelist testdatabase.le
 \end{lstlisting}
 
 \subsubsection{caffe/tools/convert\_imageset\_multi}
+\label{subsec:convert_imageset_multi}
 The script \texttt{convert\_imageset\_multi} is an addition to  \texttt{convert\_imageset} developed by us. It can be used to stack a number of images from the file list into single multi-channel image.
 The \texttt{STACK\_SIZE} parameter specifies how many images will be merged into one.
 Internally, it uses the method \texttt{cv::merge} from OpenCV to stack the images before writing them to the database.
@@ -162,10 +163,11 @@ caffe/tools/convert_imageset_multi -backend Leveldb imageroot filelist testdatab
 \subsubsection{tools/frame\_extraction.sh}
 \label{subsec:frame_extraction}
 The script \texttt{tools/frame\_extraction.sh} is responsible for extracting the image frames from all UCF101 video files using \emph{FFmpeg}.
-The parameters passed to \emph{FFmpeg} are as follows: \todo{Joseph}.
+The parameters passed to \emph{FFmpeg} are as follows: \lstinline{ffmpeg -n -nostdin -i "$file" -r "$framerate" -qscale:v 2 "$outputfolder/%3d.jpg"}.
+\todo{Joseph}
 \begin{lstlisting}[language=sh, caption=convert\_image\_multi.sh, label=lst:convert_imageset]
 # Usage
-caffe/tools/convert_imageset_multi [FLAGS] VIDEOFOLDER/ OUTPUTFOLDER/ FRAMERATE
+tools/frame\_extraction.sh [FLAGS] VIDEOFOLDER/ OUTPUTFOLDER/ FRAMERATE
 
 # Example
 tools/frame\_extraction.sh /opt/data_sets/UCF-101/videos/ /opt/data_sets/UCF-101/frames_10fps/ 10
