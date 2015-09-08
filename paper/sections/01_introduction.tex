@@ -3,14 +3,12 @@
 \label{sec:introduction}
 
 Nowadays millions of videos can be found in the World Wide Web.
-300 hours of video are alone uploaded to YouTube every minute.
-But, most of the videos do not have semantic meta data.
-It is not given, what the video is about.
-Therefore, searching for a video showing a specific action becomes difficult.
-Also recommendations could be improved having those information.
+300 hours of video are uploaded to YouTube every minute.
+However, most videos do not contain semantic meta data and the video platforms are left clueless about the contents.
+Searching for a video showing a specific action becomes difficult and recommending related material is hard. Both tasks greatly benefit from smart systems that have a deep understanding of their media files. 
 
 In this paper we present a system to automatically classify videos using artificial neural networks.
-The resulting classification of videos can be use to enrich a video with meta data and to improve the search and recommendation of videos.
+The resulting classification of videos can be use to enrich a video with metadata in order to improve the search and recommendation of videos.
 
 Artificial neural networks have seen a rise in popularity in the computer vision community in the last years.
 This rise is mostly due to impressive improvements in image and video classification tasks.
@@ -18,25 +16,15 @@ This rise is mostly due to impressive improvements in image and video classifica
 Our system builds on the latest results in the video classification domain.
 Those latest results are listed and summarized in Section~\ref{sec:related}.
 To create our neural network we used the UCF101~\cite{soomro2012ucf101} dataset.
-The data set and the data preprocessing is explained in detail in Section~\ref{sec:data}.
+The data set and corresponding preprocessing is explained in detail in Section~\ref{sec:data}.
 Our resulting neural network architecture consists of a two-stream neural network architecture.
-The first stream is a \emph{spatial} recurrent neural network, which is responsible for processing the individual frames of an video.
-It is explained in Section~\ref{subsec:spatial}.
-The second stream is a \emph{flow} recurrent network.
-This network processes the optical flow of an video and is presented in Section~\ref{subsec:flow}
-The two neural networks are merged in a third \emph{fusion} network (Section~\ref{subsec:fusion}).
-To present our results we developed a web application, where users can upload and classify a video.
-The application is describes in Section~\ref{sec:web}.
-
-% This research report summarizes our experiences and experiments for activity recognition in videos using the deep neural network framework Caffe~\cite{jia2014caffe}.
-
-% Section~\ref{sec:related} lists and summarizes the papers we built on.
-% We also talk about our problems reproducing some of their results.
-% Section~\ref{sec:data} shows the details of our data preprocessing.
-% Section~\ref{sec:classification} explains our net architectures and shows the results of some experiments.
-% Section~\ref{sec:web} focuses on the web application, and finally section~\ref{sec:scripts} summarizes the scripts we used and implemented during our work.
+The first stream is a \emph{spatial} recurrent \todo{recurrent really?} neural network, which is responsible for processing the individual frames of an video.
+It is explained in detail in Section~\ref{subsec:spatial}.
+The second stream consists of a \emph{temporal} recurrent \todo{recurrent really?} network processing the optical flow of a video and is presented in Section~\ref{subsec:flow}
+The two neural networks are merged into a third \emph{fusion} network (Section~\ref{subsec:fusion}).
+To present our results we developed a web application, where users can upload and classify a video as described in Section~\ref{sec:web}.
 
 \subsection*{Research Task}
-The goal of this research project is to apply state of the art deep neural network to activity recognition for videos.
+The goal of this research project is to apply state of the art deep neural networks to activity recognition for videos.
 We aim to confirm the outstanding classification performance of a two-stream learning architecture~\cite{simonyan2014two} as proposed by Simonyan et al.
 More specifically, we focus on validating the top of the class prediction results of 91.3\% as presented by Wu et al.~\cite{wu2015modeling}.

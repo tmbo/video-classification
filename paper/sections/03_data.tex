@@ -3,7 +3,7 @@
 \label{sec:data}
 
 As mentioned in Section~\ref{sec:related}, there are many parameters and design decisions in the data generation and preparation process, which influence the final performance.
-This section discuss all these parameters in detail.
+This section discusses all these parameters in detail.
 In general we first extract the frame images from a video, and then calculate optical flow images based on two adjacent frames.
 This captures the movement between those two frames.
 After the data generation, the preprocessed data has to be converted into a suitable data file for the Caffe framework.
@@ -28,108 +28,148 @@ We dealt with these by rescaling them to \texttt{320 x 240}.
 On average the clips have a length of 7 seconds.
 
 For comparable results the dataset's authors published three fixed train/test splits.
-We worked on the first split, i.e. \texttt{trainlist01.txt} and \texttt{testlist01.txt}\footnote{See \url{http://crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip} for the splits.}.
-When working with UC101 it is important to follow these splits, because the training instances are often sampled and cut from a longer video sequence.
-Concretely, this means that when generating the dataset, there usually was a long sequence of one activity.
-This long sequence was then cut to create more than one training sample from this sequence.
-It is important to keep the samples from one original sequence in the same dataset.
-Otherwise, the test performance is estimated to high.
+We worked on the first split, i.e. \texttt{trainlist01.txt} and \texttt{testlist01.txt}\footnote{ \url{http://crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip}}.
+When working with UC101 it is important to follow these splits, because training instances are often sampled and cut from a longer video sequence.
+Concretely, this means that dataset's authors gathered long activity video sequences and cut them into short clips to create more than one training sample from this sequence.
+It is important to keep the samples from one original sequence in the same dataset or otherwise the test performance is estimated too high.
 
-%UCF101 is composed of unconstrained videos downloaded from YouTube which feature challenges such as poor lighting, cluttered background and severe camera motion.
 \subsection{Frame extraction}
 The first preprocessing step needs to convert the given \texttt{*.avi} video files into single-frame pictures.
-We extracted the frame data from the videos with the \emph{FFmpeg}\footnote{\url{http://www.ffmpeg.org/}} tool.
+We extracted the frame data from the videos with the \emph{FFmpeg}\footnote{\url{http://www.ffmpeg.org}} tool.
 See Section~\ref{subsec:frame_extraction} for the concrete parameters.
 As output, we chose JPEG files.
-A challenge was finding the correct frame rate for the frame extraction.
-High frame rates, such as 30 frames per second, often led to two adjacent frames being exactly identical.
-This is a problem for the optical flow extraction, because the optical flow will be empty then.
-Especially for classes, where a lot of movement and characteristic optical flow is expected (such as \emph{Archery} or \emph{Juggling Balls}), this turned out problematic.
-The problem of identical images does not exist for lower frame rates, for example 5 frames per second.
-However they create less overall training data and less details, especially for optical flow extraction.
+Finding the correct frame rate for the frame extraction was challenging.
+High frame rates, such as 30 frames per second, often lead to two adjacent frames being exactly identical.
+This is a problem for the optical flow extraction, since there will be almost no measurable difference between the images and the optical flow is reported as empty.
+Especially for classes, where a lot of movement and characteristic optical flow is expected (such as \emph{Archery} or \emph{Juggling Balls}), this turned out to be problematic.
+The problem of identical images does not exist for lower frame rates, e.g. 5 frames per second.
+However in this case we create less overall training data and less details, especially for optical flow extraction.
 A variable frame rate extraction is not feasible, as the optical flow must be comparable between different video types, i.e. the time between two frames must be identical.
 This is why we decided to use a fixed frame rate of 15 frames per second.
 % COMMENT: The data on the server is definitely 15 frames per second. There are twice as much frames in the frames_30fps/ subfolders than in the frames/ subfolders.
-This minimized the occurrence of two identical frames after each other while still giving a sufficient amount of detail.
+This minimized the occurrence of two identical adjacent frames while still giving a sufficient amount of detail.
 
 \subsection{Optical flow extraction}
-To capture the movement in a video sequence, the optical flow is computed.
-Optical flow is always based on two immediately consecutive frames.
-We are using the optical flow algorithm from Brox et al~\cite{brox2004high}, because it is used by many other groups and because it can be computed on the GPU, leading to faster flow extraction.
-It also readily implemented in openCV using the method \texttt{TODO}.
-Optical flow can be computed in both directions, therefore there are two optical flow images for each pair of consecutive frames.
-Therefore, for $N$ frames, there are $\frac{N - 1}{2}$ optical flows.
+Optical flow is computed to capture the movement in a video sequence and is always based on two immediate consecutive grey-scale frames.
+We used the optical flow algorithm from Brox et al~\cite{brox2004high}, an accepted standard in the research community.
+We were able to apply to out of the box OpenCV algorithm \footnote{\url{http://docs.opencv.org/modules/gpu/doc/video.html\#gpu-broxopticalflow}} and benefited from its GPU computation, leading to faster flow extraction.
+Optical flow can be computed both along X and Y axis. Therefore there are two optical flow images for each pair of consecutive frames, resulting in $\frac{N - 1}{2}$ optical flows for $N$ frames.
 
 \todo{Figure}
 
 \subsection{Optical flow frame stacking}
 A single optical flow image does not contain as much information as the RGB picture of the same frame.
 Therefore, several optical flow images are stacked, just as the color channels \emph{R}, \emph{G}, and \emph{B} are stacked in a standard image.
-For each frame, we stack the optical flows for the next 10 frames, leading to a stack size of 20 in total.
-We also experimented with adding the flows of the 10 previous frames as well, leading to a stack size of 40.
+For each frame, we stack the optical flows for the next 10 frames in both x and y direction, leading to a total stack size of 20.
+We experimented with adding the flows of the 10 previous frames as well, leading to a stack size of 40.
 However, this did not improve the results.
-Please note, that when we say that we take the optical flows for the next 10 frames, we do not mean that we compute the flow from the \nth{1} frame to the \nth{10} frame.
-Rather, we add the optical flows from the \nth{1} to the \nth{2} frame, from the \nth{2} to the \nth{3} frame, and so on.
+Note, stacking is done with a sliding window. E.g. we add the optical flows from the \nth{1} to the \nth{2} frame, from the \nth{2} to the \nth{3} frame, and so on. X and Y flows are interleaved.
+
 
 \subsection{Data format for caffe}
 % Experiences with LMDB, LevelDB, HDF5
-Caffe requires the input data to be in either a LMDB, HDF5, or LevelDB.
+The caffe framework accepts different formats for the input data. Commonly the data is stored in a database of the type LMDB, HDF5, or LevelDB.
 In our initial tests, we used LMDB, as this is usually used in the Caffe examples, and seems to be the recommended option.
-The problem with LMDB was that it created large databases, because no compression is used.
+Using LMDB resulted in very large databases, because it does not support compression.
 This led to disk space issues.
 
-We then decided to use HDF5, which compresses the data.
-However, the library we used, h5py\footnote{See \url{http://www.h5py.org/}.} cannot be recommended, because we had big issues with memory leaks.
-The library was consuming so much RAM and swap space, that the machine had to be killed sometimes.
-Also, the Caffe documentation says, that HDF5 should only be used ``when efficiency is not critical''.
+We went on to use HDF5, which compresses the data.
+However, we relied on Python library h5py\footnote{\url{http://www.h5py.org/}}, which turned out to have major memory leaks. Therefore we cannot recommend using HDF5 in Python environment.
+The library was consuming so much RAM and swap space, that the machine had to be killed at times.
+Also, the Caffe documentation states, that HDF5 should only be used ``when efficiency is not critical''.
 
-Finally we used LevelDB, a database developed by Google for fast read performance.
-Compression is done using Google's Snappy\footnote{See \url{http://google.github.io/snappy/}.} library, which offers both performance and good compression.
-We therefore recommend LevelDB.
+Finally we settled on LevelDB, a database developed by Google for fast read performance.
+Compression is done using Google's Snappy\footnote{\url{http://google.github.io/snappy/}} library, which offers both good performance and compression.
+We therefore recommend LevelDB. A complete comparison of the DB creation time and size can be found in table \ref{table:databases}.
 
-% Table:
-% Creation Time
-% Database Size
+\todo{Who has the table values?}
+\begin{table}[]
+\centering
+\caption{Data format comparison}
+\label{table:databases}
+\begin{tabular}{lll}
+\toprule
+Creation Time 		& DB Size  & DB Type \\ \midrule
+TODO           & XX GB  	 & LMDB \\
+TODO          		& XX GB  	 & HDF5 \\
+TODO          		& XX GB  	 & LevelDB \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Image cropping}
-As said before, most images have a resolution of \texttt{320 x 240}.
+As mentioned before, most images have a resolution of \texttt{320 x 240}.
 On the other hand, most convolutional network architectures require a squared input resolution.
 The \emph{Caffenet} requires data to be in \texttt{227 x 227}, the \emph{CNN\_M} network requires a resolution of \texttt{224 x 224}.
-The best approach to transform the image from the original resolution to the required resolution is cropping.
+The best approach to transform an image from its original resolution to the required resolution is cropping.
 Caffe already comes with a built-in method for randomly cropping images.
 When setting the \texttt{crop\_size} parameter in the net definition, the input image is cropped randomly every time the image is read for training or testing.
-Also, mirroring can be used to increase the training size further with the same approach.
+Also, mirroring can be used to further increase the training size with the same approach.
 
-Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a crop from each corner and from the center of the image.
-We also tried this, but did not use it in our final setting, because of two reasons.
-First, it massively increases the training set size, making the data harder to handle and requiring more disk space.
-Second, the random cropping in Caffe is at least as effective as doing crops manually.
+Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image.
+We also tried this approach, but discarded it from our final setup, because of two reasons.
+Firstly, it massively increases the training set size making the data harder to handle and requiring more disk space.
+Secondly, the random cropping in Caffe is at least as effective as manually cropping and can save us some work.
 
 \subsection{Selecting frames for the LSTM}
 For the LSTMs, we need another set of databases (spatial and flow), which contain only a fixed number of frames per video.
-This is because the LSTM implementation by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
-We decided to use 16 frames per video.
-We select these 16 frames by omitting the first and last five frames, and the equally distributing the selected frames among the remaining frames.
-We skipped some frames at the beginning and end, because the are fade-in/fade-out effects in some of the videos.
-\todo{Reference the script, which selects the frames}.
+We decided to use 16 frames per video, on the grounds that the LSTM implementation \footnote{\url{https://github.com/jeffdonahue/caffe/tree/recurrent}} by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
+From every videos' frame pool we selected these 16 frames by omitting the first and last five frames, and the equally distributing the selected frames among the remaining frames.
+By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos. To create such a selection see section \ref{subsec:listfile_to_file_ucf_static} for details.
 
 \subsection{Relevant scripts}
+\todo{Which of the script are still relevant?}
 
-\subsubsection{convert\_imageset}
-The script \texttt{convert\_imageset} is a script provided by Caffe.
-It creates either LMDBs or LevelDBs.
-This can be switched by changing the constant \texttt{backend} in the script file and recompiling.
+\begin{itemize}
+\item build\_flow\_lmdb.sh
+\item crop\_mirror\_frames.py
+\item frame\_extraction.sh
+\item frame\_extraction\_force\_overwrite.sh
+\item frames\_to\_file\_ucf\_flow.py
+\item frames\_to\_file\_ucf\_flow\_cropped.py
+\item frames\_to\_file\_ucf\_static-de
+\item frames\_to\_hdf5.py
+\item listfile\_to\_file\_ucf\_static.py
+\item remove\_duplicate\_frame.py
+\item resize.py
+\item sce\_frames.sh
+\end{itemize}
 
-\subsubsection{convert\_imageset\_multi}
-The script \texttt{convert\_imageset\_multi} is a script written by us, based on \texttt{convert\_imageset}.
-It takes an additional parameter \texttt{STACK\_SIZE} at the end, which tells how many images from the list file to stack into one image.
+\subsubsection{caffe/tool/convert\_imageset}
+The script \texttt{convert\_imageset} is a script provided by Caffe and bundles individual images into either a LMDB or LevelDB.
+The database type can be switched with the \texttt{backend} parameter.
+
+\begin{lstlisting}[language=sh, caption=convert\_image.sh, label=lst:convert_imageset]
+# Usage
+caffe/tools/convert_imageset [FLAGS] ROOTFOLDER/ LISTFILE DB_NAME
+
+# Example
+caffe/tools/convert_imageset -backend Leveldb imageroot filelist testdatabase.leveldb
+\end{lstlisting}
+
+\subsubsection{caffe/tools/convert\_imageset\_multi}
+The script \texttt{convert\_imageset\_multi} is an addition to  \texttt{convert\_imageset} developed by us. It can be used to stack a number of images from the file list into single multi-channel image.
+The \texttt{STACK\_SIZE} parameter specifies how many images will be merged into one.
 Internally, it uses the method \texttt{cv::merge} from OpenCV to stack the images before writing them to the database.
+\begin{lstlisting}[language=sh, caption=convert\_image\_multi.sh, label=lst:convert_imageset]
+# Usage
+caffe/tools/convert_imageset_multi [FLAGS] ROOTFOLDER/ LISTFILE DB_NAME STACK_SIZE
 
-\subsubsection{frame\_extraction.sh}
+# Example
+caffe/tools/convert_imageset_multi -backend Leveldb imageroot filelist testdatabase.leveldb 16 
+\end{lstlisting}
+
+\subsubsection{tools/frame\_extraction.sh}
 \label{subsec:frame_extraction}
-
-The script under \texttt{tools/frame\_extraction.sh} is responsible for extracting the files using \emph{FFmpeg}.
-It's used like the following: \texttt{./frame\_extraction.sh /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10}.
+The script \texttt{tools/frame\_extraction.sh} is responsible for extracting the image frames from all UCF101 video files using \emph{FFmpeg}.
 The parameters passed to \emph{FFmpeg} are as follows: \todo{Joseph}.
+\begin{lstlisting}[language=sh, caption=convert\_image\_multi.sh, label=lst:convert_imageset]
+# Usage
+caffe/tools/convert_imageset_multi [FLAGS] VIDEOFOLDER/ OUTPUTFOLDER/ FRAMERATE
 
+# Example
+tools/frame\_extraction.sh /opt/data_sets/UCF-101/videos/ /opt/data_sets/UCF-101/frames_10fps/ 10
+\end{lstlisting}
 
+\subsubsection{tools/listfile\_to\_file\_ucf\_static.py}
+\label{subsec:listfile_to_file_ucf_static}
