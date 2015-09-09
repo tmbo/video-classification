@@ -135,18 +135,19 @@ This approach resulted in fusion accuracy of 75\%, barely better than the \emph{
 Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.
 We took the CNN\_Ms for \emph{spatial} and \emph{flow} presented above and build a fusion architecture on top of them.
 We selected 16 frames per video as described in Section~\ref{sec:data} and pass them on to the CNNs for \emph{spatial} and \emph{flow}.
-The CNNs were cut off after the \textit{fc6}-layer having an output of 1 x 4096 per frame.
+The CNNs were cut off after the \textit{fc6}-layer resulting in an output of 1 x 4096 per frame.
 Having 16 frames in total this corresponds to an input of 16 x 4096 for both \emph{spatial} and \emph{flow} for the fusion net.
-The first step in the fusion network is to merge the 16 predictions of one video into one prediction of the whole video for both \emph{spatial} and \emph{flow}.
+The first step in the fusion network is to merge the 16 predictions of one video into one overall prediction for the whole video for both \emph{spatial} and \emph{flow}.
 This is done by taking the average prediction.
 A fully-connected layer is then trained with those predictions before we concatenate the predictions of \emph{spatial} and \emph{flow}.
-In the end two fully-connected layer are trained on the merged predictions.
+Finally two fully-connected layer are trained on the merged predictions.
 The output is defined by an accuracy layer.
 The whole architecture is shown in Figure~\ref{fig:early_fusion}.
+
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[scale=.7]{images/early_fusion.eps}
-	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one prediction per video each. Those predictions are then merged and trained via two fully connected layers.}
+	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one overall prediction per video each. Those predictions are then merged and trained via two fully connected layers.}
 	\label{fig:early_fusion}
 \end{figure}
 
