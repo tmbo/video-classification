@@ -83,7 +83,7 @@ Compression is done using Google's Snappy\footnote{\url{http://google.github.io/
 We therefore recommend LevelDB. A complete comparison of the DB creation time and size can be found in table \ref{table:databases}.
 
 \todo{Who has the table values?}
-\begin{table}[]
+\begin{table}[H]
 \centering
 \caption{Data format comparison}
 \label{table:databases}
@@ -106,7 +106,7 @@ Caffe already comes with a built-in method for randomly cropping images.
 When setting the \texttt{crop\_size} parameter in the net definition, the input image is cropped randomly every time the image is read for training or testing.
 Also, mirroring can be used to further increase the training size with the same approach.
 
-Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image.
+Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image. (see section \ref{subsec:crop_mirror_frames})
 We also tried this approach, but discarded it from our final setup, because of two reasons.
 Firstly, it massively increases the training set size making the data harder to handle and requiring more disk space.
 Secondly, the random cropping in Caffe is at least as effective as manually cropping and can save us some work.
@@ -118,60 +118,82 @@ From every videos' frame pool we selected these 16 frames by omitting the first 
 By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos. To create such a selection see section \ref{subsec:listfile_to_file_ucf_static} for details.
 
 \subsection{Relevant scripts}
-\todo{Which of the script are still relevant?}
 
-\begin{itemize}
-\item build\_flow\_lmdb.sh
-\item crop\_mirror\_frames.py
-\item frame\_extraction.sh
-\item frame\_extraction\_force\_overwrite.sh
-\item frames\_to\_file\_ucf\_flow.py
-\item frames\_to\_file\_ucf\_flow\_cropped.py
-\item frames\_to\_file\_ucf\_static-de
-\item frames\_to\_hdf5.py
-\item listfile\_to\_file\_ucf\_static.py
-\item remove\_duplicate\_frame.py
-\item resize.py
-\item sce\_frames.sh
-\end{itemize}
+\subsubsection{convert\_imageset}
+A Caffe utility to bundle a list of individual images into a database file. Supports both LMDB and LevelDB.
 
-\subsubsection{caffe/tools/convert\_imageset}
-The script \texttt{convert\_imageset} is a script provided by Caffe and bundles individual images into either a LMDB or LevelDB.
-The database type can be switched with the \texttt{backend} parameter.
+\begin{table}[H]
+\begin{tabularx}{\textwidth}{p{0.5cm}p{3cm}L}
+\multicolumn{2}{l}{Location}  		& \textit{caffe/build/tools/} \\
+\multicolumn{2}{l}{Parameter} 		&                                        \\
+        & \textit{root\_folder}		& the root folder from where to search for the videos in the file list  \\
+        & \textit{file\_list}		& a text file containing one file path to a video and its class per line \\
+        & \textit{database\_name}   & the name and path of the newly created DB \\
+        & \textit{-backend}    		& switches between \textit{leveldb} and \textit{lmdb}  \\
+\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb} \\        
+\end{tabularx}
+\end{table}
 
-\begin{lstlisting}[language=sh, caption=convert\_image.sh, label=lst:convert_imageset]
-# Usage
-caffe/tools/convert_imageset [FLAGS] ROOTFOLDER/ LISTFILE DB_NAME
-
-# Example
-caffe/tools/convert_imageset -backend Leveldb imageroot filelist testdatabase.leveldb
-\end{lstlisting}
-
-\subsubsection{caffe/tools/convert\_imageset\_multi}
+\subsubsection{convert\_imageset\_multi}
 \label{subsec:convert_imageset_multi}
-The script \texttt{convert\_imageset\_multi} is an addition to  \texttt{convert\_imageset} developed by us. It can be used to stack a number of images from the file list into single multi-channel image.
-The \texttt{STACK\_SIZE} parameter specifies how many images will be merged into one.
-Internally, it uses the method \texttt{cv::merge} from OpenCV to stack the images before writing them to the database.
-\begin{lstlisting}[language=sh, caption=convert\_image\_multi.sh, label=lst:convert_imageset]
-# Usage
-caffe/tools/convert_imageset_multi [FLAGS] ROOTFOLDER/ LISTFILE DB_NAME STACK_SIZE
+A slight modification to the original \texttt{convert\_imageset} to allow for stacking a number of images into a single data structure before storing them in a database file. Otherwise identical to original above. Note, this script is only available in our Caffe fork.
 
-# Example
-caffe/tools/convert_imageset_multi -backend Leveldb imageroot filelist testdatabase.leveldb 16 
-\end{lstlisting}
+\begin{table}[H]
+\begin{tabularx}{\textwidth}{p{0.5cm}p{3cm}L}
+\multicolumn{2}{l}{Location}  		& \textit{caffe/build/tools/} \\
+\multicolumn{2}{l}{Parameter} 		&                                        \\
+        & \textit{root\_folder}		& the root folder from where to search for the videos in the file list  \\
+        & \textit{file\_list}		& a text file containing one file path to a video and its class per line \\
+        & \textit{database\_name}   & the name and path of the newly created DB \\
+        & \textit{stack\_size}    	& a number indicating how many succeeding images from the list will be merged \\
+        & \textit{-backend}    		& switches between \textit{leveldb} and \textit{lmdb} \\
+\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset\_multi -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb 16} \\        
+\end{tabularx}
+\end{table}
 
-\subsubsection{tools/frame\_extraction.sh}
+\subsubsection{frame\_extraction.sh}
 \label{subsec:frame_extraction}
-The script \texttt{tools/frame\_extraction.sh} is responsible for extracting the image frames from all UCF101 video files using \emph{FFmpeg}.
-The parameters passed to \emph{FFmpeg} are as follows: \lstinline{ffmpeg -n -nostdin -i "$file" -r "$framerate" -qscale:v 2 "$outputfolder/%3d.jpg"}.
-\todo{Joseph}
-\begin{lstlisting}[language=sh, caption=convert\_image\_multi.sh, label=lst:convert_imageset]
-# Usage
-tools/frame\_extraction.sh [FLAGS] VIDEOFOLDER/ OUTPUTFOLDER/ FRAMERATE
+A wrapper around \textit{ffmpeg } responsible for extracting the image frames from all UCF101 video files.
 
-# Example
-tools/frame\_extraction.sh /opt/data_sets/UCF-101/videos/ /opt/data_sets/UCF-101/frames_10fps/ 10
-\end{lstlisting}
+\begin{table}[H]
+\begin{tabularx}{\textwidth}{p{0.5cm}p{3cm}L}
+\multicolumn{2}{l}{Location}  		& \textit{video-classification/tools/} \\
+\multicolumn{2}{l}{Parameter} 		&                                        \\
+        & \textit{input\_folder}	& the root folder containing all the UCF101 videos  \\
+        & \textit{output\_folder}	& the root folder for storing the extracted frames \\
+        & \textit{frame\_rate}  	& the frame rate for extraction \\
+\multicolumn{2}{l}{Example}  		& \textit{frame\_extraction.sh /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\        
+\end{tabularx}
+\end{table}
 
-\subsubsection{tools/listfile\_to\_file\_ucf\_static.py}
+
+\subsubsection{listfile\_to\_file\_ucf\_static.py}
 \label{subsec:listfile_to_file_ucf_static}
+A utility to list all image files in a directory and save their path to a text file. The result can be used as an input for \textit{convert\_imageset}.
+
+\begin{table}[H]
+\begin{tabularx}{\textwidth}{p{0.5cm}p{3cm}L}
+\multicolumn{2}{l}{Location}  		& \textit{video-classification/tools/} \\
+\multicolumn{2}{l}{Parameter} 		&                                        \\
+        & \textit{input\_folder}	& the root folder containing all the UCF101 videos  \\
+        & \textit{output\_folder}	& the root folder for storing the extracted frames \\
+        & \textit{frame\_rate}  	& the frame rate for extraction \\
+\multicolumn{2}{l}{Example}  		& \textit{python listfile\_to\_file\_ucf\_static.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\        
+\end{tabularx}
+\end{table}
+
+\subsubsection{crop\_mirror\_frames.py}
+\label{subsec:crop_mirror_frames}
+A utility to help with data augmentation by cropping and multiplying a complete directory of images to 224x224px. Every image is cropped from each of the four corner as well as a center cut. The resulting files are also mirrored for additional diversity.
+
+\begin{table}[ht]
+\begin{tabularx}{\textwidth}{p{0.5cm}p{3cm}L}
+\multicolumn{2}{l}{Location}  		& \textit{video-classification/tools/} \\
+\multicolumn{2}{l}{Parameter} 		&                                        \\
+        & \textit{input\_folder}	& a folder containing image files  \\
+        & \textit{output\_folder}	& the output folder \\
+\multicolumn{2}{l}{Example}  		& \textit{python crop\_mirror\_frames.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/cropped\_frames/ } \\        
+\end{tabularx}
+\end{table}
+
+
