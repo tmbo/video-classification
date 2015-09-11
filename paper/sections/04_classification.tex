@@ -10,9 +10,9 @@ We worked with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com
 Wu at al \cite{wu2015modeling} proposed a hybrid deep learning for video classification resulting in a complex artificial neural network architecture.
 It comprises of three components, as shown in Figure~\ref{fig:architecture}: the \emph{spatial}, \emph{flow} and \emph{fusion} nets respectively.
 
-The \emph{spatial} part is processing the single frames of a video in order to to recognize objects and structures in frames.
+The \emph{spatial} part is processing the single frames of a video in order to recognize objects and structures in frames.
 The \emph{flow} part memorizes motion of actions by learning the optical flow images.
-Both parts consists of a convolutional neural network (CNN) followed by a long-short-term memory (LSTM).
+Both parts consist of a convolutional neural network (CNN) followed by a long-short-term memory (LSTM) recurrent neural network (RNN).
 To merge the predictions of both parts, \emph{spatial} and \emph{flow}, a third part is introduced.
 This part, called \emph{fusion}, takes the output of both CNNs and merges their predictions.
 Hence the final overall prediction is a combination of the three results.
@@ -24,12 +24,13 @@ Hence the final overall prediction is a combination of the three results.
 	\label{fig:architecture}
 \end{figure}
 
+% COMMENT: Wir haben das nur mäßig getestet und damals gab es glaube auch noch die ein oder andere Unstimmigkeit in den Daten, aber damals haben wir ein eher mäßige Verbesserung von 1% oder so bekommen, während das entsprechende Paper deutlich mehr versprochen hatte, oder so...
 Our initial test indicated that the use of LSTMs did not improve our prediction results.\todo{Correct?} 
 Therefore we eliminated the LSTM parts for our network structure, leaving us more in line with two-stream approach of Simonyan et al\cite{simonyan2014two}.
-The simplified approach retains a separate CNN for each of the three components.
+The simplified approach retains a separate CNN's for spatial and flow as well as the fusion network.
 
 During our research we tried out different neural networks, which will be presented in this section.
-In this section we will summarize the results and hyperparameters, which were used for the training.
+Additionally, we will summarize the results and hyperparameters, which were used for the training.
 
 \subsection{Modifications to Caffe}
 
@@ -43,7 +44,7 @@ For generating this tagging sequence we wrote a new data-generation strategy for
 This layer is meant to generate artificial data: Existing implementations generate constant values, uniformly distributed and gaussian distributed data etc.
 \newline
 An example of the dummy data layer can be found in Listing~\ref{lst:seq-layer}.
-The layer has the two parameters:
+The layer has the following two parameters:
 The \texttt{shape} parameter defines the output shape of the tagging blob, i.e. \texttt{16 x 4} in the example.
 The second parameter \texttt{data\_filler} sets the concrete parameters for the dummy data.
 In our case, we specify the tagging sequence data generation type.
@@ -69,7 +70,7 @@ layer {
 \end{lstlisting}
 
 
-In order to create stacked optical flow data we made a second modification to Caffe. As mentioned in section \ref{subsec:convert_imageset_multi}, we added a utility script bundle a list of images into a database of stacked images.
+In order to create stacked optical flow data we made a second modification to Caffe. As mentioned in section \ref{subsec:convert_imageset_multi}, we added a utility script to bundle a list of images into a database of stacked images.
 
 % \begin{itemize}
 % 	\item New sequence data layer
@@ -123,10 +124,13 @@ We used this script for all of our experiments and think it is of great value.
 \label{subsec:fusion}
 
 To combine the respective results from \emph{spatial} and \emph{flow} we need a third component.
-For the fusion part we can use an additional machine learning algorithm to further generalize our prediction results. To establish a baseline with applied a support vector machine (SVM) for the fusion. We followed up by using neutral networks for the fusion. In the following section we will present and evaluate different network configurations.
+For the fusion part we can use an additional machine learning algorithm to further generalize our prediction results.
+To establish a baseline, we applied a support vector machine (SVM) for the fusion.
+We followed up by using neutral networks for the fusion.
+In the following section we will present and evaluate different network configurations.
 
 \subsubsection{Support Vector Machine}
-The establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output. 
+To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output. 
 its own.
 \todo[inline]{Joseph}
 This approach resulted in fusion accuracy of 75\%, barely better than the \emph{flow} network on 
@@ -140,7 +144,7 @@ Having 16 frames in total this corresponds to an input of 16 x 4096 for both \em
 The first step in the fusion network is to merge the 16 predictions of one video into one overall prediction for the whole video for both \emph{spatial} and \emph{flow}.
 This is done by taking the average prediction.
 A fully-connected layer is then trained with those predictions before we concatenate the predictions of \emph{spatial} and \emph{flow}.
-Finally two fully-connected layer are trained on the merged predictions.
+Finally two fully-connected layers are trained on the merged predictions.
 The output is defined by an accuracy layer.
 The whole architecture is shown in Figure~\ref{fig:early_fusion}.
 

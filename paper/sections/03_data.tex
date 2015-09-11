@@ -12,7 +12,7 @@ In the following section we will discuss the different ways and data formats ava
 \subsection{Dataset}
 For our research purposes we relied on the UCF101~\cite{soomro2012ucf101} dataset, a popular choice in the computer vision community.
 UCF101 is an action recognition data set of realistic action videos, collected from YouTube, having 101 action categories.
-The videos in 101 action categories are grouped into 25 groups, where each group can consist of 4-7 videos of an action.
+The videos in the 101 action categories are grouped into 25 groups, where each group can consist of 4-7 video clips of an action.
 The videos from the same group may share some common features, such as similar background, similar viewpoint, etc.
 The action categories can be divided into five types:
 \begin{enumerate*}
@@ -52,17 +52,17 @@ This minimized the occurrence of two identical adjacent frames while still givin
 \subsection{Optical flow extraction}
 Optical flow is computed to capture the movement in a video sequence and is always based on two immediate consecutive grey-scale frames.
 We used the optical flow algorithm from Brox et al~\cite{brox2004high}, an accepted standard in the research community.
-We were able to apply to out of the box OpenCV algorithm \footnote{\url{http://docs.opencv.org/modules/gpu/doc/video.html\#gpu-broxopticalflow}} and benefited from its GPU computation, leading to faster flow extraction.
-Optical flow can be computed both along X and Y axis. Therefore there are two optical flow images for each pair of consecutive frames, resulting in $\frac{N - 1}{2}$ optical flows for $N$ frames.
+We were able to apply the out of the box OpenCV algorithm \footnote{\url{http://docs.opencv.org/modules/gpu/doc/video.html\#gpu-broxopticalflow}} and benefited from its GPU computation, leading to faster flow extraction.
+Optical flow can be computed both along X and Y axis. Therefore there are two optical flow images for each pair of consecutive frames, resulting in $2 * (N - 1)$ optical flows for $N$ frames.
 
 \todo{Figure}
 
 \subsection{Optical flow frame stacking}
 A single optical flow image does not contain as much information as the RGB picture of the same frame.
 Therefore, several optical flow images are stacked, just as the color channels \emph{R}, \emph{G}, and \emph{B} are stacked in a standard image.
-For each frame, we stack the optical flows for the next 10 frames in both x and y direction, leading to a total stack size of 20.
+For each frame, we stack the optical flows for the next 10 frames in both X and Y direction, leading to a total stack size of 20.
 We experimented with adding the flows of the 10 previous frames as well, leading to a stack size of 40.
-However, this did not improve the results.
+However, this did not improve the results.\todo{könnte es sein, dass wir das gemacht haben, als das Stacking noch kaputt war?}
 Note, stacking is done with a sliding window. E.g. we add the optical flows from the \nth{1} to the \nth{2} frame, from the \nth{2} to the \nth{3} frame, and so on. X and Y flows are interleaved.
 
 
@@ -74,7 +74,8 @@ Using LMDB resulted in very large databases, because it does not support compres
 This led to disk space issues.
 
 We went on to use HDF5, which compresses the data.
-However, we relied on Python library h5py\footnote{\url{http://www.h5py.org/}}, which turned out to have major memory leaks. Therefore we cannot recommend using HDF5 in Python environment.
+However, we relied on the Python library h5py\footnote{\url{http://www.h5py.org/}}, which turned out to have major memory leaks.
+Therefore, we cannot recommend using HDF5 in Python environment.
 The library was consuming so much RAM and swap space, that the machine had to be killed at times.
 Also, the Caffe documentation states, that HDF5 should only be used ``when efficiency is not critical''.
 
@@ -109,13 +110,15 @@ Also, mirroring can be used to further increase the training size with the same 
 Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image. (see section \ref{subsec:crop_mirror_frames})
 We also tried this approach, but discarded it from our final setup, because of two reasons.
 Firstly, it massively increases the training set size making the data harder to handle and requiring more disk space.
-Secondly, the random cropping in Caffe is at least as effective as manually cropping and can save us some work.
+Secondly, the random cropping in Caffe is at least as effective \todo{effective ist hier ungenau (bedeutung), ausserdem hilft das feste cropping mit der Varianz der Bilder, da caffe oft in der mitte cropped} as manually cropping and can save us some work.
 
 \subsection{Selecting frames for the LSTM}
 For the LSTMs, we need another set of databases (spatial and flow), which contain only a fixed number of frames per video.
 We decided to use 16 frames per video, on the grounds that the LSTM implementation \footnote{\url{https://github.com/jeffdonahue/caffe/tree/recurrent}} by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
-From every videos' frame pool we selected these 16 frames by omitting the first and last five frames, and the equally distributing the selected frames among the remaining frames.
-By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos. To create such a selection see section \ref{subsec:listfile_to_file_ucf_static} for details.
+From every videos' frame pool we selected these 16 frames by omitting the first and last five frames\todo{Ich glaube, das machen wir nicht mehr}, and the equally distributing the selected frames among the remaining frames.
+By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos.
+For details on how to create such a selection see section \ref{subsec:listfile_to_file_ucf_static}.
+Additionally, these sets of frames are used for training the fusion network.
 
 \subsection{Relevant scripts}
 
