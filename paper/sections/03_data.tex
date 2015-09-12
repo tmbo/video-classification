@@ -53,9 +53,15 @@ This minimized the occurrence of two identical adjacent frames while still givin
 Optical flow is computed to capture the movement in a video sequence and is always based on two immediate consecutive grey-scale frames.
 We used the optical flow algorithm from Brox et al~\cite{brox2004high}, an accepted standard in the research community.
 We were able to apply the out of the box OpenCV algorithm \footnote{\url{http://docs.opencv.org/modules/gpu/doc/video.html\#gpu-broxopticalflow}} and benefited from its GPU computation, leading to faster flow extraction.
-Optical flow can be computed both along X and Y axis. Therefore there are two optical flow images for each pair of consecutive frames, resulting in $2 * (N - 1)$ optical flows for $N$ frames.
+Optical flow can be computed both along X and Y axis, as shown in Figure~\ref{fig:optical_flow}.
+Therefore there are two optical flow images for each pair of consecutive frames, resulting in $2 * (N - 1)$ optical flows for $N$ frames.
 
-\todo{Figure}
+\begin{figure}[!htb]
+        \centering
+        \includegraphics[scale=.7]{images/optical_flow.eps}
+        \caption{The optical flow is calculated along both X and Y axis.}
+        \label{fig:optical_flow}
+\end{figure}
 
 \subsection{Optical flow frame stacking}
 A single optical flow image does not contain as much information as the RGB picture of the same frame.
@@ -90,10 +96,10 @@ We therefore recommend LevelDB. A complete comparison of the DB creation time an
 \label{table:databases}
 \begin{tabular}{lll}
 \toprule
-Creation Time 		& DB Size  & DB Type \\ \midrule
-TODO           & XX GB  	 & LMDB \\
-TODO          		& XX GB  	 & HDF5 \\
-TODO          		& XX GB  	 & LevelDB \\
+Creation Time & DB Size  & DB Type \\ \midrule
+TODO  & XX GB & LMDB \\
+TODO  & XX GB & HDF5 \\
+TODO  & XX GB & LevelDB \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -133,7 +139,7 @@ A Caffe utility to bundle a list of individual images into a database file. Supp
         & \textit{file\_list}		& a text file containing one file path to a video and its class per line \\
         & \textit{database\_name}   & the name and path of the newly created DB \\
         & \textit{-backend}    		& switches between \textit{leveldb} and \textit{lmdb}  \\
-\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb} \\        
+\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb} \\
 \end{tabularx}
 \end{table}
 
@@ -150,7 +156,7 @@ A slight modification to the original \texttt{convert\_imageset} to allow for st
         & \textit{database\_name}   & the name and path of the newly created DB \\
         & \textit{stack\_size}    	& a number indicating how many succeeding images from the list will be merged \\
         & \textit{-backend}    		& switches between \textit{leveldb} and \textit{lmdb} \\
-\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset\_multi -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb 16} \\        
+\multicolumn{2}{l}{Example}  		& \textit{convert\_imageset\_multi -backend leveldb /opt/data\_sets/UCF101 filelist.txt /opt/data\_sets/UCF101/leveldb.leveldb 16} \\
 \end{tabularx}
 \end{table}
 
@@ -165,7 +171,7 @@ A wrapper around \textit{ffmpeg } responsible for extracting the image frames fr
         & \textit{input\_folder}	& the root folder containing all the UCF101 videos  \\
         & \textit{output\_folder}	& the root folder for storing the extracted frames \\
         & \textit{frame\_rate}  	& the frame rate for extraction \\
-\multicolumn{2}{l}{Example}  		& \textit{frame\_extraction.sh /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\        
+\multicolumn{2}{l}{Example}  		& \textit{frame\_extraction.sh /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\
 \end{tabularx}
 \end{table}
 
@@ -181,7 +187,7 @@ A utility to list all image files in a directory and save their path to a text f
         & \textit{input\_folder}	& the root folder containing all the UCF101 videos  \\
         & \textit{output\_folder}	& the root folder for storing the extracted frames \\
         & \textit{frame\_rate}  	& the frame rate for extraction \\
-\multicolumn{2}{l}{Example}  		& \textit{python listfile\_to\_file\_ucf\_static.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\        
+\multicolumn{2}{l}{Example}  		& \textit{python listfile\_to\_file\_ucf\_static.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/frames\_10fps/ 10} \\
 \end{tabularx}
 \end{table}
 
@@ -195,6 +201,6 @@ A utility to help with data augmentation by cropping and multiplying a complete 
 \multicolumn{2}{l}{Parameter} 		&                                        \\
         & \textit{input\_folder}	& a folder containing image files  \\
         & \textit{output\_folder}	& the output folder \\
-\multicolumn{2}{l}{Example}  		& \textit{python crop\_mirror\_frames.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/cropped\_frames/ } \\        
+\multicolumn{2}{l}{Example}  		& \textit{python crop\_mirror\_frames.py /opt/data\_sets/UCF-101/videos/ /opt/data\_sets/UCF-101/cropped\_frames/ } \\
 \end{tabularx}
 \end{table}

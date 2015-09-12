@@ -8,7 +8,7 @@ The source code for Caffe is hosted on GitHub available to be adapted and extend
 We worked with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com/BVLC/caffe/pull/2033}}, which offers an implementation for long-short-term memory (LSTM) networks.
 
 Wu at al \cite{wu2015modeling} proposed a hybrid deep learning for video classification resulting in a complex artificial neural network architecture.
-It comprises of three components, as shown in Figure~\ref{fig:architecture}: the \emph{spatial}, \emph{flow} and \emph{fusion} nets respectively.
+It comprises of three components: the \emph{spatial}, \emph{flow} and \emph{fusion} nets respectively.
 
 The \emph{spatial} part is processing the single frames of a video in order to recognize objects and structures in frames.
 The \emph{flow} part memorizes motion of actions by learning the optical flow images.
@@ -17,17 +17,17 @@ To merge the predictions of both parts, \emph{spatial} and \emph{flow}, a third 
 This part, called \emph{fusion}, takes the output of both CNNs and merges their predictions.
 Hence the final overall prediction is a combination of the three results.
 
+% COMMENT: Wir haben das nur mäßig getestet und damals gab es glaube auch noch die ein oder andere Unstimmigkeit in den Daten, aber damals haben wir ein eher mäßige Verbesserung von 1% oder so bekommen, während das entsprechende Paper deutlich mehr versprochen hatte, oder so...
+Our initial test indicated that the use of LSTMs did not improve our prediction results.
+Therefore we eliminated the LSTM parts for our network structure, leaving us more in line with two-stream approach of Simonyan et al\cite{simonyan2014two}, as shown in Figure~\ref{fig:architecture}.
+The simplified approach retains a separate CNN's for spatial and flow as well as the fusion network.
+
 \begin{figure}[!htb]
 	\centering
-	\includegraphics[scale=.7]{images/architecture.eps}
-	\caption{General Architecture TODO}
+	\includegraphics[scale=.7]{images/net_architecture.eps}
+	\caption{Our neural network architecture consisting of three components: \emph{spatial}, \emph{flow} and \emph{fusion}. The \emph{spatial} and \emph{flow} neural network are convolutional neural networks. The predictions of both networks are combined in the third \emph{fusion} network.}
 	\label{fig:architecture}
 \end{figure}
-
-% COMMENT: Wir haben das nur mäßig getestet und damals gab es glaube auch noch die ein oder andere Unstimmigkeit in den Daten, aber damals haben wir ein eher mäßige Verbesserung von 1% oder so bekommen, während das entsprechende Paper deutlich mehr versprochen hatte, oder so...
-Our initial test indicated that the use of LSTMs did not improve our prediction results.\todo{Correct?}
-Therefore we eliminated the LSTM parts for our network structure, leaving us more in line with two-stream approach of Simonyan et al\cite{simonyan2014two}.
-The simplified approach retains a separate CNN's for spatial and flow as well as the fusion network.
 
 During our research we tried out different neural networks, which will be presented in this section.
 Additionally, we will summarize the results and hyperparameters, which were used for the training.
@@ -42,7 +42,7 @@ A tagging sequence consist of 0's and 1's.
 A 1 indicates the beginning of a new sequence.
 For generating this tagging sequence we wrote a new data-generation strategy for the \emph{DummyData} layer.
 This layer is meant to generate artificial data: Existing implementations generate constant values, uniformly distributed and gaussian distributed data etc.
-\newline
+
 An example of the dummy data layer can be found in Listing~\ref{lst:seq-layer}.
 The layer has the following two parameters:
 The \texttt{shape} parameter defines the output shape of the tagging blob, i.e. \texttt{16 x 4} in the example.
