@@ -2,7 +2,7 @@
 \section{Video Classification in Caffe}
 \label{sec:classification}
 
-For building our artificial neural network we used the  Caffe\footnote{\url{http://caffe.berkeleyvision.org/}} framework.
+For building our artificial neural network we used the Caffe\footnote{\url{http://caffe.berkeleyvision.org/}} framework.
 Caffe is a deep learning framework offering several implementations of common layers.
 The source code for Caffe is hosted on GitHub available to be adapted and extended for special use cases.
 We worked with the Caffe branch of Jeff Donahue\footnote{\url{https://github.com/BVLC/caffe/pull/2033}}, which offers an implementation for long-short-term memory (LSTM) networks.
@@ -25,7 +25,7 @@ Hence the final overall prediction is a combination of the three results.
 \end{figure}
 
 % COMMENT: Wir haben das nur mäßig getestet und damals gab es glaube auch noch die ein oder andere Unstimmigkeit in den Daten, aber damals haben wir ein eher mäßige Verbesserung von 1% oder so bekommen, während das entsprechende Paper deutlich mehr versprochen hatte, oder so...
-Our initial test indicated that the use of LSTMs did not improve our prediction results.\todo{Correct?} 
+Our initial test indicated that the use of LSTMs did not improve our prediction results.\todo{Correct?}
 Therefore we eliminated the LSTM parts for our network structure, leaving us more in line with two-stream approach of Simonyan et al\cite{simonyan2014two}.
 The simplified approach retains a separate CNN's for spatial and flow as well as the fusion network.
 
@@ -69,14 +69,8 @@ layer {
 }
 \end{lstlisting}
 
-
-In order to create stacked optical flow data we made a second modification to Caffe. As mentioned in section \ref{subsec:convert_imageset_multi}, we added a utility script to bundle a list of images into a database of stacked images.
-
-% \begin{itemize}
-% 	\item New sequence data layer
-% 	\item Multi-layer script
-% 	\item More?
-% \end{itemize}
+In order to create stacked optical flow data we made a second modification to Caffe.
+As mentioned in section \ref{subsec:convert_imageset_multi}, we added a utility script to bundle a list of images into a database of stacked images.
 
 \subsection{Experiment infrastructure}
 For running experiments with different parameter settings, we build a script, which helps with keeping track of different experiments.
@@ -168,10 +162,10 @@ CNN\_M		& 8			& 80\%		& 0.001			 	& 0.5			& 3					& 100.000		& 15\\
 
 
 \subsubsection{Support Vector Machine}
-To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output. 
+To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output.
 its own.
 \todo[inline]{Joseph}
-This approach resulted in fusion accuracy of 75\%, barely better than the \emph{flow} network on 
+This approach resulted in fusion accuracy of 75\%, barely better than the \emph{flow} network on
 
 \subsubsection{Early Fusion}
 Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.

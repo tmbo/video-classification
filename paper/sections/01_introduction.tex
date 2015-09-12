@@ -6,7 +6,7 @@ Nowadays millions of videos can be found in the World Wide Web.
 300 hours of video are uploaded to YouTube every minute.
 However, most videos do not contain semantic meta data and the video platforms are left clueless about the contents.
 Searching for a video showing a specific action becomes difficult and recommending related material is hard.
-Both tasks greatly benefit from smart systems that have a deep understanding of their media files. 
+Both tasks greatly benefit from smart systems that have a deep understanding of their media files.
 
 In this paper we present a system to automatically classify videos using artificial neural networks.
 The resulting classification of videos can be used to enrich a video with metadata in order to improve the search and recommendation of videos.
@@ -19,9 +19,9 @@ Those latest results are listed and summarized in Section~\ref{sec:related}.
 To create our neural network we used the UCF101~\cite{soomro2012ucf101} dataset.
 The data set and corresponding preprocessing is explained in detail in Section~\ref{sec:data}.
 Our resulting neural network architecture consists of a two-stream neural network architecture.
-The first stream is a \emph{spatial} recurrent \todo{recurrent really?} neural network, which is responsible for processing the individual frames of an video.
+The first stream is a \emph{spatial} convolutional neural network, which is responsible for processing the individual frames of an video.
 It is explained in detail in Section~\ref{subsec:spatial}.
-The second stream consists of a \emph{temporal} recurrent \todo{recurrent really?} network processing the optical flow of a video and is presented in Section~\ref{subsec:flow}
+The second stream consists of a \emph{temporal} convolutional neural network processing the optical flow of a video and is presented in Section~\ref{subsec:flow}
 The two neural networks are merged into a third \emph{fusion} network (Section~\ref{subsec:fusion}).
 To present our results we developed a web application, where users can upload and classify a video as described in Section~\ref{sec:web}.
 
