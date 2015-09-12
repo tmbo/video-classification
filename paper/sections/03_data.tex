@@ -68,7 +68,7 @@ A single optical flow image does not contain as much information as the RGB pict
 Therefore, several optical flow images are stacked, just as the color channels \emph{R}, \emph{G}, and \emph{B} are stacked in a standard image.
 For each frame, we stack the optical flows for the next 10 frames in both X and Y direction, leading to a total stack size of 20.
 We experimented with adding the flows of the 10 previous frames as well, leading to a stack size of 40.
-However, this did not improve the results.\todo{könnte es sein, dass wir das gemacht haben, als das Stacking noch kaputt war?}
+However, this did not improve the results.\todo[inline]{könnte es sein, dass wir das gemacht haben, als das Stacking noch kaputt war?}
 Note, stacking is done with a sliding window. E.g. we add the optical flows from the \nth{1} to the \nth{2} frame, from the \nth{2} to the \nth{3} frame, and so on. X and Y flows are interleaved.
 
 
@@ -89,7 +89,7 @@ Finally we settled on LevelDB, a database developed by Google for fast read perf
 Compression is done using Google's Snappy\footnote{\url{http://google.github.io/snappy/}} library, which offers both good performance and compression.
 We therefore recommend LevelDB. A complete comparison of the DB creation time and size can be found in table \ref{table:databases}.
 
-\todo{Who has the table values?}
+\todo[inline]{Who has the table values?}
 \begin{table}[H]
 \centering
 \caption{Data format comparison}
@@ -116,12 +116,12 @@ Also, mirroring can be used to further increase the training size with the same 
 Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image. (see section \ref{subsec:crop_mirror_frames})
 We also tried this approach, but discarded it from our final setup, because of two reasons.
 Firstly, it massively increases the training set size making the data harder to handle and requiring more disk space.
-Secondly, the random cropping in Caffe is at least as effective \todo{effective ist hier ungenau (bedeutung), ausserdem hilft das feste cropping mit der Varianz der Bilder, da caffe oft in der mitte cropped} as manually cropping and can save us some work.
+Secondly, the random cropping in Caffe is at least as effective \todo[inline]{effective ist hier ungenau (bedeutung), ausserdem hilft das feste cropping mit der Varianz der Bilder, da caffe oft in der mitte cropped} as manually cropping and can save us some work.
 
 \subsection{Selecting frames for the LSTM}
 For the LSTMs, we need another set of databases (spatial and flow), which contain only a fixed number of frames per video.
 We decided to use 16 frames per video, on the grounds that the LSTM implementation \footnote{\url{https://github.com/jeffdonahue/caffe/tree/recurrent}} by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
-From every videos' frame pool we selected these 16 frames by omitting the first and last five frames\todo{Ich glaube, das machen wir nicht mehr}, and the equally distributing the selected frames among the remaining frames.
+From every videos' frame pool we selected these 16 frames by omitting the first and last five frames\todo[inline]{Ich glaube, das machen wir nicht mehr}, and the equally distributing the selected frames among the remaining frames.
 By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos.
 For details on how to create such a selection see section \ref{subsec:listfile_to_file_ucf_static}.
 Additionally, these sets of frames are used for training the fusion network.

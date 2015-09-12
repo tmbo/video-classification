@@ -7,10 +7,19 @@ Users are given the opportunity to upload a video file as input for the predicti
 Alternatively, we provide example videos from the UCF-101 dataset for quick access.
 The uploaded video material undergoes the same preprocessing as outlined in section \ref{sec:data}.
 The extracted frames and optical flows serve as the input for the spatial and temporal network, respectively.
-The joint prediction results are returned by means of a REST interface and are presented two-fold as shown in figure \ref{} \todo{add screenshot}:
+The joint prediction results are returned by means of a REST interface and are presented two-fold as shown in figure \ref{fig:web_app}:
 \textit{(1)} Next to a preview of the video is the overall classification summary given by the top five label probabilities.
 (\textit{2}) To reflect a video’s temporal dimension the demo presents a per-frame based evaluation highlighting the top five probabilities for each frame.
 For easy verification a click on the graphical nodes synchronizes the preview video with the selected frame.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/screenshot.png}
+	\caption{The results of our neural network: On the top the video with the overall classification summary given by the top five label probabilities is given. In the middle the per frame prediction of the \emph{spatial} neural network and on the bottom the per frame prediction of the \emph{flow} neural network is shown.}
+	\label{fig:web_app}
+\end{figure}
+
+\todo[inline]{Tausche Screenshot gegen einen mit besseren Ergebnissen!}
 
 \subsection{Architecture}
 The system contains of two almost independent parts:

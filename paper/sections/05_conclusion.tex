@@ -6,7 +6,7 @@ In this report, we tried to document our efforts at reproducing the latest resul
 Our first challenge was to identify the correct parameters for the data preprocessing and preparation task.
 Since regenerating the data takes several hours, these decisions are important and must be made with care.
 % COMMENT: Wir hatten damals Probleme mit dem Optical Flow trainieren und haben die leeren frames gefunden. Daher haben wir uns für eine kleinere Framerate (15FPS) entschieden. Es hat immer noch nichts geklappt und wir haben gemerkt, das wir nicht richtig stacken. Nachdem wir das behoben haben, konnten wir das optical flow netzt trainieren. Dessen resultate sind mit 15 FPS. Genauso wie unser damaliges spatial CNN. Haojin hatte dann nochmal gefragt das VGG19 mit 30FPS zu trainieren und hat damit das beste Ergebnis erzielt. Unser End-Fusion-Netzt ist also eigentlich ein Misch aus 15 und 30 FPS und es wäre sinnvoll vielleicht nochmal mit 30 oder 25FPS den Optical flow zu testen.
-We received our best results when extracting with 15 frames per second, \todo{Did we really get best results with 15FPS? The final presentation says otherwise (30FPS)} using 10-times stacked optical flows, employing random frame cropping, and selecting 16 frames per video for the fusion part.
+We received our best results when extracting with 15 frames per second, \todo[inline]{Did we really get best results with 15FPS? The final presentation says otherwise (30FPS)} using 10-times stacked optical flows, employing random frame cropping, and selecting 16 frames per video for the fusion part.
 Our final prediction accuracy was 83.6\%.
 
 % Not sure if we should have such doubts in the conclusion? %
@@ -18,5 +18,5 @@ We proposed a deep video classification model, which incorporates separate spati
 For the architecture, we based our nets on the Caffenet and VGG nets, which are well established in the literature.
 We based our spatial stream on the deep VGG19 net, containing a total of 19 layers (16 convolutional and 3 fully-connected). Finetuning the last 5 layers on data extracted with 30FPS yielded an accuracy of 75.3\%.
 
-Our flow net is based on the CNN\_M net (5 Conv, 3 FC layers) as published by Fudan University, which they trained on the UCF101 dataset's optical flow. \todo{reference} We were able to increase our initial flow performance to a top accuracy of 66.4\% by finetuning the last 3 layers with our optical flow data. To push the recognition boundaries even further we believe, that improving the flow network will yield in even better results for the future.
+Our flow net is based on the CNN\_M net (5 Conv, 3 FC layers) as published by Fudan University, which they trained on the UCF101 dataset's optical flow. \todo[inline]{reference} We were able to increase our initial flow performance to a top accuracy of 66.4\% by finetuning the last 3 layers with our optical flow data. To push the recognition boundaries even further we believe, that improving the flow network will yield in even better results for the future.
 
