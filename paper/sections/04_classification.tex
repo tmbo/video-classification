@@ -91,6 +91,20 @@ We used this script for all of our experiments and think it is of great value.
 \subsection{Spatial}
 \label{subsec:spatial}
 
+
+\begin{table}[H]
+\centering
+\caption{Spatial Net Configurations}
+\label{table:spatial_results}
+\begin{tabularx}{\textwidth}{XXXXXXXX}
+\toprule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+CNN\_M		& 8			& 80\%		& 0.001			 	& 0.5			& 3					& 100.000		& 15\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
 \begin{itemize}
 	\item
 		Different nets:
@@ -118,7 +132,17 @@ We used this script for all of our experiments and think it is of great value.
 \subsection{Flow}
 \label{subsec:flow}
 
-
+\begin{table}[H]
+\centering
+\caption{Flow Net Configurations}
+\label{table:flow_results}
+\begin{tabularx}{\textwidth}{XXXXXXXX}
+\toprule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+CNN\_M		& 8			& 80\%		& 0.001			 	& 0.5			& 3					& 100.000		& 15\\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Fusion}
 \label{subsec:fusion}
@@ -128,6 +152,20 @@ For the fusion part we can use an additional machine learning algorithm to furth
 To establish a baseline, we applied a support vector machine (SVM) for the fusion.
 We followed up by using neutral networks for the fusion.
 In the following section we will present and evaluate different network configurations.
+
+
+\begin{table}[H]
+\centering
+\caption{Fusion Net Configurations}
+\label{table:fusion_results}
+\begin{tabularx}{\textwidth}{XXXXXXXX}
+\toprule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+CNN\_M		& 8			& 80\%		& 0.001			 	& 0.5			& 3					& 100.000		& 15\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 
 \subsubsection{Support Vector Machine}
 To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output. 
