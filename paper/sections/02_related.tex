@@ -2,21 +2,17 @@
 \section{Related Work}
 \label{sec:related}
 
-\todo[inline]{Tmbo}
+Previous video recognition research has been focused on obtaining video descriptors which encode motion information and appearances in order to achieve state-of-art results. The research in this area has also been driven by advances in image recognition methods which can be adapted and reused for video processing tasks. Systems employing video descriptors rely on handcrafted features, intensive analysis and prolonged feature preparation. An example for an approach using motion information captured in local spatio-temporal features is called Histogram of Oriented Gradients \cite{dalal2005histograms}. Variations include the Histogram of oriented Optical Flow (HOOF) \cite{hoof} or Motion Boundary Histograms (MBH) \cite{dalal2006human} around different kinds of trajectories \cite{goodale1992separate}. Those features can be used to encode a video using a bag of words (BoW) approach \cite{laptev2008learning} or Fisher vector based encodings \cite{wang2013action}. In a later work \cite{wang2009evaluation} it was also shown that using local features instead of sparse interest points is beneficial. The creation of features can be further improved by using global camera motion reduction techniques \cite{jain2013better, kuehne2011hmdb, wang2013action}. 
 
-\begin{itemize}
-	\item Explain the development in the last two years and their respective approaches
-    \item Explain LSTM
-	\item Explain, why some papers are hard to reproduce
-\end{itemize}
+There are also a number of attempts to develop a deep architecture for video recognition. Several approaches use 3D-convolution over short video clips to learn motion features from the raw image data \cite{baccouche2011sequential, ji20133d, karpathy2014large}. This can be rather challenging as indicated by Karpathy et al. \cite{karpathy2014large} and in \cite{jhuang2007biologically} an HMAX architecture for video recognition with pre-defined spatio-temporal filters in the first layer is suggested. In \cite{chen2010deep}\cite{le2011learning}\cite{taylor2010convolutional} convolutional restricted boltzmann machines (RBM) were used for unsupervised feature learning  before getting plugged into discriminative models for action recognition. 
+
+Another approach by Simonyan et al. \cite{simonyan2014two} directly incorporates motion information from optical flows. Although, this improves prediction quality compared to the naive approach of classifying individual frames, it still only uses information of 10 consecutive frames and can therefore still be considered a local classification approach. Building on those optical flow results Ng et al. \cite{ng2015beyond} and Donahue et al. \cite{donahue2014long} introduce Long Short Term Memory layers into their networks. This results in an aggregation of strong CNN image features over long periods of a video. The work results in state of the art performance and is superior to the work of Baccouche et al. \cite{baccouche2010action} because of the use of optical flow features. 
 
 \subsection*{Reproducibility Issues}
 Understanding and recreating some papers is a challenge in its own right. Certain claims and results were hard to reproduce. In most cases the network architecture is very well published and most nets are available to research community for download. However, data generation varies between labs and is not described in detail.
-Concretely, we are missing information on the following parameters organized by paper:
+Common issues we encountered while trying to gather all necessary information to reproduce a papers results:
 \begin{itemize}
-	\item Which frame rate was used to extract frames from videos
-	\item When frames are sampled from the video, which selection schema was used?
-	\item
-	\item IDEA: Use a table and list which paper lists which preprocessing steps?
-	\item TODO
+	\item Parameters concerning the extraction of frames (FPS, sampling schema).
+	\item Complete overview over all parameters used during training (e.g. learning rate, momentum, dropout). Most papers contain some of the parameters but miss out on others.
+	\item Accessibility of trained models. Since there is no standart way of sharing trained networks yet, most of the papers didn't make their final networks available. Even if the trained networks are published, it is hard to use them due to the different formats of serialization.
 \end{itemize}
