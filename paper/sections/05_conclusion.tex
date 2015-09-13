@@ -19,4 +19,3 @@ For the architecture, we based our nets on the Caffenet and VGG nets, which are 
 We based our spatial stream on the deep VGG19 net, containing a total of 19 layers (16 convolutional and 3 fully-connected). Finetuning the last 5 layers on data extracted with 30FPS yielded an accuracy of 75.3\%.
 
 Our flow net is based on the CNN\_M net (5 Conv, 3 FC layers) as published by Fudan University, which they trained on the UCF101 dataset's optical flow. \todo[inline]{reference} We were able to increase our initial flow performance to a top accuracy of 66.4\% by finetuning the last 3 layers with our optical flow data. To push the recognition boundaries even further we believe, that improving the flow network will yield in even better results for the future.
-
