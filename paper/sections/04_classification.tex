@@ -87,7 +87,7 @@ We used this script for all of our experiments and think it is of great value.
 For our spatial net we relied on finetuning two well-established networks from the University of Oxford. 
 CNN-M-2048 \cite{chatfield2014return} is medium sized net of 8 layers (5 convolutional, 3 fully-connected) trained in the ILSVRC-2012 data. The complete layer architecture can be found in table \ref{table:cnn-m-208}.
 
-Later we were able to evaluate the very deep 19 layer VGG-19 \cite{simonyan2014very} network. 
+Later we were able to evaluate the very deep 19 layer VGG-19 \cite{simonyan2014very} network\footnote{\url{https://gist.github.com/ksimonyan/3785162f95cd2d5fee77\#file-readme-md}}. 
 
 We experimented with different configurations of the learning rate, dropout rate, the number of finedtuned layers and with different amounts of input data. Some nets were trained with only 16 frames belonging to one video and others with all frames of the respective video. A complete overview can be seen in table \ref{table:spatial_results}.
 
@@ -161,6 +161,7 @@ CNN\_M & 8 & 59.1\%     &  0.001 &  9 & 3 & 150,000   & all \\
 
 \subsection{Flow}
 \label{subsec:flow}
+Due to the different nature of the flow data we could not rely on on finetuning the same networks we used for the spatial part, since these were trained on RGB images. We tried using the CNN-M-2048 architecture for training from scratch but to no avail. Our final approach is based a CNN-M-48 net trained on flow data by the University of Fudan \cite{wu2015modeling}. However, due to differences in the optical flow data to ours we achieved rather poor results of only 44\% instead of the published 70\%. \todo{confirm this number} Finetuning the network on our data yielded in better performance. We applied the same testing configuration as described for the spatial part. All results are listed in table \ref{table:flow_results}.
 
 \begin{table}[H]
 \centering
@@ -169,7 +170,20 @@ CNN\_M & 8 & 59.1\%     &  0.001 &  9 & 3 & 150,000   & all \\
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
 Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
-CNN\_M		& 8			& 80\%		& 0.001			 	& 0.5			& 3					& 100.000		& 15\\
+
+CNN\_M & 8 & 55\%5   & 0.001 & ? & ? & 2,500   & 16\_per\_video \\
+CNN\_M & 8 & 58\%99  & 0.001 & 7 & 3 & 22,000  & all \\
+CNN\_M & 8 & 60\%2   & 0.001 & 8 & 3 & 200,000 & all \\
+CNN\_M & 8 & 13\%37  &  0.01 & 8 & 3 & 90,000  & all \\
+CNN\_M & 8 & 65\%3   & 0.001 & 8 & 8 & 116,000 & all \\
+CNN\_M & 8 & 63\%1   & 0.001 & 5 & 8 & 75,000  & all \\
+CNN\_M & 8 & 66\%4   & 0.001 & 9 & 3 & 400,000 & all \\
+CNN\_M & 8 & 62\%5   & 0.001 & 9 & 4 & 130,000 & all \\
+CNN\_M & 8 & 62\%3   & 0.001 & 7 & 4 & 400,000 & all \\
+CNN\_M & 8 & 59\%8   & 0.001 & 9 & 4 & 20,000  & all \\
+CNN\_M & 8 & 58\%6   & 0.001 & 8 & 3 & 15,000  & all \\
+CNN\_M & 8 & 59\%1   & 0.001 & 9 & 3 & 150,000 & all \\
+
 \bottomrule
 \end{tabularx}
 \end{table}
