@@ -49,7 +49,7 @@ The \texttt{shape} parameter defines the output shape of the tagging blob, i.e. 
 The second parameter \texttt{data\_filler} sets the concrete parameters for the dummy data.
 In our case, we specify the tagging sequence data generation type.
 The parameter \texttt{value} specifies the length of a sequence.
-In the example, this means that there is single one, followed by 15 zeroes.
+In the example, this means that there is a single one, followed by 15 zeroes.
 
 \begin{lstlisting}[language=sh, caption=Sequence Layer, label=lst:seq-layer]
 layer {
@@ -84,12 +84,9 @@ We used this script for all of our experiments and think it is of great value.
 
 \subsection{Spatial}
 \label{subsec:spatial}
-For our spatial net we relied on finetuning two well-established networks from the University of Oxford. 
-CNN-M-2048 \cite{chatfield2014return} is medium sized net of 8 layers (5 convolutional, 3 fully-connected) trained in the ILSVRC-2012 data. The complete layer architecture can be found in table \ref{table:cnn-m-208}.
-
-Later we were able to evaluate the very deep 19 layer VGG-19 \cite{simonyan2014very} network\footnote{\url{https://gist.github.com/ksimonyan/3785162f95cd2d5fee77\#file-readme-md}}. 
-
-We experimented with different configurations of the learning rate, dropout rate, the number of finedtuned layers and with different amounts of input data. Some nets were trained with only 16 frames belonging to one video and others with all frames of the respective video. A complete overview can be seen in table \ref{table:spatial_results}.
+For our \emph{spatial} net we relied on finetuning two well-established networks from the University of Oxford.
+CNN-M-2048 \cite{chatfield2014return} is medium sized net of 8 layers (5 convolutional, 3 fully-connected) trained in the ILSVRC-2012 data.
+The complete layer architecture can be found in table \ref{table:cnn-m-208}.
 
 \begin{table}[H]
 \centering
@@ -110,6 +107,10 @@ conv1 & conv2 & conv3 & conv4 & conv5 & full6  & full7 & full8 \\ \midrule
 \end{tabularx}
 \end{table}
 
+Later we were able to evaluate the very deep 19 layer VGG-19 \cite{simonyan2014very} network\footnote{\url{https://gist.github.com/ksimonyan/3785162f95cd2d5fee77\#file-readme-md}}.
+
+We experimented with different configurations of the learning rate, dropout rate, the number of finedtuned layers and with different amounts of input data. Some nets were trained with only 16 frames belonging to one video and others with all frames of the respective video. A complete overview can be seen in table \ref{table:spatial_results}.
+
 \begin{table}[H]
 \centering
 \caption{Spatial Net Configurations}
@@ -118,12 +119,12 @@ conv1 & conv2 & conv3 & conv4 & conv5 & full6  & full7 & full8 \\ \midrule
 \toprule
 Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& Input Frames & LSTM Config\\ \midrule
 
-CNN\_M & 8          & 67.9 \% & 0.001 & 1 & 2 & 100,000  & 10 & \\ 
-CNN\_M & 8          & 67.2 \% & 0.001 & 1 & 2 & 31,000   & 10 & \\ 
-CNN\_M & 8          & 68.3 \% & 0.001 & 3 & 2 & 200,000  & 10 & \\ 
-CNN\_M & 8          & 68.89\% & 0.001 & 5 & 2 & 134,000  & 10 & \\ 
-CNN\_M & 8          & 06.19\% & 0.001 & 3 & 2 & 6,000    & 10 & \\ 
-CNN\_M & 8          & 69.9 \% & 0.001 & 7 & 2 & 76,000   & 10 & \\ 
+CNN\_M & 8          & 67.9 \% & 0.001 & 1 & 2 & 100,000  & 10 & \\
+CNN\_M & 8          & 67.2 \% & 0.001 & 1 & 2 & 31,000   & 10 & \\
+CNN\_M & 8          & 68.3 \% & 0.001 & 3 & 2 & 200,000  & 10 & \\
+CNN\_M & 8          & 68.89\% & 0.001 & 5 & 2 & 134,000  & 10 & \\
+CNN\_M & 8          & 06.19\% & 0.001 & 3 & 2 & 6,000    & 10 & \\
+CNN\_M & 8          & 69.9 \% & 0.001 & 7 & 2 & 76,000   & 10 & \\
 CNN\_M & 7 + 2 lstm & 67.5 \% & 0.001 & 7 & 3 & 180,000  & train\_lstm & 1024 + 512 \\
 CNN\_M & 7 + 2 lstm & 65.6 \% & 0.001 & 7 & 3 & 7,000    & train\_lstm & 256 + 256 \\
 CNN\_M & 7 + 2 lstm & 65.8 \% & 0.001 & 5 & 3 & 200,000  & train\_lstm & 256 + 256 \\
@@ -135,34 +136,44 @@ CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 3 & 200,000  & train\_lstm & 256 \\
 \end{tabularx}
 \end{table}
 
+\todo[inline]{Haben wir keine Experimente mit dem VGG19?}
 
-\begin{itemize}
-	\item
-		Different nets:
-		\begin{itemize}
-			\item Caffenet/CNN\_M (also tried, VGG 19, but too big)
-			\item With weights/without weights
-			\item Compare the nets with respect to memory, number of parameters, training time, performance
-		\end{itemize}
-	\item
-		Experiments:
-		\begin{itemize}
-			\item Different dropouts
-			\item Train from scratch vs train from weights
-			\item On different splits?
-			\item Fc6, Fc7, fc8
-			\item Different base data sets (only 16, all data)
-			\item Different flows?
-			\item Occlusion tests
-		\end{itemize}
-	\item
-		LSTM did not work out
-\end{itemize}
+As you can see from the different experiments, we achieved the best result using the CNN\_M net with 8 layers.
+Having a learning rate of 0.001, a dropout rate of 7 and finetuning the last two layers results in an accuracy of 69.9\%.
+
+% \begin{itemize}
+% 	\item
+% 		Different nets:
+% 		\begin{itemize}
+% 			\item Caffenet/CNN\_M (also tried, VGG 19, but too big)
+% 			\item With weights/without weights
+% 			\item Compare the nets with respect to memory, number of parameters, training time, performance
+% 		\end{itemize}
+% 	\item
+% 		Experiments:
+% 		\begin{itemize}
+% 			\item Different dropouts
+% 			\item Train from scratch vs train from weights
+% 			\item On different splits?
+% 			\item Fc6, Fc7, fc8
+% 			\item Different base data sets (only 16, all data)
+% 			\item Different flows?
+% 			\item Occlusion tests
+% 		\end{itemize}
+% 	\item
+% 		LSTM did not work out
+% \end{itemize}
 
 
 \subsection{Flow}
 \label{subsec:flow}
-Due to the different nature of the flow data we could not rely on on finetuning the same networks we used for the spatial part, since these were trained on RGB images. We tried using the CNN-M-2048 architecture for training from scratch but to no avail. Our final approach is based a CNN-M-48 net trained on flow data by the University of Fudan \cite{wu2015modeling}. However, due to differences in the optical flow data to ours we achieved rather poor results of only 44\% instead of the published 70\%. \todo{confirm this number} Finetuning the network on our data yielded in better performance. We applied the same testing configuration as described for the spatial part. All results are listed in table \ref{table:flow_results}.
+Due to the different nature of the flow data we could not rely on finetuning the same networks we used for the \emph{spatial} part, since these were trained on RGB images.
+We tried using the CNN-M-2048 architecture for training from scratch but to no avail.
+Our final approach is based a CNN-M-48 net trained on flow data by the University of Fudan \cite{wu2015modeling}.
+However, due to differences in the optical flow data to ours we achieved rather poor results of only 44\% instead of the published 70\%. \todo[inline]{confirm this number}
+Finetuning the network on our data yielded in better performance.
+We applied the same testing configuration as described for the spatial part.
+All results are listed in table \ref{table:flow_results}.
 
 \begin{table}[H]
 \centering
@@ -172,58 +183,46 @@ Due to the different nature of the flow data we could not rely on on finetuning 
 \toprule
 Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
 
-CNN\_M & 8 & 55\%5   & 0.001 & ? & ? & 2,500   & 16\_per\_video \\
-CNN\_M & 8 & 58\%99  & 0.001 & 7 & 3 & 22,000  & all \\
-CNN\_M & 8 & 60\%2   & 0.001 & 8 & 3 & 200,000 & all \\
-CNN\_M & 8 & 13\%37  &  0.01 & 8 & 3 & 90,000  & all \\
-CNN\_M & 8 & 65\%3   & 0.001 & 8 & 8 & 116,000 & all \\
-CNN\_M & 8 & 63\%1   & 0.001 & 5 & 8 & 75,000  & all \\
-CNN\_M & 8 & 66\%4   & 0.001 & 9 & 3 & 400,000 & all \\
-CNN\_M & 8 & 62\%5   & 0.001 & 9 & 4 & 130,000 & all \\
-CNN\_M & 8 & 62\%3   & 0.001 & 7 & 4 & 400,000 & all \\
-CNN\_M & 8 & 59\%8   & 0.001 & 9 & 4 & 20,000  & all \\
-CNN\_M & 8 & 58\%6   & 0.001 & 8 & 3 & 15,000  & all \\
-CNN\_M & 8 & 59\%1   & 0.001 & 9 & 3 & 150,000 & all \\
+CNN\_M & 8 & 55.5\%   & 0.001 & ? & ? & 2,500   & 16\_per\_video \\
+CNN\_M & 8 & 58.99\%  & 0.001 & 7 & 3 & 22,000  & all \\
+CNN\_M & 8 & 60.2\%   & 0.001 & 8 & 3 & 200,000 & all \\
+CNN\_M & 8 & 13.37\%  &  0.01 & 8 & 3 & 90,000  & all \\
+CNN\_M & 8 & 65.3\%   & 0.001 & 8 & 8 & 116,000 & all \\
+CNN\_M & 8 & 63.1\%   & 0.001 & 5 & 8 & 75,000  & all \\
+CNN\_M & 8 & 66.4\%   & 0.001 & 9 & 3 & 400,000 & all \\
+CNN\_M & 8 & 62.5\%   & 0.001 & 9 & 4 & 130,000 & all \\
+CNN\_M & 8 & 62.3\%   & 0.001 & 7 & 4 & 400,000 & all \\
+CNN\_M & 8 & 59.8\%   & 0.001 & 9 & 4 & 20,000  & all \\
+CNN\_M & 8 & 58.6\%   & 0.001 & 8 & 3 & 15,000  & all \\
+CNN\_M & 8 & 59.1\%   & 0.001 & 9 & 3 & 150,000 & all \\
 
 \bottomrule
 \end{tabularx}
 \end{table}
+
+The best accuracy result for the \emph{flow} network is 66.4\%.
+This was achieved by using a learning rate of 0.001, a dropout rate of 8 and finetuning the last 3 of the 8 layers.
 
 \subsection{Fusion}
 \label{subsec:fusion}
 
 To combine the respective results from \emph{spatial} and \emph{flow} we need a third component.
-For the fusion part we can use an additional machine learning algorithm to further generalize our prediction results.
+For the \emph{fusion} part we can use an additional machine learning algorithm to further generalize our prediction results.
 To establish a baseline, we applied a support vector machine (SVM) for the fusion.
 We followed up by using neutral networks for the fusion.
 In the following section we will present and evaluate different network configurations.
-
-
-\begin{table}[H]
-\centering
-\caption{Fusion Net Configurations}
-\label{table:fusion_results}
-\begin{tabularx}{\textwidth}{XXXXXXXX}
-\toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
-
-
-\bottomrule
-\end{tabularx}
-\end{table}
-
 
 \subsubsection{Support Vector Machine}
 To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output.
 its own.
 \todo[inline]{Joseph}
-This approach resulted in fusion accuracy of 75\%, barely better than the \emph{flow} network on
+This approach resulted in fusion accuracy of 75\%.
 
 \subsubsection{Early Fusion}
 Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.
 We took the CNN\_Ms for \emph{spatial} and \emph{flow} presented above and build a fusion architecture on top of them.
 We selected 16 frames per video as described in Section~\ref{sec:data} and pass them on to the CNNs for \emph{spatial} and \emph{flow}.
-The CNNs were cut off after the \textit{fc6}-layer resulting in an output of 1 x 4096 per frame.
+The CNNs were cut off after the \texttt{fc6}-layer resulting in an output of 1 x 4096 per frame.
 Having 16 frames in total this corresponds to an input of 16 x 4096 for both \emph{spatial} and \emph{flow} for the fusion net.
 The first step in the fusion network is to merge the 16 predictions of one video into one overall prediction for the whole video for both \emph{spatial} and \emph{flow}.
 This is done by taking the average prediction.
@@ -235,21 +234,50 @@ The whole architecture is shown in Figure~\ref{fig:early_fusion}.
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[scale=.7]{images/early_fusion.eps}
-	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one overall prediction per video each. Those predictions are then merged and trained via two fully connected layers.}
+	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one overall prediction per video each. Those predictions are then concatenated and trained via two fully connected layers.}
 	\label{fig:early_fusion}
 \end{figure}
 
-\todo[inline]{TODO: results and parameter we tried}
-
 \subsubsection{Middle Fusion}
-
+In the \emph{middle} fusion the \texttt{fc6}-layer of the CNN for \emph{spatial} and \emph{flow} is changed so that the output is 1 x 101.
+Having again 16 frames as input to the CNN the output and therefore input to the fusion is 16 x 101.
+As in the \emph{early} fusion, the 16 prediction of one video are merged into one by taking the average prediction.
+Afterwards, those predictions are trained via a fully connected layer and then concatenated.
+In the end two fully connected layers are trained with the concatenated predictions.
 
 \subsubsection{Late Fusion}
-
+As in the \emph{middle} fusion the \texttt{fc6}-layer of the CNNs is adapted so that the output is 1 x 101.
+Again 16 frames per video are used.
+A fully connected layer is trained with the output of the CNNs, before the predictions are concatenated.
+Afterwards, a fully connected layer is trained on those concatenated predictions, still leading to one prediction per frame (16 x 2048).
+Now the 16 predictions per video are merged into one prediction by taking the average.
+Finally, a fully connected layer is trained resulting in an output of 1 x 101.
+The architecture of the \emph{late} fusion is shown in Figure~\ref{fig:late_fusion}.
 
 \begin{figure}[!htb]
 	\centering
 	\includegraphics[scale=.7]{images/late_fusion.eps}
-	\caption{}
+	\caption{Late fusion architecture: The predictions of the spatial and flow net are first concatenated before they are merged into one prediction.}
 	\label{fig:late_fusion}
 \end{figure}
+
+\subsubsection{Experiments}
+
+We tested the different fusion architectures with several parameters.
+The results are listed in Table~\ref{table:fusion_results}.
+For the CNNs we used those CNNs of \emph{spatial} and \emph{flow}, which lead to the best results.
+\todo[inline]{Fusion Experimente}
+
+\begin{table}[H]
+\centering
+\caption{Fusion Net Configurations}
+\label{table:fusion_results}
+\begin{tabularx}{\textwidth}{XXXXXXXX}
+\toprule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+\bottomrule
+\end{tabularx}
+\end{table}
+
+As you can see our best overall result is 83.6\%.
+This was achieved by using the ...
