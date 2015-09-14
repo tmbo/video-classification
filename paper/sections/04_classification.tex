@@ -117,20 +117,20 @@ We experimented with different configurations of the learning rate, dropout rate
 \label{table:spatial_results}
 \begin{tabularx}{\textwidth}{XXXXXXXLX}
 \toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& Input Frames & LSTM Config\\ \midrule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS & LSTM Config \\ \midrule
 
-CNN\_M & 8          & 67.9 \% & 0.001 & 1 & 2 & 100,000  & 10 & \\
-CNN\_M & 8          & 67.2 \% & 0.001 & 1 & 2 & 31,000   & 10 & \\
-CNN\_M & 8          & 68.3 \% & 0.001 & 3 & 2 & 200,000  & 10 & \\
-CNN\_M & 8          & 68.89\% & 0.001 & 5 & 2 & 134,000  & 10 & \\
-CNN\_M & 8          & 06.19\% & 0.001 & 3 & 2 & 6,000    & 10 & \\
-CNN\_M & 8          & 69.9 \% & 0.001 & 7 & 2 & 76,000   & 10 & \\
-CNN\_M & 7 + 2 lstm & 67.5 \% & 0.001 & 7 & 3 & 180,000  & train\_lstm & 1024 + 512 \\
-CNN\_M & 7 + 2 lstm & 65.6 \% & 0.001 & 7 & 3 & 7,000    & train\_lstm & 256 + 256 \\
-CNN\_M & 7 + 2 lstm & 65.8 \% & 0.001 & 5 & 3 & 200,000  & train\_lstm & 256 + 256 \\
-CNN\_M & 7 + 1 lstm & 67.3 \% & 0.001 & 5 & 3 & 85,000   & train\_lstm & 256 \\
-CNN\_M & 7 + 1 lstm & 66.6 \% & 0.001 & 7 & 3 & 200,000  & train\_lstm & 256 \\
-CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 3 & 200,000  & train\_lstm & 256 \\
+CNN\_M & 8          & 67.90\% & 0.001 & 1 & 2 & 100,000 & 10 & \\
+CNN\_M & 8          & 67.20\% & 0.001 & 1 & 2 &  31,000 & 10 & \\
+CNN\_M & 8          & 68.30\% & 0.001 & 3 & 2 & 200,000 & 10 & \\
+CNN\_M & 8          & 68.89\% & 0.001 & 5 & 2 & 134,000 & 10 & \\
+CNN\_M & 8          & 06.19\% & 0.001 & 3 & 2 &   6,000 & 10 & \\
+CNN\_M & 8          & 69.90\% & 0.001 & 7 & 2 &  76,000 & 10 & \\
+CNN\_M & 7 + 2 lstm & 67.50\% & 0.001 & 7 & 3 & 180,000 & ?  & 1024 + 512 \\
+CNN\_M & 7 + 2 lstm & 65.60\% & 0.001 & 7 & 3 &   7,000 & ?  & 256 + 256 \\
+CNN\_M & 7 + 2 lstm & 65.80\% & 0.001 & 5 & 3 & 200,000 & ?  & 256 + 256 \\
+CNN\_M & 7 + 1 lstm & 67.30\% & 0.001 & 5 & 3 &  85,000 & ?  & 256 \\
+CNN\_M & 7 + 1 lstm & 66.60\% & 0.001 & 7 & 3 & 200,000 & ?  & 256 \\
+CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 3 & 200,000 & ?  & 256 \\
 
 \bottomrule
 \end{tabularx}
@@ -181,20 +181,20 @@ All results are listed in table \ref{table:flow_results}.
 \label{table:flow_results}
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& Frames per Video \\ \midrule
 
-CNN\_M & 8 & 55.5\%   & 0.001 & ? & ? & 2,500   & 16\_per\_video \\
-CNN\_M & 8 & 58.99\%  & 0.001 & 7 & 3 & 22,000  & all \\
-CNN\_M & 8 & 60.2\%   & 0.001 & 8 & 3 & 200,000 & all \\
-CNN\_M & 8 & 13.37\%  &  0.01 & 8 & 3 & 90,000  & all \\
-CNN\_M & 8 & 65.3\%   & 0.001 & 8 & 8 & 116,000 & all \\
-CNN\_M & 8 & 63.1\%   & 0.001 & 5 & 8 & 75,000  & all \\
-CNN\_M & 8 & 66.4\%   & 0.001 & 9 & 3 & 400,000 & all \\
-CNN\_M & 8 & 62.5\%   & 0.001 & 9 & 4 & 130,000 & all \\
-CNN\_M & 8 & 62.3\%   & 0.001 & 7 & 4 & 400,000 & all \\
-CNN\_M & 8 & 59.8\%   & 0.001 & 9 & 4 & 20,000  & all \\
-CNN\_M & 8 & 58.6\%   & 0.001 & 8 & 3 & 15,000  & all \\
-CNN\_M & 8 & 59.1\%   & 0.001 & 9 & 3 & 150,000 & all \\
+CNN\_M & 8 & 55.50\%  & 0.001 & ? & ? &   2,500 & 16\\
+CNN\_M & 8 & 58.99\%  & 0.001 & 7 & 3 &  22,000 & all \\
+CNN\_M & 8 & 60.20\%  & 0.001 & 8 & 3 & 200,000 & all \\
+CNN\_M & 8 & 13.37\%  & 0.01  & 8 & 3 &  90,000 & all \\
+CNN\_M & 8 & 65.30\%  & 0.001 & 8 & 8 & 116,000 & all \\
+CNN\_M & 8 & 63.10\%  & 0.001 & 5 & 8 &  75,000 & all \\
+CNN\_M & 8 & 66.40\%  & 0.001 & 9 & 3 & 400,000 & all \\
+CNN\_M & 8 & 62.50\%  & 0.001 & 9 & 4 & 130,000 & all \\
+CNN\_M & 8 & 62.30\%  & 0.001 & 7 & 4 & 400,000 & all \\
+CNN\_M & 8 & 59.80\%  & 0.001 & 9 & 4 &  20,000 & all \\
+CNN\_M & 8 & 58.60\%  & 0.001 & 8 & 3 &  15,000 & all \\
+CNN\_M & 8 & 59.10\%  & 0.001 & 9 & 3 & 150,000 & all \\
 
 \bottomrule
 \end{tabularx}
@@ -274,7 +274,13 @@ For the CNNs we used those CNNs of \emph{spatial} and \emph{flow}, which lead to
 \label{table:fusion_results}
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS\\ \midrule
+Architecture 		&  Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers of CNN & Iterations	& FPS & Batch Size \\ \midrule
+Early  & 83.60\%  & ? & ? & 2 & ? & ? & 16 \\
+Early  & 77.06\%  & ? & ? & 3 & ? & ? & 16 \\
+Early  & 83.60\%  & ? & ? & 2 & ? & ? & 48 \\
+Middle & 77.80\%  & ? & ? & 2 & ? & ? & 16 \\
+Late   & ??.??\%  & ? & ? & ? & ? & ? & ?? \\
+SVM           & 74.90\%  &   &   &   &   &   &    \\
 \bottomrule
 \end{tabularx}
 \end{table}
