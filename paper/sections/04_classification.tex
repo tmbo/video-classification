@@ -214,9 +214,20 @@ In the following section we will present and evaluate different network configur
 
 \subsubsection{Support Vector Machine}
 To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output.
-its own.
-\todo[inline]{Joseph}
-This approach resulted in fusion accuracy of 75\%.
+The feature vector from the \texttt{fc6}-layer from both CNNs was taken as an input, which results in 16 x 4096 features for 16 frames of one video for the SVM.
+To combine the inputs for the fully connected layer, we used a concat layer, which does not learn or change the output in any way.
+This was important since we used a SVM solution included in the Caffe software.
+For this SVM equivalent in Caffe a single fully connected layer (with no other learnable parameters) is needed, directly followed by a hinge loss layer.
+The number of outputs of the fully connected layer has to be chosen equal to the number of classes and provides the class predictions to the hinge loss layer.
+The whole net can be seen in \autoref{fig:svm_fusion}.
+This approach resulted in a fusion accuracy of 75\%.
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[scale=.7]{images/fusion_svm.eps}
+	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one overall prediction per video each. Those predictions are then concatenated and trained via two fully connected layers.}
+	\label{fig:svm_fusion}
+\end{figure}
 
 \subsubsection{Early Fusion}
 Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.
