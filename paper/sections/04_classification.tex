@@ -41,7 +41,7 @@ This is important, as there is more than one training sequence per batch.
 A tagging sequence consist of 0's and 1's.
 A 1 indicates the beginning of a new sequence.
 For generating this tagging sequence we wrote a new data-generation strategy for the \emph{DummyData} layer.
-This layer is meant to generate artificial data: Existing implementations generate constant values, uniformly distributed and gaussian distributed data etc.
+This layer is meant to generate artificial data: Existing implementations generate constant values, uniformly distributed and Gaussian distributed data etc.
 
 An example of the dummy data layer can be found in Listing~\ref{lst:seq-layer}.
 The layer has the following two parameters:
@@ -49,7 +49,7 @@ The \texttt{shape} parameter defines the output shape of the tagging blob, i.e. 
 The second parameter \texttt{data\_filler} sets the concrete parameters for the dummy data.
 In our case, we specify the tagging sequence data generation type.
 The parameter \texttt{value} specifies the length of a sequence.
-In the example, this means that there is a single one, followed by 15 zeroes.
+In the example, this means that there is a single one, followed by 15 zeros.
 
 \begin{lstlisting}[language=sh, caption=Sequence Layer, label=lst:seq-layer]
 layer {
@@ -115,9 +115,9 @@ We experimented with different configurations of the learning rate, dropout rate
 \centering
 \caption{Spatial Net Configurations}
 \label{table:spatial_results}
-\begin{tabularx}{\textwidth}{XXXXXXXLX}
+\begin{tabularx}{\textwidth}{XXXXXXXXX}
 \toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& FPS & LSTM Config \\ \midrule
+Net & Layers & Accuracy	& Learning Rate & Dropout Rate & Fine- tuned Layers	& Iterations	& FPS & LSTM Config \\ \midrule
 
 CNN\_M & 8          & 67.90\% & 0.001 & 1 & 2 & 100,000 & 10 & \\
 CNN\_M & 8          & 67.20\% & 0.001 & 1 & 2 &  31,000 & 10 & \\
@@ -135,42 +135,17 @@ CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 3 & 200,000 & ?  & 256 \\
 \bottomrule
 \end{tabularx}
 \end{table}
-
 \todo[inline]{Haben wir keine Experimente mit dem VGG19?}
 
 As you can see from the different experiments, we achieved the best result using the CNN\_M net with 8 layers.
 Having a learning rate of 0.001, a dropout rate of 7 and finetuning the last two layers results in an accuracy of 69.9\%.
-
-% \begin{itemize}
-% 	\item
-% 		Different nets:
-% 		\begin{itemize}
-% 			\item Caffenet/CNN\_M (also tried, VGG 19, but too big)
-% 			\item With weights/without weights
-% 			\item Compare the nets with respect to memory, number of parameters, training time, performance
-% 		\end{itemize}
-% 	\item
-% 		Experiments:
-% 		\begin{itemize}
-% 			\item Different dropouts
-% 			\item Train from scratch vs train from weights
-% 			\item On different splits?
-% 			\item Fc6, Fc7, fc8
-% 			\item Different base data sets (only 16, all data)
-% 			\item Different flows?
-% 			\item Occlusion tests
-% 		\end{itemize}
-% 	\item
-% 		LSTM did not work out
-% \end{itemize}
-
 
 \subsection{Flow}
 \label{subsec:flow}
 Due to the different nature of the flow data we could not rely on finetuning the same networks we used for the \emph{spatial} part, since these were trained on RGB images.
 We tried using the CNN-M-2048 architecture for training from scratch but to no avail.
 Our final approach is based a CNN-M-48 net trained on flow data by the University of Fudan \cite{wu2015modeling}.
-However, due to differences in the optical flow data to ours we achieved rather poor results of only 44\% instead of the published 70\%. \todo[inline]{confirm this number}
+However, due to differences in the optical flow data to ours we achieved rather poor results of only 44.3\% instead of the published 70\%.
 Finetuning the network on our data yielded in better performance.
 We applied the same testing configuration as described for the spatial part.
 All results are listed in table \ref{table:flow_results}.
@@ -181,7 +156,7 @@ All results are listed in table \ref{table:flow_results}.
 \label{table:flow_results}
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
-Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers	& Iterations	& Frames per Video \\ \midrule
+Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Fine- tuned Layers	& Iterations	& Frames per Video \\ \midrule
 
 CNN\_M & 8 & 55.50\%  & 0.001 & ? & ? &   2,500 & 16\\
 CNN\_M & 8 & 58.99\%  & 0.001 & 7 & 3 &  22,000 & all \\
@@ -214,23 +189,23 @@ In the following section we will present and evaluate different network configur
 
 \subsubsection{Support Vector Machine}
 To establish a baseline we applied a SVM to the respective \emph{spatial} and \emph{flow} output.
-The feature vector from the \texttt{fc6}-layer from both CNNs was taken as an input, which results in 16 x 4096 features for 16 frames of one video for the SVM.
-To combine the inputs for the fully connected layer, we used a concat layer, which does not learn or change the output in any way.
-This was important since we used a SVM solution included in the Caffe software.
+The feature vector from the \texttt{fc6}-layer from both CNNs, which results in 16 x 4096 features for 16 frames of one video each, was taken as an input to the SVM.
+To combine the inputs of the CNNs, we used a \texttt{concat}-layer, which does not learn or change the input in any way.
+For the SVM we used a solution offered by Caffe.
 For this SVM equivalent in Caffe a single fully connected layer (with no other learnable parameters) is needed, directly followed by a hinge loss layer.
 The number of outputs of the fully connected layer has to be chosen equal to the number of classes and provides the class predictions to the hinge loss layer.
-The whole net can be seen in \autoref{fig:svm_fusion}.
+The whole net can be seen in Figure~\ref{fig:svm_fusion}.
 This approach resulted in a fusion accuracy of 75\%.
 
 \begin{figure}[tb]
 	\centering
 	\includegraphics[scale=.7]{images/fusion_svm.eps}
-	\caption{Early fusion architecture: The predictions per frame of one video from the spatial and flow net are merged into one overall prediction per video each. Those predictions are then concatenated and trained via two fully connected layers.}
+	\caption{Fusion architecture using SVM: For the SVM a solution offered by Caffe consisting of a fully connected layer and a hinge loss layer was used.}
 	\label{fig:svm_fusion}
 \end{figure}
 
 \subsubsection{Early Fusion}
-Our \emph{early fusion} architecture was build on the fusion architecture presented by \todo[inline]{TODO (Wu et al?}.
+Our \emph{early fusion} architecture was build on the fusion architecture presented by Wu et al.~\cite{wu2015modeling}.
 We took the CNN\_Ms for \emph{spatial} and \emph{flow} presented above and build a fusion architecture on top of them.
 We selected 16 frames per video as described in Section~\ref{sec:data} and pass them on to the CNNs for \emph{spatial} and \emph{flow}.
 The CNNs were cut off after the \texttt{fc6}-layer resulting in an output of 1 x 4096 per frame.
@@ -277,7 +252,6 @@ The architecture of the \emph{late} fusion is shown in Figure~\ref{fig:late_fusi
 We tested the different fusion architectures with several parameters.
 The results are listed in Table~\ref{table:fusion_results}.
 For the CNNs we used those CNNs of \emph{spatial} and \emph{flow}, which lead to the best results.
-\todo[inline]{Fusion Experimente}
 
 \begin{table}[H]
 \centering
@@ -285,7 +259,7 @@ For the CNNs we used those CNNs of \emph{spatial} and \emph{flow}, which lead to
 \label{table:fusion_results}
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
-Architecture 		&  Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers of CNN & Iterations	& FPS & Batch Size \\ \midrule
+Archi- tecture 		&  Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers of CNN & Iterations	& FPS & Batch Size \\ \midrule
 Early  & 83.60\%  & ? & ? & 2 & ? & ? & 16 \\
 Early  & 77.06\%  & ? & ? & 3 & ? & ? & 16 \\
 Early  & 83.60\%  & ? & ? & 2 & ? & ? & 48 \\
@@ -295,6 +269,7 @@ SVM           & 74.90\%  &   &   &   &   &   &    \\
 \bottomrule
 \end{tabularx}
 \end{table}
+\todo[inline]{Fusion Experimente eintragen!}
 
 As you can see our best overall result is 83.6\%.
 This was achieved by using the ...
