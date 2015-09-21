@@ -119,23 +119,29 @@ We experimented with different configurations of the learning rate, dropout rate
 \toprule
 Net & Layers & Accuracy	& Learning Rate & Dropout Rate & Fine- tuned Layers	& Iterations	& FPS & LSTM Config \\ \midrule
 
-CNN\_M & 8          & 67.90\% & 0.001 & 1 & 2 & 100,000 & 10 & \\
-CNN\_M & 8          & 67.20\% & 0.001 & 1 & 2 &  31,000 & 10 & \\
-CNN\_M & 8          & 68.30\% & 0.001 & 3 & 2 & 200,000 & 10 & \\
-CNN\_M & 8          & 68.89\% & 0.001 & 5 & 2 & 134,000 & 10 & \\
-CNN\_M & 8          & 06.19\% & 0.001 & 3 & 2 &   6,000 & 10 & \\
-CNN\_M & 8          & 69.90\% & 0.001 & 7 & 2 &  76,000 & 10 & \\
-CNN\_M & 7 + 2 lstm & 67.50\% & 0.001 & 7 & 3 & 180,000 & ?  & 1024 + 512 \\
-CNN\_M & 7 + 2 lstm & 65.60\% & 0.001 & 7 & 3 &   7,000 & ?  & 256 + 256 \\
-CNN\_M & 7 + 2 lstm & 65.80\% & 0.001 & 5 & 3 & 200,000 & ?  & 256 + 256 \\
-CNN\_M & 7 + 1 lstm & 67.30\% & 0.001 & 5 & 3 &  85,000 & ?  & 256 \\
-CNN\_M & 7 + 1 lstm & 66.60\% & 0.001 & 7 & 3 & 200,000 & ?  & 256 \\
-CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 3 & 200,000 & ?  & 256 \\
+CNN\_M & 8          & 67.90\% & 0.001 & 1 & 3 & 100,000 & 15 & \\
+CNN\_M & 8          & 67.20\% & 0.001 & 1 & 3 &  31,000 & 15 & \\
+CNN\_M & 8          & 68.30\% & 0.001 & 3 & 3 & 200,000 & 15 & \\
+CNN\_M & 8          & 68.89\% & 0.001 & 5 & 3 & 134,000 & 15 & \\
+CNN\_M & 8          & 06.19\% & 0.001 & 3 & 3 &   6,000 & 15 & \\
+CNN\_M & 8          & 69.90\% & 0.001 & 7 & 3 &  76,000 & 15 & \\
+CNN\_M & 7 + 2 lstm & 67.50\% & 0.001 & 7 & 3 & 180,000 & 15 & 1024 + 512 \\
+CNN\_M & 7 + 2 lstm & 65.60\% & 0.001 & 7 & 3 &   7,000 & 15 & 256 + 256 \\
+CNN\_M & 7 + 2 lstm & 65.80\% & 0.001 & 5 & 3 & 200,000 & 15 & 256 + 256 \\
+CNN\_M & 7 + 1 lstm & 67.30\% & 0.001 & 5 & 2 &  85,000 & 15 & 256 \\
+CNN\_M & 7 + 1 lstm & 66.60\% & 0.001 & 7 & 2 & 200,000 & 15 & 256 \\
+CNN\_M & 7 + 1 lstm & 66.73\% &  0.01 & 7 & 2 & 200,000 & 15 & 256 \\
+VGG19 & 19          & 73.40\% & 0.001 & 7 & 3 &       - & 15 & \\
+VGG19 & 19          & 74.80\% & 0.001 & 7 & 4 &       - & 15 & \\
+VGG19 & 19          & 74.10\% & 0.001 & 7 & 7 &       - & 15 & \\
+VGG19 & 19          & 73.10\% & 0.001 & 7 & 3 &       - & 30 & \\
+VGG19 & 19          & 75.30\% & 0.001 & 7 & 5 &       - & 30 & \\
+VGG19 & 19          & 74.90\% & 0.001 & 7 & 6 &       - & 30 & \\
+VGG19 & 19          & 74.60\% & 0.001 & 7 & 7 &       - & 30 & \\
 
 \bottomrule
 \end{tabularx}
 \end{table}
-\todo[inline]{Haben wir keine Experimente mit dem VGG19?}
 
 As you can see from the different experiments, we achieved the best result using the CNN\_M net with 8 layers.
 Having a learning rate of 0.001, a dropout rate of 7 and finetuning the last two layers results in an accuracy of 69.9\%.
@@ -158,7 +164,7 @@ All results are listed in table \ref{table:flow_results}.
 \toprule
 Net 		& Layers	& Accuracy	& Learning Rate 	& Dropout Rate	& Fine- tuned Layers	& Iterations	& Frames per Video \\ \midrule
 
-CNN\_M & 8 & 55.50\%  & 0.001 & ? & ? &   2,500 & 16\\
+CNN\_M & 8 & 55.50\%  & 0.001 & - & - &   2,500 & 16\\
 CNN\_M & 8 & 58.99\%  & 0.001 & 7 & 3 &  22,000 & all \\
 CNN\_M & 8 & 60.20\%  & 0.001 & 8 & 3 & 200,000 & all \\
 CNN\_M & 8 & 13.37\%  & 0.01  & 8 & 3 &  90,000 & all \\
@@ -259,17 +265,18 @@ For the CNNs we used those CNNs of \emph{spatial} and \emph{flow}, which lead to
 \label{table:fusion_results}
 \begin{tabularx}{\textwidth}{XXXXXXXX}
 \toprule
-Archi- tecture 		&  Accuracy	& Learning Rate 	& Dropout Rate	& Finetuned Layers of CNN & Iterations	& FPS & Batch Size \\ \midrule
-Early  & 83.60\%  & ? & ? & 2 & ? & ? & 16 \\
-Early  & 77.06\%  & ? & ? & 3 & ? & ? & 16 \\
-Early  & 83.60\%  & ? & ? & 2 & ? & ? & 48 \\
-Middle & 77.80\%  & ? & ? & 2 & ? & ? & 16 \\
-Late   & ??.??\%  & ? & ? & ? & ? & ? & ?? \\
-SVM           & 74.90\%  &   &   &   &   &   &    \\
+Archi- tecture 		&  Accuracy	& Learning Rate 	& Dropout Rate	& Fusion Layers & Iterations	& FPS & Batch Size \\ \midrule
+Early  & 83.60\%  & 0.01  & 5 & 2 & 15 & 16 \\
+Early  & 77.80\%  & 0.001 & 5 & 3 & 15 & 16 \\
+Early  & 77.40\%  & 0.01  & 5 & 2 & 15 & 32 \\
+Early  & 83.00\%  & 0.001 & 5 & 2 & 15 & 48 \\
+Middle & 81.60\%  & 0.001 & 5 & 2 & 15 & 16 \\
+Late   & 23.00\%  & 0.001 & 5 & 2 & 15 & 16 \\
+SVM    & 74.90\%  & 0.001 & 5 & - & 15 & 16 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 \todo[inline]{Fusion Experimente eintragen!}
 
 As you can see our best overall result is 83.6\%.
-This was achieved by using the ...
+This was achieved by using the the early fusion of the best VGG19 spatial network and the best CNN\_M temporal model.
