@@ -119,14 +119,14 @@ Also, mirroring can be used to further increase the training size with the same 
 Some authors~\cite{ye2015evaluating} perform this cropping manually, by taking a clipping from each corner and from the center of the image. (see section \ref{subsec:crop_mirror_frames})
 We also tried this approach, but discarded it from our final setup, because of two reasons.
 Firstly, it massively increases the training set size making the data harder to handle and requiring more disk space.
-Secondly, the random cropping in Caffe is at least as effective as manually cropping and can save us some work.
-%COMMENT/TODO: effective ist hier ungenau (bedeutung), ausserdem hilft das feste cropping mit der Varianz der Bilder, da caffe oft in der mitte cropped
+Secondly, the random cropping in Caffe can achieve similar results and saves us some work.
+%COMMENT: das feste cropping hilft mit der Varianz der Bilder, da caffe oft in der mitte cropped
 
 \subsection{Selecting frames for the LSTM}
 For the LSTMs, we need another set of databases (spatial and flow), which contain only a fixed number of frames per video.
 We decided to use 16 frames per video, on the grounds that the LSTM implementation \footnote{\url{https://github.com/jeffdonahue/caffe/tree/recurrent}} by Jeff Donahue cannot handle arbitrarily long input sequences, especially over batches.
-From every videos' frame pool we selected these 16 frames by omitting the first and last five frames, and the equally distributing the selected frames among the remaining frames.
-%COMMENT: Ich glaube, das machen wir nicht mehr
+From every videos' frame pool we selected these 16 frames by omitting the first and last five frames, and then equally distributing the selected frames among the remaining frames.
+%COMMENT: Ich glaube wir wählen von allen Bildern aus
 By skipping some frames at the beginning and end, we avoided the fade-in/fade-out effects in some of the videos.
 For details on how to create such a selection see section \ref{subsec:listfile_to_file_ucf_static}.
 Additionally, these sets of frames are used for training the fusion network.
